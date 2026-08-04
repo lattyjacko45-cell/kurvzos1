@@ -27,6 +27,16 @@ export const ProjectStatus = {
 export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
 
 
+export const FocusSessionStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type FocusSessionStatus = (typeof FocusSessionStatus)[keyof typeof FocusSessionStatus]
+
+
 export const TaskStatus = {
   TODO: 'TODO',
   IN_PROGRESS: 'IN_PROGRESS',
@@ -45,3 +55,23 @@ export const Priority = {
 } as const
 
 export type Priority = (typeof Priority)[keyof typeof Priority]
+
+
+export const FeedbackType = {
+  BUG: 'BUG',
+  CONFUSING: 'CONFUSING',
+  MISSING_FEATURE: 'MISSING_FEATURE',
+  IMPROVEMENT: 'IMPROVEMENT'
+} as const
+
+export type FeedbackType = (typeof FeedbackType)[keyof typeof FeedbackType]
+
+
+export const FeedbackStatus = {
+  NEW: 'NEW',
+  REVIEWING: 'REVIEWING',
+  FIXED: 'FIXED',
+  DISMISSED: 'DISMISSED'
+} as const
+
+export type FeedbackStatus = (typeof FeedbackStatus)[keyof typeof FeedbackStatus]

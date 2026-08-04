@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 
 import {
@@ -16,7 +17,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import {
+  TaskStatusSelect,
+  type TaskStatus,
+} from "@/components/dashboard/task-status-select";
 export const metadata: Metadata = {
   title: "Tasks",
 };
@@ -140,9 +144,11 @@ function TaskGrid({
               <Badge variant={priorityVariants[task.priority]}>
                 {task.priority.toLowerCase()}
               </Badge>
-              <Badge variant="outline">
-                {statusLabels[task.status]}
-              </Badge>
+              <TaskStatusSelect
+  taskId={task.id}
+  status={task.status as TaskStatus}
+  />
+
             </div>
           </CardContent>
         </Card>

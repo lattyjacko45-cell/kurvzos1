@@ -69,3 +69,18 @@ export type Project = Prisma.ProjectModel
  * 
  */
 export type Task = Prisma.TaskModel
+/**
+ * Model TaskStep
+ * 
+ */
+export type TaskStep = Prisma.TaskStepModel
+/**
+ * Model FocusSession
+ * 
+ */
+export type FocusSession = Prisma.FocusSessionModel
+/**
+ * Model Feedback
+ * 
+ */
+export type Feedback = Prisma.FeedbackModel

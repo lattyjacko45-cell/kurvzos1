@@ -1,9 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   CheckSquare,
+  FileText,
   FolderKanban,
   LayoutDashboard,
   LogOut,
@@ -38,11 +40,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { FeedbackDialog } from "@/components/feedback/feedback-dialog";
 
 const iconMap = {
   LayoutDashboard,
   FolderKanban,
   CheckSquare,
+  FileText,
   Settings,
 } as const;
 
@@ -118,6 +122,14 @@ export function AppSidebar({ user }: { user: AuthUser }) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            {/* FeedbackDialog reads useSearchParams; the boundary keeps this
+                out of any future statically-rendered route. */}
+            <Suspense fallback={null}>
+              <FeedbackDialog />
+            </Suspense>
+          </SidebarMenuItem>
+
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger

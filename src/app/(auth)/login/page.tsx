@@ -12,11 +12,13 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       <Link href="/" className="mb-8 flex items-center gap-2">
-        <div className="flex size-10 items-center justify-center rounded-lg bg-primary">
-          <span className="font-bold text-primary-foreground">K</span>
+        <div className="flex size-10 items-center justify-center rounded-lg bg-black">
+          <span className="font-bold text-white">K</span>
         </div>
+
         <span className="text-xl font-semibold">{siteConfig.name}</span>
       </Link>
+
       <LoginForm />
     </div>
   );

@@ -17,6 +17,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { TASK_TEMPLATES, getTaskTemplate } from "@/config/task-templates";
+import { createTaskWithSteps } from "@/lib/task-creation";
 
 interface CreateProjectDialogProps {
   workspaceId: string;
@@ -108,15 +110,54 @@ export function CreateProjectDialog({ workspaceId }: CreateProjectDialogProps) {
 
 interface CreateTaskDialogProps {
   projects: Array<{ id: string; name: string }>;
+  /** Defaults to "New Task"; the mission card's empty state overrides it. */
+  triggerLabel?: string;
 }
 
-export function CreateTaskDialog({ projects }: CreateTaskDialogProps) {
+type CreateMode = "BLANK" | "TEMPLATE";
+
+export function CreateTaskDialog({
+  projects,
+  triggerLabel = "New Task",
+}: CreateTaskDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<CreateMode>("BLANK");
+  const [templateId, setTemplateId] = useState<string>(
+    TASK_TEMPLATES[0]?.id ?? ""
+  );
   const [title, setTitle] = useState("");
   const [projectId, setProjectId] = useState(projects[0]?.id ?? "");
   const [priority, setPriority] = useState("MEDIUM");
+
+  const selectedTemplate = mode === "TEMPLATE" ? getTaskTemplate(templateId) : null;
+
+  function resetForm() {
+    setTitle("");
+    setMode("BLANK");
+    setTemplateId(TASK_TEMPLATES[0]?.id ?? "");
+  }
+
+  /** Switching to a template suggests its title; the field stays editable. */
+  function applyMode(nextMode: CreateMode) {
+    setMode(nextMode);
+
+    if (nextMode === "BLANK") {
+      setTitle("");
+      return;
+    }
+
+    const template = getTaskTemplate(templateId);
+    if (template) setTitle(template.suggestedTitle);
+  }
+
+  function applyTemplate(nextTemplateId: string) {
+    setTemplateId(nextTemplateId);
+
+    const template = getTaskTemplate(nextTemplateId);
+    if (template) setTitle(template.suggestedTitle);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -128,20 +169,24 @@ export function CreateTaskDialog({ projects }: CreateTaskDialogProps) {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, projectId, priority }),
-      });
+      const steps = selectedTemplate ? selectedTemplate.steps : [];
+      const result = await createTaskWithSteps(
+        { title, projectId, priority },
+        steps
+      );
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to create task");
+      if (result.failedSteps.length > 0) {
+        toast.warning(
+          `Task created with ${result.stepsCreated} of ${steps.length} steps. Add the rest from the mission card.`
+        );
+      } else if (result.stepsCreated > 0) {
+        toast.success(`Task created with ${result.stepsCreated} steps!`);
+      } else {
+        toast.success("Task created!");
       }
 
-      toast.success("Task created!");
       setOpen(false);
-      setTitle("");
+      resetForm();
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -154,7 +199,7 @@ export function CreateTaskDialog({ projects }: CreateTaskDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button />}>
         <Plus className="mr-2 size-4" />
-        New Task
+        {triggerLabel}
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit}>
@@ -163,6 +208,59 @@ export function CreateTaskDialog({ projects }: CreateTaskDialogProps) {
             <DialogDescription>Add a new task to a project.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label>Start from</Label>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={mode === "BLANK" ? "default" : "outline"}
+                  onClick={() => applyMode("BLANK")}
+                  disabled={isLoading}
+                >
+                  Start Blank
+                </Button>
+
+                <Button
+                  type="button"
+                  variant={mode === "TEMPLATE" ? "default" : "outline"}
+                  onClick={() => applyMode("TEMPLATE")}
+                  disabled={isLoading}
+                >
+                  Use Template
+                </Button>
+              </div>
+            </div>
+
+            {mode === "TEMPLATE" ? (
+              <div className="space-y-2">
+                <Label htmlFor="template">Template</Label>
+                <select
+                  id="template"
+                  value={templateId}
+                  onChange={(e) => applyTemplate(e.target.value)}
+                  className="border-input bg-background flex h-8 w-full rounded-lg border px-2.5 text-sm"
+                  disabled={isLoading}
+                >
+                  {TASK_TEMPLATES.map((template) => (
+                    <option key={template.id} value={template.id}>
+                      {template.name}
+                    </option>
+                  ))}
+                </select>
+
+                {selectedTemplate ? (
+                  <ol className="mt-2 max-h-32 space-y-1 overflow-auto rounded-lg border p-3 text-xs text-muted-foreground">
+                    {selectedTemplate.steps.map((step, index) => (
+                      <li key={step} className="tabular-nums">
+                        {index + 1}. {step}
+                      </li>
+                    ))}
+                  </ol>
+                ) : null}
+              </div>
+            ) : null}
+
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input

@@ -84,3 +84,62 @@ export async function GET() {
 
   return NextResponse.json(tasks);
 }
+const updateTaskStatusSchema = z.object({
+  taskId: z.string().uuid(),
+  status: z.enum(["TODO", "IN_PROGRESS", "REVIEW", "DONE"]),
+});
+
+export async function PATCH(request: Request) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const data = updateTaskStatusSchema.parse(body);
+
+    const profile = await ensureProfile(
+      user.id,
+      user.email,
+      user.fullName ?? undefined
+    );
+
+    const task = await prisma.task.findFirst({
+      where: {
+        id: data.taskId,
+        project: {
+          workspace: {
+            members: {
+              some: { profileId: profile.id },
+            },
+          },
+        },
+      },
+    });
+
+    if (!task) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    const updatedTask = await prisma.task.update({
+      where: { id: data.taskId },
+      data: { status: data.status },
+    });
+
+    return NextResponse.json(updatedTask);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: err.issues[0].message },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
