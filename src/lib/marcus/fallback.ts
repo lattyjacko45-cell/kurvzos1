@@ -1,3 +1,4 @@
+import { hasSpendingMandate } from "@/lib/marcus/safety";
 import type { MarcusAnswer, MarcusContext } from "@/lib/marcus/types";
 
 /**
@@ -53,25 +54,38 @@ export function buildMarcusFallback(
     financials.marketingPercentOfRevenue !== null &&
     financials.marketingPercentOfRevenue > HIGH_MARKETING_SHARE;
 
-  // Priority follows the most binding constraint.
+  // Without a stated budget or reserve we cannot know what is safe to spend,
+  // so no recommendation may name an amount.
+  const mandated = hasSpendingMandate(context);
+
+  // Unpublished or unscheduled work means the constraint is execution, not
+  // funding — and finishing it costs nothing.
+  const unfinishedContent = content.inProgress > 0;
+
   let financialPriority: string;
   let investmentRecommendation: string;
 
   if (shortRunway) {
     financialPriority = "Extend runway";
-    investmentRecommendation = `Hold spending flat and cut the largest non-essential cost this month. At ${financials.monthlyBurn} a month against ${financials.availableCash} on hand, protecting cash outranks any new investment.`;
+    investmentRecommendation = `Hold spending flat and cut the largest non-essential cost this month. With ${financials.monthlyBurn} a month going out, protecting the cash balance outranks any new commitment.`;
   } else if (!financials.isCashFlowPositive) {
     financialPriority = "Return to positive cash flow";
     investmentRecommendation = `Close the gap between ${financials.revenue} in revenue and ${financials.operatingExpenses} in operating costs before committing to anything new.`;
+  } else if (unfinishedContent) {
+    // The example case: money is not the bottleneck, unfinished work is.
+    financialPriority = "Finish what is already built before spending";
+    investmentRecommendation = `Protect the ${financials.availableCash} cash balance. Complete and publish the ${content.inProgress === 1 ? "content item" : `${content.inProgress} content items`} already in progress before committing any promotion spend, then evaluate whether a small test budget is justified.`;
   } else if (highMarketing) {
     financialPriority = "Check what marketing spend is buying";
-    investmentRecommendation = `Marketing is ${financials.marketingPercentOfRevenue}% of revenue. Hold it at the current level for one more month and compare published output before increasing it.`;
-  } else if (financials.revenueGap !== null && financials.revenueGap !== "0") {
-    financialPriority = "Close the revenue gap";
-    investmentRecommendation = `You are ${financials.revenueGap} short of target. Put the next unit of spend behind whatever most directly produces revenue rather than new overhead.`;
+    investmentRecommendation = `Marketing is ${financials.marketingPercentOfRevenue}% of revenue. Hold it at the current level for one more month and compare it against what actually published before changing it.`;
+  } else if (financials.revenueGap !== null) {
+    financialPriority = "Work the revenue gap without new spend";
+    investmentRecommendation = mandated
+      ? `You are ${financials.revenueGap} short of target. Keep any spend inside the budget you set, and put it behind work that already exists rather than new overhead.`
+      : `You are ${financials.revenueGap} short of target. Set a spending budget or a minimum cash reserve first — until then the safe amount to invest cannot be determined, so prefer no-cost execution.`;
   } else {
     financialPriority = "Protect the current position";
-    investmentRecommendation = `The month is cash-flow positive at ${financials.netCashFlow}. Set aside a portion of that surplus before increasing any recurring commitment.`;
+    investmentRecommendation = `The month is cash-flow positive at ${financials.netCashFlow}. Hold the surplus rather than adding a recurring commitment against it.`;
   }
 
   const costToWatch = highMarketing
@@ -82,13 +96,15 @@ export function buildMarcusFallback(
         ? "You have unresolved feedback mentioning cost or pricing — worth reviewing before it becomes a commitment."
         : null;
 
+  // Grounded phrasing only: KurvzOS has no attribution or conversion data, so
+  // nothing here may promise that content produces revenue.
   const revenueOpportunity =
     content.published > 0
-      ? `${content.published} published content ${content.published === 1 ? "item" : "items"} already exist — the cheapest revenue work is usually making existing output easier to buy from.`
+      ? `${content.published} published content ${content.published === 1 ? "item" : "items"} already exist — making them easier to act on creates an asset that could later support revenue, at no additional cost.`
       : content.scheduled > 0
-        ? `${content.scheduled} scheduled ${content.scheduled === 1 ? "item" : "items"} will publish soon; decide now what action you want that audience to take.`
+        ? `${content.scheduled} scheduled ${content.scheduled === 1 ? "item" : "items"} will publish soon. Deciding now what action you want from that audience tests whether this content contributes to the revenue goal.`
         : leadProject
-          ? `“${leadProject.name}” carries the most active work and is the clearest candidate to turn into revenue.`
+          ? `“${leadProject.name}” carries the most active work, so it is the clearest place to test whether current effort contributes to the revenue goal.`
           : null;
 
   const financialRisk = shortRunway

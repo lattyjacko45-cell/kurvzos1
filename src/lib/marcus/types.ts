@@ -94,6 +94,16 @@ export interface MarcusContext {
   } | null;
   /** Named explicitly so Marcus can say what is missing rather than guess. */
   missingFinancialData: string[];
+  /**
+   * What the user has said is safe to spend or hold back. Null means unknown —
+   * in which case no dollar recommendation may be made at all.
+   */
+  spendingMandate: {
+    budget: string | null;
+    minimumReserve: string | null;
+    budgetCents: number | null;
+    minimumReserveCents: number | null;
+  } | null;
   projects: Array<{
     name: string;
     status: string;

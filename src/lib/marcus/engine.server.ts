@@ -9,6 +9,10 @@ import { humanizeAdvice } from "@/lib/executives/language";
 import { buildMarcusContext } from "@/lib/marcus/context.server";
 import { buildMarcusFallback } from "@/lib/marcus/fallback";
 import {
+  findFinancialSafetyViolations,
+  groundAdviceLanguage,
+} from "@/lib/marcus/safety";
+import {
   MARCUS_SYSTEM_PROMPT,
   buildMarcusUserPrompt,
 } from "@/lib/marcus/prompt";
@@ -66,7 +70,24 @@ export async function runMarcus(
         validator: marcusAnswerSchema,
       });
 
-      result = { advice, source: "AI" };
+      // Schema-valid is not the same as financially safe. A response that
+      // treats the balance as spendable, names an unsupported amount, or
+      // promises revenue is rejected outright rather than edited — a softened
+      // version of unsafe advice is still unsafe advice.
+      const violations = findFinancialSafetyViolations(advice, context);
+
+      if (violations.length > 0) {
+        logMarcusFallback("financial-safety", violations.join(", "));
+
+        result = {
+          advice: buildMarcusFallback(context, question),
+          source: "FALLBACK",
+          fallbackReason:
+            "The model response did not meet Marcus's financial safety rules.",
+        };
+      } else {
+        result = { advice, source: "AI" };
+      }
     } catch (error) {
       logMarcusFallback(
         error instanceof AiRequestError
@@ -84,7 +105,12 @@ export async function runMarcus(
     }
   }
 
-  result = { ...result, advice: humanizeAdvice(result.advice) };
+  // Language cleanup runs on both paths: field-name hygiene, then grounded
+  // financial phrasing.
+  result = {
+    ...result,
+    advice: groundAdviceLanguage(humanizeAdvice(result.advice)),
+  };
 
   await prisma.executiveConversation.create({
     data: {

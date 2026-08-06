@@ -15,6 +15,7 @@ import {
   formatPeriod,
   monthStart,
 } from "@/lib/finance/money";
+import { parseSpendingMandate } from "@/lib/marcus/safety";
 import type { MarcusContext } from "@/lib/marcus/types";
 
 /**
@@ -108,6 +109,15 @@ export async function buildMarcusContext(
 
   let financials: MarcusContext["financials"] = null;
 
+  // Read from notes in a strict form; there is no dedicated column yet.
+  const mandate = parseSpendingMandate(snapshot?.notes);
+
+  if (!mandate) {
+    missingFinancialData.push(
+      "No spending budget or minimum cash reserve has been set, so a safe amount to invest cannot be determined."
+    );
+  }
+
   if (!snapshot) {
     missingFinancialData.push(
       "No financial snapshot has been entered for this month."
@@ -188,6 +198,23 @@ export async function buildMarcusContext(
     generatedAt: now.toISOString(),
     financials,
     missingFinancialData,
+    spendingMandate: mandate
+      ? {
+          budget:
+            mandate.budgetCents !== null
+              ? formatCents(mandate.budgetCents, snapshot?.currency ?? "USD")
+              : null,
+          minimumReserve:
+            mandate.minimumReserveCents !== null
+              ? formatCents(
+                  mandate.minimumReserveCents,
+                  snapshot?.currency ?? "USD"
+                )
+              : null,
+          budgetCents: mandate.budgetCents,
+          minimumReserveCents: mandate.minimumReserveCents,
+        }
+      : null,
     projects: packet.projects.map((project) => ({
       name: project.name,
       status: PROJECT_STATUS_LABELS[project.status] ?? "unknown",

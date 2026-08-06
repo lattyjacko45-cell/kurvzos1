@@ -3,6 +3,10 @@ import { buildMarcusContext } from "@/lib/marcus/context.server";
 import { getLatestMarcusAdvice } from "@/lib/marcus/engine.server";
 import { buildMarcusFallback } from "@/lib/marcus/fallback";
 import {
+  findFinancialSafetyViolations,
+  groundAdviceLanguage,
+} from "@/lib/marcus/safety";
+import {
   isMarcusContextStale,
   parseStoredMarcusContext,
 } from "@/lib/marcus/staleness";
@@ -42,24 +46,29 @@ export async function getMarcusView(
   const stale = isMarcusContextStale(savedContext, context);
 
   if (!stale && savedAdvice?.success) {
-    const source: MarcusSource =
-      latest &&
-      typeof latest.response === "object" &&
-      latest.response !== null &&
-      (latest.response as { source?: unknown }).source === "AI"
-        ? "AI"
-        : "FALLBACK";
+    const stored = groundAdviceLanguage(humanizeAdvice(savedAdvice.data));
 
-    return {
-      advice: humanizeAdvice(savedAdvice.data),
-      source,
-      wasStale: false,
-      context,
-    };
+    // Rows written before the safety rules existed are re-checked on read, so
+    // unsafe advice cannot resurface from history.
+    const violations = findFinancialSafetyViolations(stored, context);
+
+    if (violations.length === 0) {
+      const source: MarcusSource =
+        latest &&
+        typeof latest.response === "object" &&
+        latest.response !== null &&
+        (latest.response as { source?: unknown }).source === "AI"
+          ? "AI"
+          : "FALLBACK";
+
+      return { advice: stored, source, wasStale: false, context };
+    }
   }
 
   return {
-    advice: humanizeAdvice(buildMarcusFallback(context, null)),
+    advice: groundAdviceLanguage(
+      humanizeAdvice(buildMarcusFallback(context, null))
+    ),
     source: "FALLBACK",
     wasStale: Boolean(latest),
     context,

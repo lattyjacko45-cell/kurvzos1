@@ -31,6 +31,17 @@ export const marcusContextSchema = z.object({
     })
     .nullable(),
   missingFinancialData: z.array(z.string()),
+  // Optional so snapshots written before spending mandates existed still parse
+  // rather than being discarded wholesale.
+  spendingMandate: z
+    .object({
+      budget: z.string().nullable(),
+      minimumReserve: z.string().nullable(),
+      budgetCents: z.number().nullable(),
+      minimumReserveCents: z.number().nullable(),
+    })
+    .nullable()
+    .optional(),
   projects: z.array(
     z.object({
       name: z.string(),
@@ -87,6 +98,9 @@ function financialSignature(context: MarcusContext): string {
     f.marketingSpend,
     f.availableCash,
     f.targetRevenue ?? "-",
+    // A newly stated budget or reserve changes what Marcus may recommend.
+    context.spendingMandate?.budget ?? "-",
+    context.spendingMandate?.minimumReserve ?? "-",
   ].join("~");
 }
 

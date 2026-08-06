@@ -6,6 +6,7 @@ import { getCurrentUser, ensureProfile, getUserWorkspace } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getAiSetupState } from "@/lib/ai/provider";
 import { humanizeAdvice } from "@/lib/executives/language";
+import { groundAdviceLanguage } from "@/lib/marcus/safety";
 import { formatPeriod, monthStart } from "@/lib/finance/money";
 import { getRecentMarcusConversations } from "@/lib/marcus/engine.server";
 import { getMarcusView } from "@/lib/marcus/view.server";
@@ -38,7 +39,11 @@ function readStoredAdvice(
       ? "AI"
       : "FALLBACK";
 
-  return { advice: humanizeAdvice(parsed.data), source };
+  // History is language-cleaned and grounded on the way out too.
+  return {
+    advice: groundAdviceLanguage(humanizeAdvice(parsed.data)),
+    source,
+  };
 }
 
 export default async function MarcusPage() {
