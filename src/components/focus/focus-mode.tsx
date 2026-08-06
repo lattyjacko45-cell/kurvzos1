@@ -174,6 +174,9 @@ export function FocusMode({
 
     const minutes = ended.durationMinutes ?? toDurationMinutes(elapsedSeconds);
 
+    // A completed focus session changes Olivia's read of execution rhythm.
+    scheduleHarperRefresh();
+
     setIsLeaving(true);
     router.push(`/dashboard?focusMinutes=${minutes}`);
     router.refresh();

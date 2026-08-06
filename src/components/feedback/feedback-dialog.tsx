@@ -18,6 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
+import { useExecutiveAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 
 export const FEEDBACK_TYPE_LABELS = {
   BUG: "Bug",
@@ -49,6 +50,7 @@ export function FeedbackDialog() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const scheduleExecutiveRefresh = useExecutiveAutoRefresh();
 
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +85,8 @@ export function FeedbackDialog() {
       }
 
       toast.success("Feedback sent. Thank you!");
+      // Unresolved feedback is one of Olivia's friction signals.
+      scheduleExecutiveRefresh();
       setOpen(false);
       setDescription("");
       setType("BUG");

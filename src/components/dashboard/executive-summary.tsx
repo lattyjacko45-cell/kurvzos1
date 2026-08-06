@@ -6,6 +6,7 @@ interface ExecutiveSummaryProps {
   harperNextMove: string;
   reneeStrategicPriority: string;
   sophiaMarketingPriority: string;
+  oliviaOperationsPriority: string;
 }
 
 interface ExecutiveCellProps {
@@ -54,6 +55,7 @@ export function ExecutiveSummary({
   harperNextMove,
   reneeStrategicPriority,
   sophiaMarketingPriority,
+  oliviaOperationsPriority,
 }: ExecutiveSummaryProps) {
   return (
     <section
@@ -67,7 +69,9 @@ export function ExecutiveSummary({
         Executive Team
       </h2>
 
-      <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {/* One column on phones, two on tablets, four on wide screens — the
+          cells stay readable rather than collapsing to slivers. */}
+      <div className="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <ExecutiveCell
           label="Harper · next move"
           value={harperNextMove}
@@ -87,6 +91,13 @@ export function ExecutiveSummary({
           value={sophiaMarketingPriority}
           href="/executive-team/sophia"
           action="Open Sophia"
+        />
+
+        <ExecutiveCell
+          label="Olivia · operations priority"
+          value={oliviaOperationsPriority}
+          href="/executive-team/olivia"
+          action="Open Olivia"
         />
       </div>
     </section>

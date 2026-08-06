@@ -10,8 +10,9 @@ import { useRouter } from "next/navigation";
  * change was significant enough to spend a model call. Harper cares about
  * execution — the mission and its checklist. Renee cares about the portfolio —
  * projects, weekly priority, shipped content. Sophia cares about the pipeline —
- * content stages, the schedule, publishing cadence. The same user action can
- * therefore be significant to one and not the others.
+ * content stages, the schedule, publishing cadence. Olivia cares about the
+ * shape of the work — stages, staleness, handoffs, focus sessions. The same
+ * user action can therefore be significant to one and not the others.
  *
  * Three layers stop duplicate spend:
  *  1. Here — a debounce plus an in-flight guard, so a burst of clicks produces
@@ -26,6 +27,7 @@ const AUTO_REFRESH_ENDPOINTS = [
   "/api/harper/auto",
   "/api/renee/auto",
   "/api/sophia/auto",
+  "/api/olivia/auto",
 ] as const;
 
 export function useHarperAutoRefresh(delayMs = 1200): () => void {

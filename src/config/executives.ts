@@ -44,10 +44,11 @@ export const EXECUTIVES: readonly ExecutiveProfile[] = [
   {
     id: "OLIVIA",
     name: "Olivia",
-    role: "Operations Lead",
-    description: "Watches capacity, workload and delivery risk.",
-    href: null,
-    active: false,
+    role: "Chief Operations Officer",
+    description:
+      "Finds what is slowing execution down and how the process should change.",
+    href: "/executive-team/olivia",
+    active: true,
   },
   {
     id: "MARCUS",

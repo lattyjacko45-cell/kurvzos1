@@ -61,6 +61,28 @@ const FIELD_LABELS: Record<string, string> = {
   marketingFeedback: "marketing feedback",
   latestReneeStrategicPriority: "Renee's latest strategic priority",
 
+  // Olivia's context and advice
+  operationsPriority: "operations priority",
+  currentBottleneck: "current bottleneck",
+  processRecommendation: "process recommendation",
+  systemOrDelegationOpportunity: "system or delegation opportunity",
+  operationsRisk: "operations risk",
+  tasksByStage: "tasks by stage",
+  stalledTasks: "stalled tasks",
+  finishedButOpenTasks: "finished but still open tasks",
+  tasksWithoutChecklist: "tasks without a checklist",
+  overdueTasks: "overdue tasks",
+  daysSinceUpdate: "days since the last update",
+  daysSinceActivity: "days since the last activity",
+  daysOverdue: "days overdue",
+  checklistProgress: "checklist progress",
+  tasksWithChecklist: "tasks with a checklist",
+  averagePercentComplete: "average percent complete",
+  hasActionableWork: "has actionable work",
+  averageSessionMinutes: "average session length in minutes",
+  averageMinutesPerCompletedTask: "average minutes per completed task",
+  latestSophiaMarketingPriority: "Sophia's latest marketing priority",
+
   // Shared execution vocabulary
   currentPriority: "current priority",
   nextMove: "next move",
@@ -151,6 +173,16 @@ const DOMAIN_WORDS = [
   "formats",
   "draft",
   "drafts",
+  "operations",
+  "bottleneck",
+  "process",
+  "stage",
+  "stages",
+  "stalled",
+  "overdue",
+  "checklist",
+  "delegation",
+  "workload",
 ];
 
 function splitCamelCase(token: string): string {
