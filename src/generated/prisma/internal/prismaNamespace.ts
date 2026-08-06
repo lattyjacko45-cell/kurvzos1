@@ -400,6 +400,7 @@ export const ModelName = {
   Feedback: 'Feedback',
   ContentItem: 'ContentItem',
   ExecutiveConversation: 'ExecutiveConversation',
+  FinancialSnapshot: 'FinancialSnapshot',
   YouTubeConnection: 'YouTubeConnection'
 } as const
 
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback" | "contentItem" | "executiveConversation" | "youTubeConnection"
+    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback" | "contentItem" | "executiveConversation" | "financialSnapshot" | "youTubeConnection"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1160,6 +1161,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FinancialSnapshot: {
+      payload: Prisma.$FinancialSnapshotPayload<ExtArgs>
+      fields: Prisma.FinancialSnapshotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FinancialSnapshotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FinancialSnapshotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>
+        }
+        findFirst: {
+          args: Prisma.FinancialSnapshotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FinancialSnapshotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>
+        }
+        findMany: {
+          args: Prisma.FinancialSnapshotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>[]
+        }
+        create: {
+          args: Prisma.FinancialSnapshotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>
+        }
+        createMany: {
+          args: Prisma.FinancialSnapshotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FinancialSnapshotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>[]
+        }
+        delete: {
+          args: Prisma.FinancialSnapshotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>
+        }
+        update: {
+          args: Prisma.FinancialSnapshotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>
+        }
+        deleteMany: {
+          args: Prisma.FinancialSnapshotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FinancialSnapshotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FinancialSnapshotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>[]
+        }
+        upsert: {
+          args: Prisma.FinancialSnapshotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinancialSnapshotPayload>
+        }
+        aggregate: {
+          args: Prisma.FinancialSnapshotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFinancialSnapshot>
+        }
+        groupBy: {
+          args: Prisma.FinancialSnapshotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FinancialSnapshotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FinancialSnapshotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FinancialSnapshotCountAggregateOutputType> | number
+        }
+      }
+    }
     YouTubeConnection: {
       payload: Prisma.$YouTubeConnectionPayload<ExtArgs>
       fields: Prisma.YouTubeConnectionFieldRefs
@@ -1421,6 +1496,24 @@ export const ExecutiveConversationScalarFieldEnum = {
 } as const
 
 export type ExecutiveConversationScalarFieldEnum = (typeof ExecutiveConversationScalarFieldEnum)[keyof typeof ExecutiveConversationScalarFieldEnum]
+
+
+export const FinancialSnapshotScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  periodStart: 'periodStart',
+  currency: 'currency',
+  revenueCents: 'revenueCents',
+  operatingExpensesCents: 'operatingExpensesCents',
+  marketingSpendCents: 'marketingSpendCents',
+  availableCashCents: 'availableCashCents',
+  targetRevenueCents: 'targetRevenueCents',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FinancialSnapshotScalarFieldEnum = (typeof FinancialSnapshotScalarFieldEnum)[keyof typeof FinancialSnapshotScalarFieldEnum]
 
 
 export const YouTubeConnectionScalarFieldEnum = {
@@ -1796,6 +1889,7 @@ export type GlobalOmitConfig = {
   feedback?: Prisma.FeedbackOmit
   contentItem?: Prisma.ContentItemOmit
   executiveConversation?: Prisma.ExecutiveConversationOmit
+  financialSnapshot?: Prisma.FinancialSnapshotOmit
   youTubeConnection?: Prisma.YouTubeConnectionOmit
 }
 

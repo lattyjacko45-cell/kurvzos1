@@ -28,6 +28,7 @@ const AUTO_REFRESH_ENDPOINTS = [
   "/api/renee/auto",
   "/api/sophia/auto",
   "/api/olivia/auto",
+  "/api/marcus/auto",
 ] as const;
 
 export function useHarperAutoRefresh(delayMs = 1200): () => void {

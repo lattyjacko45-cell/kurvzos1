@@ -203,6 +203,7 @@ export type ProfileWhereInput = {
   contentItems?: Prisma.ContentItemListRelationFilter
   youtubeConnection?: Prisma.XOR<Prisma.YouTubeConnectionNullableScalarRelationFilter, Prisma.YouTubeConnectionWhereInput> | null
   executiveConversations?: Prisma.ExecutiveConversationListRelationFilter
+  financialSnapshots?: Prisma.FinancialSnapshotListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   workspaceMembers?: Prisma.WorkspaceMemberListRelationFilter
 }
@@ -220,6 +221,7 @@ export type ProfileOrderByWithRelationInput = {
   contentItems?: Prisma.ContentItemOrderByRelationAggregateInput
   youtubeConnection?: Prisma.YouTubeConnectionOrderByWithRelationInput
   executiveConversations?: Prisma.ExecutiveConversationOrderByRelationAggregateInput
+  financialSnapshots?: Prisma.FinancialSnapshotOrderByRelationAggregateInput
   assignedTasks?: Prisma.TaskOrderByRelationAggregateInput
   workspaceMembers?: Prisma.WorkspaceMemberOrderByRelationAggregateInput
 }
@@ -240,6 +242,7 @@ export type ProfileWhereUniqueInput = Prisma.AtLeast<{
   contentItems?: Prisma.ContentItemListRelationFilter
   youtubeConnection?: Prisma.XOR<Prisma.YouTubeConnectionNullableScalarRelationFilter, Prisma.YouTubeConnectionWhereInput> | null
   executiveConversations?: Prisma.ExecutiveConversationListRelationFilter
+  financialSnapshots?: Prisma.FinancialSnapshotListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   workspaceMembers?: Prisma.WorkspaceMemberListRelationFilter
 }, "id" | "userId">
@@ -283,6 +286,7 @@ export type ProfileCreateInput = {
   contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -300,6 +304,7 @@ export type ProfileUncheckedCreateInput = {
   contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -317,6 +322,7 @@ export type ProfileUpdateInput = {
   contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -334,6 +340,7 @@ export type ProfileUncheckedUpdateInput = {
   contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -506,6 +513,20 @@ export type ProfileUpdateOneRequiredWithoutExecutiveConversationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutExecutiveConversationsInput, Prisma.ProfileUpdateWithoutExecutiveConversationsInput>, Prisma.ProfileUncheckedUpdateWithoutExecutiveConversationsInput>
 }
 
+export type ProfileCreateNestedOneWithoutFinancialSnapshotsInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutFinancialSnapshotsInput, Prisma.ProfileUncheckedCreateWithoutFinancialSnapshotsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutFinancialSnapshotsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+}
+
+export type ProfileUpdateOneRequiredWithoutFinancialSnapshotsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutFinancialSnapshotsInput, Prisma.ProfileUncheckedCreateWithoutFinancialSnapshotsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutFinancialSnapshotsInput
+  upsert?: Prisma.ProfileUpsertWithoutFinancialSnapshotsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutFinancialSnapshotsInput, Prisma.ProfileUpdateWithoutFinancialSnapshotsInput>, Prisma.ProfileUncheckedUpdateWithoutFinancialSnapshotsInput>
+}
+
 export type ProfileCreateNestedOneWithoutYoutubeConnectionInput = {
   create?: Prisma.XOR<Prisma.ProfileCreateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedCreateWithoutYoutubeConnectionInput>
   connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutYoutubeConnectionInput
@@ -533,6 +554,7 @@ export type ProfileCreateWithoutWorkspaceMembersInput = {
   contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
 }
 
@@ -549,6 +571,7 @@ export type ProfileUncheckedCreateWithoutWorkspaceMembersInput = {
   contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
 }
 
@@ -581,6 +604,7 @@ export type ProfileUpdateWithoutWorkspaceMembersInput = {
   contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
 }
 
@@ -597,6 +621,7 @@ export type ProfileUncheckedUpdateWithoutWorkspaceMembersInput = {
   contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
 }
 
@@ -613,6 +638,7 @@ export type ProfileCreateWithoutAssignedTasksInput = {
   contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
 
@@ -629,6 +655,7 @@ export type ProfileUncheckedCreateWithoutAssignedTasksInput = {
   contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
 
@@ -661,6 +688,7 @@ export type ProfileUpdateWithoutAssignedTasksInput = {
   contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
 
@@ -677,6 +705,7 @@ export type ProfileUncheckedUpdateWithoutAssignedTasksInput = {
   contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
 
@@ -692,6 +721,7 @@ export type ProfileCreateWithoutFocusSessionsInput = {
   contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -708,6 +738,7 @@ export type ProfileUncheckedCreateWithoutFocusSessionsInput = {
   contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -740,6 +771,7 @@ export type ProfileUpdateWithoutFocusSessionsInput = {
   contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -756,6 +788,7 @@ export type ProfileUncheckedUpdateWithoutFocusSessionsInput = {
   contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -772,6 +805,7 @@ export type ProfileCreateWithoutFeedbackInput = {
   contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -788,6 +822,7 @@ export type ProfileUncheckedCreateWithoutFeedbackInput = {
   contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -820,6 +855,7 @@ export type ProfileUpdateWithoutFeedbackInput = {
   contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -836,6 +872,7 @@ export type ProfileUncheckedUpdateWithoutFeedbackInput = {
   contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -852,6 +889,7 @@ export type ProfileCreateWithoutContentItemsInput = {
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -868,6 +906,7 @@ export type ProfileUncheckedCreateWithoutContentItemsInput = {
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -900,6 +939,7 @@ export type ProfileUpdateWithoutContentItemsInput = {
   feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -916,6 +956,7 @@ export type ProfileUncheckedUpdateWithoutContentItemsInput = {
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -932,6 +973,7 @@ export type ProfileCreateWithoutExecutiveConversationsInput = {
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
   contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -948,6 +990,7 @@ export type ProfileUncheckedCreateWithoutExecutiveConversationsInput = {
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
   contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -980,6 +1023,7 @@ export type ProfileUpdateWithoutExecutiveConversationsInput = {
   feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
   contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -996,6 +1040,91 @@ export type ProfileUncheckedUpdateWithoutExecutiveConversationsInput = {
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
   contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
   youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileCreateWithoutFinancialSnapshotsInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileUncheckedCreateWithoutFinancialSnapshotsInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileCreateOrConnectWithoutFinancialSnapshotsInput = {
+  where: Prisma.ProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutFinancialSnapshotsInput, Prisma.ProfileUncheckedCreateWithoutFinancialSnapshotsInput>
+}
+
+export type ProfileUpsertWithoutFinancialSnapshotsInput = {
+  update: Prisma.XOR<Prisma.ProfileUpdateWithoutFinancialSnapshotsInput, Prisma.ProfileUncheckedUpdateWithoutFinancialSnapshotsInput>
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutFinancialSnapshotsInput, Prisma.ProfileUncheckedCreateWithoutFinancialSnapshotsInput>
+  where?: Prisma.ProfileWhereInput
+}
+
+export type ProfileUpdateToOneWithWhereWithoutFinancialSnapshotsInput = {
+  where?: Prisma.ProfileWhereInput
+  data: Prisma.XOR<Prisma.ProfileUpdateWithoutFinancialSnapshotsInput, Prisma.ProfileUncheckedUpdateWithoutFinancialSnapshotsInput>
+}
+
+export type ProfileUpdateWithoutFinancialSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileUncheckedUpdateWithoutFinancialSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1012,6 +1141,7 @@ export type ProfileCreateWithoutYoutubeConnectionInput = {
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
   contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -1028,6 +1158,7 @@ export type ProfileUncheckedCreateWithoutYoutubeConnectionInput = {
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
   contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -1060,6 +1191,7 @@ export type ProfileUpdateWithoutYoutubeConnectionInput = {
   feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
   contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -1076,6 +1208,7 @@ export type ProfileUncheckedUpdateWithoutYoutubeConnectionInput = {
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
   contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1090,6 +1223,7 @@ export type ProfileCountOutputType = {
   feedback: number
   contentItems: number
   executiveConversations: number
+  financialSnapshots: number
   assignedTasks: number
   workspaceMembers: number
 }
@@ -1099,6 +1233,7 @@ export type ProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   feedback?: boolean | ProfileCountOutputTypeCountFeedbackArgs
   contentItems?: boolean | ProfileCountOutputTypeCountContentItemsArgs
   executiveConversations?: boolean | ProfileCountOutputTypeCountExecutiveConversationsArgs
+  financialSnapshots?: boolean | ProfileCountOutputTypeCountFinancialSnapshotsArgs
   assignedTasks?: boolean | ProfileCountOutputTypeCountAssignedTasksArgs
   workspaceMembers?: boolean | ProfileCountOutputTypeCountWorkspaceMembersArgs
 }
@@ -1144,6 +1279,13 @@ export type ProfileCountOutputTypeCountExecutiveConversationsArgs<ExtArgs extend
 /**
  * ProfileCountOutputType without action
  */
+export type ProfileCountOutputTypeCountFinancialSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FinancialSnapshotWhereInput
+}
+
+/**
+ * ProfileCountOutputType without action
+ */
 export type ProfileCountOutputTypeCountAssignedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TaskWhereInput
 }
@@ -1169,6 +1311,7 @@ export type ProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   contentItems?: boolean | Prisma.Profile$contentItemsArgs<ExtArgs>
   youtubeConnection?: boolean | Prisma.Profile$youtubeConnectionArgs<ExtArgs>
   executiveConversations?: boolean | Prisma.Profile$executiveConversationsArgs<ExtArgs>
+  financialSnapshots?: boolean | Prisma.Profile$financialSnapshotsArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Profile$assignedTasksArgs<ExtArgs>
   workspaceMembers?: boolean | Prisma.Profile$workspaceMembersArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -1211,6 +1354,7 @@ export type ProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   contentItems?: boolean | Prisma.Profile$contentItemsArgs<ExtArgs>
   youtubeConnection?: boolean | Prisma.Profile$youtubeConnectionArgs<ExtArgs>
   executiveConversations?: boolean | Prisma.Profile$executiveConversationsArgs<ExtArgs>
+  financialSnapshots?: boolean | Prisma.Profile$financialSnapshotsArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Profile$assignedTasksArgs<ExtArgs>
   workspaceMembers?: boolean | Prisma.Profile$workspaceMembersArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -1226,6 +1370,7 @@ export type $ProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     contentItems: Prisma.$ContentItemPayload<ExtArgs>[]
     youtubeConnection: Prisma.$YouTubeConnectionPayload<ExtArgs> | null
     executiveConversations: Prisma.$ExecutiveConversationPayload<ExtArgs>[]
+    financialSnapshots: Prisma.$FinancialSnapshotPayload<ExtArgs>[]
     assignedTasks: Prisma.$TaskPayload<ExtArgs>[]
     workspaceMembers: Prisma.$WorkspaceMemberPayload<ExtArgs>[]
   }
@@ -1636,6 +1781,7 @@ export interface Prisma__ProfileClient<T, Null = never, ExtArgs extends runtime.
   contentItems<T extends Prisma.Profile$contentItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$contentItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   youtubeConnection<T extends Prisma.Profile$youtubeConnectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$youtubeConnectionArgs<ExtArgs>>): Prisma.Prisma__YouTubeConnectionClient<runtime.Types.Result.GetResult<Prisma.$YouTubeConnectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   executiveConversations<T extends Prisma.Profile$executiveConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$executiveConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExecutiveConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  financialSnapshots<T extends Prisma.Profile$financialSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$financialSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FinancialSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedTasks<T extends Prisma.Profile$assignedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$assignedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workspaceMembers<T extends Prisma.Profile$workspaceMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$workspaceMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2174,6 +2320,30 @@ export type Profile$executiveConversationsArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.ExecutiveConversationScalarFieldEnum | Prisma.ExecutiveConversationScalarFieldEnum[]
+}
+
+/**
+ * Profile.financialSnapshots
+ */
+export type Profile$financialSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FinancialSnapshot
+   */
+  select?: Prisma.FinancialSnapshotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FinancialSnapshot
+   */
+  omit?: Prisma.FinancialSnapshotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FinancialSnapshotInclude<ExtArgs> | null
+  where?: Prisma.FinancialSnapshotWhereInput
+  orderBy?: Prisma.FinancialSnapshotOrderByWithRelationInput | Prisma.FinancialSnapshotOrderByWithRelationInput[]
+  cursor?: Prisma.FinancialSnapshotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FinancialSnapshotScalarFieldEnum | Prisma.FinancialSnapshotScalarFieldEnum[]
 }
 
 /**

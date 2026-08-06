@@ -95,6 +95,15 @@ export type ContentItem = Prisma.ContentItemModel
  */
 export type ExecutiveConversation = Prisma.ExecutiveConversationModel
 /**
+ * Model FinancialSnapshot
+ * *
+ *  * A manually entered monthly financial position.
+ *  *
+ *  * Money is stored as integer cents to avoid float drift. There is no bank or
+ *  * payment-processor connection — every figure here is typed by the user.
+ */
+export type FinancialSnapshot = Prisma.FinancialSnapshotModel
+/**
  * Model YouTubeConnection
  * 
  */

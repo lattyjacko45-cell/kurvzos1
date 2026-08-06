@@ -17,6 +17,7 @@ import { getHarperView } from "@/lib/harper/view.server";
 import { getReneeView } from "@/lib/renee/view.server";
 import { getSophiaView } from "@/lib/sophia/view.server";
 import { getOliviaView } from "@/lib/olivia/view.server";
+import { getMarcusView } from "@/lib/marcus/view.server";
 import { ExecutiveSummary } from "@/components/dashboard/executive-summary";
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default async function DashboardPage() {
     reneeView,
     sophiaView,
     oliviaView,
+    marcusView,
     projects,
     tasks,
   ] = await Promise.all([
@@ -52,6 +54,7 @@ export default async function DashboardPage() {
       getReneeView(profile.id, workspace.id),
       getSophiaView(profile.id, workspace.id),
       getOliviaView(profile.id, workspace.id),
+      getMarcusView(profile.id, workspace.id),
       prisma.project.findMany({
         where: { workspaceId: workspace.id },
         include: { _count: { select: { tasks: true } } },
@@ -114,6 +117,7 @@ export default async function DashboardPage() {
         reneeStrategicPriority={reneeView.advice.strategicPriority}
         sophiaMarketingPriority={sophiaView.advice.marketingPriority}
         oliviaOperationsPriority={oliviaView.advice.operationsPriority}
+        marcusFinancialPriority={marcusView.advice.financialPriority}
       />
 
       <section className="grid gap-6 lg:grid-cols-[1.45fr_1fr]">

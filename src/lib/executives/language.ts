@@ -83,6 +83,27 @@ const FIELD_LABELS: Record<string, string> = {
   averageMinutesPerCompletedTask: "average minutes per completed task",
   latestSophiaMarketingPriority: "Sophia's latest marketing priority",
 
+  // Marcus's context and advice
+  financialPriority: "financial priority",
+  cashPosition: "cash position",
+  investmentRecommendation: "investment recommendation",
+  costToWatch: "cost to watch",
+  revenueOpportunity: "revenue opportunity",
+  financialRisk: "financial risk",
+  netCashFlow: "net cash flow",
+  isCashFlowPositive: "cash-flow positive",
+  revenueGap: "revenue gap",
+  targetRevenue: "revenue target",
+  availableCash: "available cash",
+  operatingExpenses: "operating expenses",
+  marketingSpend: "marketing spend",
+  marketingPercentOfRevenue: "marketing as a percentage of revenue",
+  monthlyBurn: "monthly burn",
+  runwayMonths: "months of runway",
+  missingFinancialData: "financial data not yet recorded",
+  costRelatedFeedback: "cost-related feedback",
+  latestOliviaOperationsPriority: "Olivia's latest operations priority",
+
   // Shared execution vocabulary
   currentPriority: "current priority",
   nextMove: "next move",
@@ -183,6 +204,16 @@ const DOMAIN_WORDS = [
   "checklist",
   "delegation",
   "workload",
+  "cash",
+  "revenue",
+  "financial",
+  "expenses",
+  "spend",
+  "cost",
+  "costs",
+  "runway",
+  "burn",
+  "investment",
 ];
 
 function splitCamelCase(token: string): string {

@@ -59,6 +59,7 @@ export const ModelName = {
   Feedback: 'Feedback',
   ContentItem: 'ContentItem',
   ExecutiveConversation: 'ExecutiveConversation',
+  FinancialSnapshot: 'FinancialSnapshot',
   YouTubeConnection: 'YouTubeConnection'
 } as const
 
@@ -226,6 +227,24 @@ export const ExecutiveConversationScalarFieldEnum = {
 } as const
 
 export type ExecutiveConversationScalarFieldEnum = (typeof ExecutiveConversationScalarFieldEnum)[keyof typeof ExecutiveConversationScalarFieldEnum]
+
+
+export const FinancialSnapshotScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  periodStart: 'periodStart',
+  currency: 'currency',
+  revenueCents: 'revenueCents',
+  operatingExpensesCents: 'operatingExpensesCents',
+  marketingSpendCents: 'marketingSpendCents',
+  availableCashCents: 'availableCashCents',
+  targetRevenueCents: 'targetRevenueCents',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FinancialSnapshotScalarFieldEnum = (typeof FinancialSnapshotScalarFieldEnum)[keyof typeof FinancialSnapshotScalarFieldEnum]
 
 
 export const YouTubeConnectionScalarFieldEnum = {

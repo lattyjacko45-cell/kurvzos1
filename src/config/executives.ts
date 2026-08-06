@@ -53,9 +53,10 @@ export const EXECUTIVES: readonly ExecutiveProfile[] = [
   {
     id: "MARCUS",
     name: "Marcus",
-    role: "Growth Advisor",
-    description: "Reads performance and recommends where to push next.",
-    href: null,
-    active: false,
+    role: "Chief Financial Officer",
+    description:
+      "Decides where the business should spend, save, or earn next.",
+    href: "/executive-team/marcus",
+    active: true,
   },
 ] as const;

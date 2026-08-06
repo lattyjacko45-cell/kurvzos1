@@ -21,6 +21,7 @@ model Profile {
   contentItems      ContentItem[]
   youtubeConnection YouTubeConnection?
   executiveConversations ExecutiveConversation[]
+  financialSnapshots     FinancialSnapshot[]
   assignedTasks     Task[]            @relation("TaskAssignee")
   workspaceMembers  WorkspaceMember[]
 
@@ -266,6 +267,38 @@ model ExecutiveConversation {
 
   @@index([profileId, executive, createdAt])
   @@map("executive_conversations")
+}
+
+/**
+ * A manually entered monthly financial position.
+ *
+ * Money is stored as integer cents to avoid float drift. There is no bank or
+ * payment-processor connection — every figure here is typed by the user.
+ */
+model FinancialSnapshot {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  /// First day of the month this snapshot describes.
+  periodStart DateTime @map("period_start")
+  /// ISO 4217 code, e.g. "USD".
+  currency  String   @default("USD")
+
+  revenueCents           Int  @default(0) @map("revenue_cents")
+  operatingExpensesCents Int  @default(0) @map("operating_expenses_cents")
+  marketingSpendCents    Int  @default(0) @map("marketing_spend_cents")
+  availableCashCents     Int  @default(0) @map("available_cash_cents")
+  targetRevenueCents     Int? @map("target_revenue_cents")
+
+  notes String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, periodStart])
+  @@index([profileId, periodStart])
+  @@map("financial_snapshots")
 }
 
 enum Executive {
