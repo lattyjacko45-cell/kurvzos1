@@ -200,6 +200,9 @@ export type ProfileWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Profile"> | Date | string
   focusSessions?: Prisma.FocusSessionListRelationFilter
   feedback?: Prisma.FeedbackListRelationFilter
+  contentItems?: Prisma.ContentItemListRelationFilter
+  youtubeConnection?: Prisma.XOR<Prisma.YouTubeConnectionNullableScalarRelationFilter, Prisma.YouTubeConnectionWhereInput> | null
+  executiveConversations?: Prisma.ExecutiveConversationListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   workspaceMembers?: Prisma.WorkspaceMemberListRelationFilter
 }
@@ -214,6 +217,9 @@ export type ProfileOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   focusSessions?: Prisma.FocusSessionOrderByRelationAggregateInput
   feedback?: Prisma.FeedbackOrderByRelationAggregateInput
+  contentItems?: Prisma.ContentItemOrderByRelationAggregateInput
+  youtubeConnection?: Prisma.YouTubeConnectionOrderByWithRelationInput
+  executiveConversations?: Prisma.ExecutiveConversationOrderByRelationAggregateInput
   assignedTasks?: Prisma.TaskOrderByRelationAggregateInput
   workspaceMembers?: Prisma.WorkspaceMemberOrderByRelationAggregateInput
 }
@@ -231,6 +237,9 @@ export type ProfileWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Profile"> | Date | string
   focusSessions?: Prisma.FocusSessionListRelationFilter
   feedback?: Prisma.FeedbackListRelationFilter
+  contentItems?: Prisma.ContentItemListRelationFilter
+  youtubeConnection?: Prisma.XOR<Prisma.YouTubeConnectionNullableScalarRelationFilter, Prisma.YouTubeConnectionWhereInput> | null
+  executiveConversations?: Prisma.ExecutiveConversationListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   workspaceMembers?: Prisma.WorkspaceMemberListRelationFilter
 }, "id" | "userId">
@@ -271,6 +280,9 @@ export type ProfileCreateInput = {
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -285,6 +297,9 @@ export type ProfileUncheckedCreateInput = {
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -299,6 +314,9 @@ export type ProfileUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -313,6 +331,9 @@ export type ProfileUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -457,6 +478,48 @@ export type ProfileUpdateOneRequiredWithoutFeedbackNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutFeedbackInput, Prisma.ProfileUpdateWithoutFeedbackInput>, Prisma.ProfileUncheckedUpdateWithoutFeedbackInput>
 }
 
+export type ProfileCreateNestedOneWithoutContentItemsInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutContentItemsInput, Prisma.ProfileUncheckedCreateWithoutContentItemsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutContentItemsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+}
+
+export type ProfileUpdateOneRequiredWithoutContentItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutContentItemsInput, Prisma.ProfileUncheckedCreateWithoutContentItemsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutContentItemsInput
+  upsert?: Prisma.ProfileUpsertWithoutContentItemsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutContentItemsInput, Prisma.ProfileUpdateWithoutContentItemsInput>, Prisma.ProfileUncheckedUpdateWithoutContentItemsInput>
+}
+
+export type ProfileCreateNestedOneWithoutExecutiveConversationsInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutExecutiveConversationsInput, Prisma.ProfileUncheckedCreateWithoutExecutiveConversationsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutExecutiveConversationsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+}
+
+export type ProfileUpdateOneRequiredWithoutExecutiveConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutExecutiveConversationsInput, Prisma.ProfileUncheckedCreateWithoutExecutiveConversationsInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutExecutiveConversationsInput
+  upsert?: Prisma.ProfileUpsertWithoutExecutiveConversationsInput
+  connect?: Prisma.ProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutExecutiveConversationsInput, Prisma.ProfileUpdateWithoutExecutiveConversationsInput>, Prisma.ProfileUncheckedUpdateWithoutExecutiveConversationsInput>
+}
+
+export type ProfileCreateNestedOneWithoutYoutubeConnectionInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedCreateWithoutYoutubeConnectionInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutYoutubeConnectionInput
+  connect?: Prisma.ProfileWhereUniqueInput
+}
+
+export type ProfileUpdateOneRequiredWithoutYoutubeConnectionNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedCreateWithoutYoutubeConnectionInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutYoutubeConnectionInput
+  upsert?: Prisma.ProfileUpsertWithoutYoutubeConnectionInput
+  connect?: Prisma.ProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutYoutubeConnectionInput, Prisma.ProfileUpdateWithoutYoutubeConnectionInput>, Prisma.ProfileUncheckedUpdateWithoutYoutubeConnectionInput>
+}
+
 export type ProfileCreateWithoutWorkspaceMembersInput = {
   id?: string
   userId: string
@@ -467,6 +530,9 @@ export type ProfileCreateWithoutWorkspaceMembersInput = {
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
 }
 
@@ -480,6 +546,9 @@ export type ProfileUncheckedCreateWithoutWorkspaceMembersInput = {
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
 }
 
@@ -509,6 +578,9 @@ export type ProfileUpdateWithoutWorkspaceMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
 }
 
@@ -522,6 +594,9 @@ export type ProfileUncheckedUpdateWithoutWorkspaceMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
 }
 
@@ -535,6 +610,9 @@ export type ProfileCreateWithoutAssignedTasksInput = {
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
 
@@ -548,6 +626,9 @@ export type ProfileUncheckedCreateWithoutAssignedTasksInput = {
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
 
@@ -577,6 +658,9 @@ export type ProfileUpdateWithoutAssignedTasksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
 
@@ -590,6 +674,9 @@ export type ProfileUncheckedUpdateWithoutAssignedTasksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
 
@@ -602,6 +689,9 @@ export type ProfileCreateWithoutFocusSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -615,6 +705,9 @@ export type ProfileUncheckedCreateWithoutFocusSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -644,6 +737,9 @@ export type ProfileUpdateWithoutFocusSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -657,6 +753,9 @@ export type ProfileUncheckedUpdateWithoutFocusSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -670,6 +769,9 @@ export type ProfileCreateWithoutFeedbackInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -683,6 +785,9 @@ export type ProfileUncheckedCreateWithoutFeedbackInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -712,6 +817,9 @@ export type ProfileUpdateWithoutFeedbackInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -725,6 +833,249 @@ export type ProfileUncheckedUpdateWithoutFeedbackInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileCreateWithoutContentItemsInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileUncheckedCreateWithoutContentItemsInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileCreateOrConnectWithoutContentItemsInput = {
+  where: Prisma.ProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutContentItemsInput, Prisma.ProfileUncheckedCreateWithoutContentItemsInput>
+}
+
+export type ProfileUpsertWithoutContentItemsInput = {
+  update: Prisma.XOR<Prisma.ProfileUpdateWithoutContentItemsInput, Prisma.ProfileUncheckedUpdateWithoutContentItemsInput>
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutContentItemsInput, Prisma.ProfileUncheckedCreateWithoutContentItemsInput>
+  where?: Prisma.ProfileWhereInput
+}
+
+export type ProfileUpdateToOneWithWhereWithoutContentItemsInput = {
+  where?: Prisma.ProfileWhereInput
+  data: Prisma.XOR<Prisma.ProfileUpdateWithoutContentItemsInput, Prisma.ProfileUncheckedUpdateWithoutContentItemsInput>
+}
+
+export type ProfileUpdateWithoutContentItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileUncheckedUpdateWithoutContentItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileCreateWithoutExecutiveConversationsInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileUncheckedCreateWithoutExecutiveConversationsInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileCreateOrConnectWithoutExecutiveConversationsInput = {
+  where: Prisma.ProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutExecutiveConversationsInput, Prisma.ProfileUncheckedCreateWithoutExecutiveConversationsInput>
+}
+
+export type ProfileUpsertWithoutExecutiveConversationsInput = {
+  update: Prisma.XOR<Prisma.ProfileUpdateWithoutExecutiveConversationsInput, Prisma.ProfileUncheckedUpdateWithoutExecutiveConversationsInput>
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutExecutiveConversationsInput, Prisma.ProfileUncheckedCreateWithoutExecutiveConversationsInput>
+  where?: Prisma.ProfileWhereInput
+}
+
+export type ProfileUpdateToOneWithWhereWithoutExecutiveConversationsInput = {
+  where?: Prisma.ProfileWhereInput
+  data: Prisma.XOR<Prisma.ProfileUpdateWithoutExecutiveConversationsInput, Prisma.ProfileUncheckedUpdateWithoutExecutiveConversationsInput>
+}
+
+export type ProfileUpdateWithoutExecutiveConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileUncheckedUpdateWithoutExecutiveConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileCreateWithoutYoutubeConnectionInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileUncheckedCreateWithoutYoutubeConnectionInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileCreateOrConnectWithoutYoutubeConnectionInput = {
+  where: Prisma.ProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedCreateWithoutYoutubeConnectionInput>
+}
+
+export type ProfileUpsertWithoutYoutubeConnectionInput = {
+  update: Prisma.XOR<Prisma.ProfileUpdateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedUpdateWithoutYoutubeConnectionInput>
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedCreateWithoutYoutubeConnectionInput>
+  where?: Prisma.ProfileWhereInput
+}
+
+export type ProfileUpdateToOneWithWhereWithoutYoutubeConnectionInput = {
+  where?: Prisma.ProfileWhereInput
+  data: Prisma.XOR<Prisma.ProfileUpdateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedUpdateWithoutYoutubeConnectionInput>
+}
+
+export type ProfileUpdateWithoutYoutubeConnectionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileUncheckedUpdateWithoutYoutubeConnectionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -737,6 +1088,8 @@ export type ProfileUncheckedUpdateWithoutFeedbackInput = {
 export type ProfileCountOutputType = {
   focusSessions: number
   feedback: number
+  contentItems: number
+  executiveConversations: number
   assignedTasks: number
   workspaceMembers: number
 }
@@ -744,6 +1097,8 @@ export type ProfileCountOutputType = {
 export type ProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   focusSessions?: boolean | ProfileCountOutputTypeCountFocusSessionsArgs
   feedback?: boolean | ProfileCountOutputTypeCountFeedbackArgs
+  contentItems?: boolean | ProfileCountOutputTypeCountContentItemsArgs
+  executiveConversations?: boolean | ProfileCountOutputTypeCountExecutiveConversationsArgs
   assignedTasks?: boolean | ProfileCountOutputTypeCountAssignedTasksArgs
   workspaceMembers?: boolean | ProfileCountOutputTypeCountWorkspaceMembersArgs
 }
@@ -775,6 +1130,20 @@ export type ProfileCountOutputTypeCountFeedbackArgs<ExtArgs extends runtime.Type
 /**
  * ProfileCountOutputType without action
  */
+export type ProfileCountOutputTypeCountContentItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContentItemWhereInput
+}
+
+/**
+ * ProfileCountOutputType without action
+ */
+export type ProfileCountOutputTypeCountExecutiveConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ExecutiveConversationWhereInput
+}
+
+/**
+ * ProfileCountOutputType without action
+ */
 export type ProfileCountOutputTypeCountAssignedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TaskWhereInput
 }
@@ -797,6 +1166,9 @@ export type ProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   focusSessions?: boolean | Prisma.Profile$focusSessionsArgs<ExtArgs>
   feedback?: boolean | Prisma.Profile$feedbackArgs<ExtArgs>
+  contentItems?: boolean | Prisma.Profile$contentItemsArgs<ExtArgs>
+  youtubeConnection?: boolean | Prisma.Profile$youtubeConnectionArgs<ExtArgs>
+  executiveConversations?: boolean | Prisma.Profile$executiveConversationsArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Profile$assignedTasksArgs<ExtArgs>
   workspaceMembers?: boolean | Prisma.Profile$workspaceMembersArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -836,6 +1208,9 @@ export type ProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type ProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   focusSessions?: boolean | Prisma.Profile$focusSessionsArgs<ExtArgs>
   feedback?: boolean | Prisma.Profile$feedbackArgs<ExtArgs>
+  contentItems?: boolean | Prisma.Profile$contentItemsArgs<ExtArgs>
+  youtubeConnection?: boolean | Prisma.Profile$youtubeConnectionArgs<ExtArgs>
+  executiveConversations?: boolean | Prisma.Profile$executiveConversationsArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Profile$assignedTasksArgs<ExtArgs>
   workspaceMembers?: boolean | Prisma.Profile$workspaceMembersArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -848,6 +1223,9 @@ export type $ProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     focusSessions: Prisma.$FocusSessionPayload<ExtArgs>[]
     feedback: Prisma.$FeedbackPayload<ExtArgs>[]
+    contentItems: Prisma.$ContentItemPayload<ExtArgs>[]
+    youtubeConnection: Prisma.$YouTubeConnectionPayload<ExtArgs> | null
+    executiveConversations: Prisma.$ExecutiveConversationPayload<ExtArgs>[]
     assignedTasks: Prisma.$TaskPayload<ExtArgs>[]
     workspaceMembers: Prisma.$WorkspaceMemberPayload<ExtArgs>[]
   }
@@ -1255,6 +1633,9 @@ export interface Prisma__ProfileClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   focusSessions<T extends Prisma.Profile$focusSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$focusSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FocusSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   feedback<T extends Prisma.Profile$feedbackArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$feedbackArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  contentItems<T extends Prisma.Profile$contentItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$contentItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  youtubeConnection<T extends Prisma.Profile$youtubeConnectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$youtubeConnectionArgs<ExtArgs>>): Prisma.Prisma__YouTubeConnectionClient<runtime.Types.Result.GetResult<Prisma.$YouTubeConnectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  executiveConversations<T extends Prisma.Profile$executiveConversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$executiveConversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExecutiveConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedTasks<T extends Prisma.Profile$assignedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$assignedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workspaceMembers<T extends Prisma.Profile$workspaceMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$workspaceMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1726,6 +2107,73 @@ export type Profile$feedbackArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.FeedbackScalarFieldEnum | Prisma.FeedbackScalarFieldEnum[]
+}
+
+/**
+ * Profile.contentItems
+ */
+export type Profile$contentItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContentItem
+   */
+  select?: Prisma.ContentItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContentItem
+   */
+  omit?: Prisma.ContentItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentItemInclude<ExtArgs> | null
+  where?: Prisma.ContentItemWhereInput
+  orderBy?: Prisma.ContentItemOrderByWithRelationInput | Prisma.ContentItemOrderByWithRelationInput[]
+  cursor?: Prisma.ContentItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContentItemScalarFieldEnum | Prisma.ContentItemScalarFieldEnum[]
+}
+
+/**
+ * Profile.youtubeConnection
+ */
+export type Profile$youtubeConnectionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the YouTubeConnection
+   */
+  select?: Prisma.YouTubeConnectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the YouTubeConnection
+   */
+  omit?: Prisma.YouTubeConnectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.YouTubeConnectionInclude<ExtArgs> | null
+  where?: Prisma.YouTubeConnectionWhereInput
+}
+
+/**
+ * Profile.executiveConversations
+ */
+export type Profile$executiveConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ExecutiveConversation
+   */
+  select?: Prisma.ExecutiveConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ExecutiveConversation
+   */
+  omit?: Prisma.ExecutiveConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExecutiveConversationInclude<ExtArgs> | null
+  where?: Prisma.ExecutiveConversationWhereInput
+  orderBy?: Prisma.ExecutiveConversationOrderByWithRelationInput | Prisma.ExecutiveConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ExecutiveConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ExecutiveConversationScalarFieldEnum | Prisma.ExecutiveConversationScalarFieldEnum[]
 }
 
 /**

@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
+  ClapperboardIcon,
   PencilIcon,
   PlayIcon,
   PlusIcon,
@@ -28,6 +35,8 @@ import {
   type MissionStep,
 } from "@/lib/mission";
 import { ESTIMATED_FOCUS_MINUTES } from "@/lib/focus";
+import { useDeferredRefresh } from "@/lib/use-deferred-refresh";
+import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 
 export type { MissionStep };
 
@@ -51,6 +60,11 @@ interface MissionSectionProps {
   greeting: string;
   /** Projects available to the inline "Create Task" dialog. */
   projects: Array<{ id: string; name: string }>;
+  /**
+   * Latest saved Harper advice. Read from the database — the dashboard never
+   * triggers a model call on render.
+   */
+  harper: { currentPriority: string; nextMove: string } | null;
 }
 
 const PRIORITY_LABELS: Record<Priority, string> = {
@@ -72,6 +86,23 @@ const PRIORITY_VARIANTS: Record<
 
 function errorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
+}
+
+const OPTIMISTIC_PREFIX = "optimistic-";
+
+/** True while a newly added step is still waiting for its real id. */
+function isOptimisticId(id: string): boolean {
+  return id.startsWith(OPTIMISTIC_PREFIX);
+}
+
+/** Cheap value-equality key for a checklist. */
+function stepsSignature(steps: MissionStep[]): string {
+  return steps
+    .map(
+      (step) =>
+        `${step.id}:${step.position}:${step.completed ? 1 : 0}:${step.title}`
+    )
+    .join("|");
 }
 
 async function requestJson(
@@ -105,17 +136,28 @@ export function MissionSection({
   firstName,
   greeting,
   projects,
+  harper,
 }: MissionSectionProps) {
   const router = useRouter();
+  const scheduleRefresh = useDeferredRefresh();
+  const scheduleHarperRefresh = useHarperAutoRefresh();
   const [steps, setSteps] = useState<MissionStep[]>(initialSteps);
-  const [isPending, setIsPending] = useState(false);
+  /** Only gates the add-step submit; never blocks the checklist itself. */
+  const [isSubmittingStep, setIsSubmittingStep] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
 
-  // Re-sync whenever the server sends fresh steps (router.refresh).
+  // Adopt server data only when it actually changed. A refresh that returns
+  // what we already have must not stomp on newer optimistic state.
+  const lastServerSignature = useRef(stepsSignature(initialSteps));
+
   useEffect(() => {
+    const signature = stepsSignature(initialSteps);
+    if (signature === lastServerSignature.current) return;
+
+    lastServerSignature.current = signature;
     setSteps(initialSteps);
   }, [initialSteps]);
 
@@ -124,6 +166,8 @@ export function MissionSection({
   const progressPercent = progress.percent;
 
   async function toggleStep(step: MissionStep) {
+    if (isOptimisticId(step.id)) return;
+
     const previous = steps;
     const nextCompleted = !step.completed;
 
@@ -132,19 +176,20 @@ export function MissionSection({
         item.id === step.id ? { ...item, completed: nextCompleted } : item
       )
     );
-    setIsPending(true);
 
     try {
       await requestJson("/api/task-steps", {
         method: "PATCH",
         body: JSON.stringify({ stepId: step.id, completed: nextCompleted }),
       });
-      router.refresh();
+      scheduleRefresh();
+
+      // The server decides whether this is worth a model call — finishing the
+      // last step is, ticking step 2 of 7 is not.
+      scheduleHarperRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to update step"));
-    } finally {
-      setIsPending(false);
     }
   }
 
@@ -153,9 +198,24 @@ export function MissionSection({
     if (!mission) return;
 
     const title = newTitle.trim();
-    if (!title) return;
+    if (!title || isSubmittingStep) return;
 
-    setIsPending(true);
+    // Optimistic row with a placeholder id, swapped for the real one on save.
+    const optimisticId = `${OPTIMISTIC_PREFIX}${Date.now()}`;
+    const previous = steps;
+
+    setSteps((current) => [
+      ...current,
+      {
+        id: optimisticId,
+        title,
+        completed: false,
+        position: current.length,
+      },
+    ]);
+    setNewTitle("");
+    setIsAdding(false);
+    setIsSubmittingStep(true);
 
     try {
       const created = (await requestJson("/api/task-steps", {
@@ -163,19 +223,24 @@ export function MissionSection({
         body: JSON.stringify({ taskId: mission.id, title }),
       })) as MissionStep;
 
-      setSteps((current) => [...current, created]);
-      setNewTitle("");
-      setIsAdding(false);
-      toast.success("Step added");
-      router.refresh();
+      setSteps((current) =>
+        current.map((item) => (item.id === optimisticId ? created : item))
+      );
+      scheduleRefresh();
     } catch (error) {
+      setSteps(previous);
       toast.error(errorMessage(error, "Failed to add step"));
     } finally {
-      setIsPending(false);
+      setIsSubmittingStep(false);
     }
   }
 
   async function saveTitle(step: MissionStep) {
+    if (isOptimisticId(step.id)) {
+      setEditingId(null);
+      return;
+    }
+
     const title = editingTitle.trim();
 
     if (!title || title === step.title) {
@@ -188,40 +253,39 @@ export function MissionSection({
       current.map((item) => (item.id === step.id ? { ...item, title } : item))
     );
     setEditingId(null);
-    setIsPending(true);
 
     try {
       await requestJson("/api/task-steps", {
         method: "PATCH",
         body: JSON.stringify({ stepId: step.id, title }),
       });
-      router.refresh();
+      scheduleRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to rename step"));
-    } finally {
-      setIsPending(false);
     }
   }
 
   async function deleteStep(step: MissionStep) {
+    if (isOptimisticId(step.id)) return;
+
     const previous = steps;
 
-    setSteps((current) => current.filter((item) => item.id !== step.id));
-    setIsPending(true);
+    setSteps((current) =>
+      current
+        .filter((item) => item.id !== step.id)
+        .map((item, index) => ({ ...item, position: index }))
+    );
 
     try {
       await requestJson("/api/task-steps", {
         method: "DELETE",
         body: JSON.stringify({ stepId: step.id }),
       });
-      toast.success("Step removed");
-      router.refresh();
+      scheduleRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to delete step"));
-    } finally {
-      setIsPending(false);
     }
   }
 
@@ -231,13 +295,16 @@ export function MissionSection({
     const target = index + direction;
     if (target < 0 || target >= steps.length) return;
 
+    // A pending row has no server id yet, so the reorder payload would be
+    // rejected. Wait for it to land.
+    if (steps.some((step) => isOptimisticId(step.id))) return;
+
     const previous = steps;
     const reordered = [...steps];
     const [moved] = reordered.splice(index, 1);
     reordered.splice(target, 0, moved);
 
     setSteps(reordered.map((step, position) => ({ ...step, position })));
-    setIsPending(true);
 
     try {
       await requestJson("/api/task-steps/reorder", {
@@ -247,12 +314,10 @@ export function MissionSection({
           orderedIds: reordered.map((step) => step.id),
         }),
       });
-      router.refresh();
+      scheduleRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to reorder steps"));
-    } finally {
-      setIsPending(false);
     }
   }
 
@@ -273,7 +338,11 @@ export function MissionSection({
         className="h-9"
       />
 
-      <Button type="submit" size="sm" disabled={isPending || !newTitle.trim()}>
+      <Button
+        type="submit"
+        size="sm"
+        disabled={isSubmittingStep || !newTitle.trim()}
+      >
         Save
       </Button>
 
@@ -403,7 +472,6 @@ export function MissionSection({
                           <input
                             type="checkbox"
                             checked={step.completed}
-                            disabled={isPending}
                             onChange={() => toggleStep(step)}
                             aria-label={`Mark ${step.title} as ${
                               step.completed ? "incomplete" : "complete"
@@ -449,7 +517,7 @@ export function MissionSection({
                               size="icon-xs"
                               variant="ghost"
                               aria-label="Move step up"
-                              disabled={isPending || index === 0}
+                              disabled={index === 0}
                               onClick={() => moveStep(index, -1)}
                             >
                               <ChevronUpIcon />
@@ -460,7 +528,7 @@ export function MissionSection({
                               size="icon-xs"
                               variant="ghost"
                               aria-label="Move step down"
-                              disabled={isPending || index === steps.length - 1}
+                              disabled={index === steps.length - 1}
                               onClick={() => moveStep(index, 1)}
                             >
                               <ChevronDownIcon />
@@ -471,7 +539,6 @@ export function MissionSection({
                               size="icon-xs"
                               variant="ghost"
                               aria-label="Rename step"
-                              disabled={isPending}
                               onClick={() => {
                                 setEditingId(step.id);
                                 setEditingTitle(step.title);
@@ -485,7 +552,6 @@ export function MissionSection({
                               size="icon-xs"
                               variant="ghost"
                               aria-label="Delete step"
-                              disabled={isPending}
                               onClick={() => deleteStep(step)}
                             >
                               <Trash2Icon />
@@ -552,15 +618,30 @@ export function MissionSection({
                   </p>
                 </div>
 
-                <Button
-                  type="button"
-                  size="lg"
-                  className="h-12 w-full px-8 text-base sm:w-auto"
-                  onClick={() => router.push(`/focus/${mission.id}`)}
-                >
-                  <PlayIcon />
-                  Start Focus Session
-                </Button>
+                <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="h-12 px-6 text-base"
+                    onClick={() =>
+                      router.push(`/content/new?taskId=${mission.id}`)
+                    }
+                  >
+                    <ClapperboardIcon />
+                    Create Content
+                  </Button>
+
+                  <Button
+                    type="button"
+                    size="lg"
+                    className="h-12 px-8 text-base"
+                    onClick={() => router.push(`/focus/${mission.id}`)}
+                  >
+                    <PlayIcon />
+                    Start Focus Session
+                  </Button>
+                </div>
               </div>
             </>
           ) : null}
@@ -581,29 +662,19 @@ export function MissionSection({
             <>
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Today&apos;s focus is
+                  Current priority
                 </p>
 
-                <p className="text-sm font-medium leading-6">{mission.title}</p>
+                <p className="text-sm font-medium leading-6">
+                  {harper?.currentPriority ?? mission.title}
+                </p>
               </div>
 
               {steps.length > 0 ? (
-                <>
-                  <div className="space-y-1">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Current Step
-                    </p>
-
-                    <p className="text-sm font-medium leading-6">
-                      {currentStep?.title ?? "All steps complete"}
-                    </p>
-                  </div>
-
-                  <p className="text-sm leading-6 text-muted-foreground tabular-nums">
-                    Progress: {completedCount} / {steps.length} complete (
-                    {progressPercent}%).
-                  </p>
-                </>
+                <p className="text-sm leading-6 text-muted-foreground tabular-nums">
+                  Progress: {completedCount} / {steps.length} complete (
+                  {progressPercent}%).
+                </p>
               ) : null}
             </>
           ) : (
@@ -615,13 +686,19 @@ export function MissionSection({
 
         <div className="mt-6 rounded-2xl bg-muted/60 p-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Recommended next move
+            Next move
           </p>
 
+          {/* Latest saved advice, or the deterministic rule when Harper has
+              not run yet. Rendering never calls the model. */}
           <p className="mt-2 text-sm leading-6">
-            {harperRecommendation(progress, mission !== null)}
+            {harper?.nextMove ?? harperRecommendation(progress, mission !== null)}
           </p>
         </div>
+
+        {/* Entry points to Harper and Renee live in the Executive Team strip
+            above, so this panel stays a mission briefing rather than a second
+            navigation surface. */}
       </div>
     </>
   );

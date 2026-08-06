@@ -4,6 +4,8 @@ import { useState, useTransition, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
+
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
 
 interface TaskStatusSelectProps {
@@ -20,6 +22,7 @@ const STATUS_OPTIONS: ReadonlyArray<{ value: TaskStatus; label: string }> = [
 
 export function TaskStatusSelect({ taskId, status }: TaskStatusSelectProps) {
   const router = useRouter();
+  const scheduleHarperRefresh = useHarperAutoRefresh();
   const [value, setValue] = useState<TaskStatus>(status);
   const [isSaving, setIsSaving] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -44,7 +47,15 @@ export function TaskStatusSelect({ taskId, status }: TaskStatusSelectProps) {
         throw new Error(`Request failed with status ${response.status}`);
       }
 
-      toast.success("Task status updated");
+      toast.success(
+        nextStatus === "DONE"
+          ? "Task completed and moved to Completed Work."
+          : "Task status updated"
+      );
+
+      // A status change always shifts the mission picture.
+      scheduleHarperRefresh();
+
       startTransition(() => {
         router.refresh();
       });

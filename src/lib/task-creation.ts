@@ -1,9 +1,9 @@
 /**
- * Reusable task creation helpers (client-side, over the existing API routes).
+ * Reusable task creation helper (client-side, over the existing API route).
  *
- * Kept separate from the dialog so future entry points — custom templates,
- * quick-add, keyboard shortcuts — can create a task plus its checklist without
- * duplicating the ordering rules.
+ * A task and its checklist are created in ONE request. `/api/tasks` performs a
+ * nested Prisma create, which is atomic — there is no window where a task
+ * exists with half its template steps.
  */
 
 export interface CreateTaskInput {
@@ -13,16 +13,20 @@ export interface CreateTaskInput {
   description?: string;
 }
 
+interface CreatedStep {
+  id: string;
+  title: string;
+  position: number;
+}
+
 interface CreatedTask {
   id: string;
+  steps?: CreatedStep[];
 }
 
 export interface CreateTaskResult {
   task: CreatedTask;
-  /** How many checklist steps were persisted. */
   stepsCreated: number;
-  /** Steps that failed to save, if any. Task creation still succeeded. */
-  failedSteps: string[];
 }
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
@@ -49,48 +53,18 @@ async function postJson<T>(url: string, body: unknown): Promise<T> {
   return payload as T;
 }
 
-export async function createTask(input: CreateTaskInput): Promise<CreatedTask> {
-  return postJson<CreatedTask>("/api/tasks", input);
-}
-
 /**
- * Creates steps one at a time, in array order.
- *
- * This is intentionally sequential: `/api/task-steps` derives each new
- * position from the current maximum, so firing the requests in parallel would
- * race and scramble the checklist.
+ * Creates a task, optionally with its checklist. Step order in the array is the
+ * order they are persisted in.
  */
-export async function createTaskSteps(
-  taskId: string,
-  titles: readonly string[]
-): Promise<{ created: number; failed: string[] }> {
-  let created = 0;
-  const failed: string[] = [];
-
-  for (const title of titles) {
-    try {
-      await postJson("/api/task-steps", { taskId, title });
-      created += 1;
-    } catch {
-      failed.push(title);
-    }
-  }
-
-  return { created, failed };
-}
-
-/** Creates the task, then its checklist. Steps are optional. */
 export async function createTaskWithSteps(
   input: CreateTaskInput,
   steps: readonly string[] = []
 ): Promise<CreateTaskResult> {
-  const task = await createTask(input);
+  const task = await postJson<CreatedTask>("/api/tasks", {
+    ...input,
+    ...(steps.length > 0 ? { steps: [...steps] } : {}),
+  });
 
-  if (steps.length === 0) {
-    return { task, stepsCreated: 0, failedSteps: [] };
-  }
-
-  const { created, failed } = await createTaskSteps(task.id, steps);
-
-  return { task, stepsCreated: created, failedSteps: failed };
+  return { task, stepsCreated: task.steps?.length ?? 0 };
 }

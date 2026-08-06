@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   Card,
   CardContent,
@@ -18,37 +20,55 @@ export function StatsCards({ stats }: StatsCardsProps) {
       title: "Total Projects",
       value: stats.totalProjects,
       description: `${stats.activeProjects} active`,
+      href: null,
     },
     {
       title: "Total Tasks",
       value: stats.totalTasks,
       description: "Across all projects",
+      href: null,
     },
     {
       title: "In Progress",
       value: stats.inProgressTasks,
       description: "Tasks being worked on",
+      href: "/dashboard/tasks",
     },
     {
       title: "Completed",
       value: stats.completedTasks,
-      description: "Tasks done",
+      description: "View completed work",
+      href: "/dashboard/tasks?tab=completed",
     },
   ];
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => (
-        <Card key={card.title}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{card.value}</div>
-            <p className="text-muted-foreground text-xs">{card.description}</p>
-          </CardContent>
-        </Card>
-      ))}
+      {cards.map((card) => {
+        const body = (
+          <Card className={card.href ? "h-full transition-colors hover:bg-muted/40" : "h-full"}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{card.value}</div>
+              <p className="text-muted-foreground text-xs">{card.description}</p>
+            </CardContent>
+          </Card>
+        );
+
+        return card.href ? (
+          <Link
+            key={card.title}
+            href={card.href}
+            className="rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {body}
+          </Link>
+        ) : (
+          <div key={card.title}>{body}</div>
+        );
+      })}
     </div>
   );
 }

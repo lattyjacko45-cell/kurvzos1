@@ -397,7 +397,10 @@ export const ModelName = {
   Task: 'Task',
   TaskStep: 'TaskStep',
   FocusSession: 'FocusSession',
-  Feedback: 'Feedback'
+  Feedback: 'Feedback',
+  ContentItem: 'ContentItem',
+  ExecutiveConversation: 'ExecutiveConversation',
+  YouTubeConnection: 'YouTubeConnection'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -413,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback"
+    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback" | "contentItem" | "executiveConversation" | "youTubeConnection"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1009,6 +1012,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ContentItem: {
+      payload: Prisma.$ContentItemPayload<ExtArgs>
+      fields: Prisma.ContentItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>
+        }
+        findMany: {
+          args: Prisma.ContentItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>[]
+        }
+        create: {
+          args: Prisma.ContentItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>
+        }
+        createMany: {
+          args: Prisma.ContentItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>
+        }
+        update: {
+          args: Prisma.ContentItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentItemPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentItem>
+        }
+        groupBy: {
+          args: Prisma.ContentItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentItemCountAggregateOutputType> | number
+        }
+      }
+    }
+    ExecutiveConversation: {
+      payload: Prisma.$ExecutiveConversationPayload<ExtArgs>
+      fields: Prisma.ExecutiveConversationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExecutiveConversationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExecutiveConversationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>
+        }
+        findFirst: {
+          args: Prisma.ExecutiveConversationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExecutiveConversationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>
+        }
+        findMany: {
+          args: Prisma.ExecutiveConversationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>[]
+        }
+        create: {
+          args: Prisma.ExecutiveConversationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>
+        }
+        createMany: {
+          args: Prisma.ExecutiveConversationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExecutiveConversationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>[]
+        }
+        delete: {
+          args: Prisma.ExecutiveConversationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>
+        }
+        update: {
+          args: Prisma.ExecutiveConversationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>
+        }
+        deleteMany: {
+          args: Prisma.ExecutiveConversationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExecutiveConversationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExecutiveConversationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>[]
+        }
+        upsert: {
+          args: Prisma.ExecutiveConversationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExecutiveConversationPayload>
+        }
+        aggregate: {
+          args: Prisma.ExecutiveConversationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExecutiveConversation>
+        }
+        groupBy: {
+          args: Prisma.ExecutiveConversationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExecutiveConversationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExecutiveConversationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExecutiveConversationCountAggregateOutputType> | number
+        }
+      }
+    }
+    YouTubeConnection: {
+      payload: Prisma.$YouTubeConnectionPayload<ExtArgs>
+      fields: Prisma.YouTubeConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.YouTubeConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.YouTubeConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.YouTubeConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.YouTubeConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.YouTubeConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.YouTubeConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.YouTubeConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.YouTubeConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.YouTubeConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>
+        }
+        update: {
+          args: Prisma.YouTubeConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.YouTubeConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.YouTubeConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.YouTubeConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.YouTubeConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$YouTubeConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.YouTubeConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateYouTubeConnection>
+        }
+        groupBy: {
+          args: Prisma.YouTubeConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.YouTubeConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.YouTubeConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.YouTubeConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1158,12 +1383,73 @@ export const FeedbackScalarFieldEnum = {
 export type FeedbackScalarFieldEnum = (typeof FeedbackScalarFieldEnum)[keyof typeof FeedbackScalarFieldEnum]
 
 
+export const ContentItemScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  projectId: 'projectId',
+  taskId: 'taskId',
+  title: 'title',
+  description: 'description',
+  tags: 'tags',
+  categoryId: 'categoryId',
+  madeForKids: 'madeForKids',
+  contentType: 'contentType',
+  status: 'status',
+  scheduledAt: 'scheduledAt',
+  timezone: 'timezone',
+  youtubeVideoId: 'youtubeVideoId',
+  youtubeUrl: 'youtubeUrl',
+  uploadProgress: 'uploadProgress',
+  processingStatus: 'processingStatus',
+  publishedAt: 'publishedAt',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContentItemScalarFieldEnum = (typeof ContentItemScalarFieldEnum)[keyof typeof ContentItemScalarFieldEnum]
+
+
+export const ExecutiveConversationScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  executive: 'executive',
+  userMessage: 'userMessage',
+  response: 'response',
+  contextSnapshot: 'contextSnapshot',
+  createdAt: 'createdAt'
+} as const
+
+export type ExecutiveConversationScalarFieldEnum = (typeof ExecutiveConversationScalarFieldEnum)[keyof typeof ExecutiveConversationScalarFieldEnum]
+
+
+export const YouTubeConnectionScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  channelId: 'channelId',
+  channelTitle: 'channelTitle',
+  encryptedRefreshToken: 'encryptedRefreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type YouTubeConnectionScalarFieldEnum = (typeof YouTubeConnectionScalarFieldEnum)[keyof typeof YouTubeConnectionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1180,6 +1466,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1336,6 +1631,62 @@ export type ListEnumFeedbackStatusFieldRefInput<$PrismaModel> = FieldRefInputTyp
 
 
 /**
+ * Reference to a field of type 'ContentType'
+ */
+export type EnumContentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentType'>
+    
+
+
+/**
+ * Reference to a field of type 'ContentType[]'
+ */
+export type ListEnumContentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ContentStatus'
+ */
+export type EnumContentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ContentStatus[]'
+ */
+export type ListEnumContentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Executive'
+ */
+export type EnumExecutiveFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Executive'>
+    
+
+
+/**
+ * Reference to a field of type 'Executive[]'
+ */
+export type ListEnumExecutiveFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Executive[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1443,6 +1794,9 @@ export type GlobalOmitConfig = {
   taskStep?: Prisma.TaskStepOmit
   focusSession?: Prisma.FocusSessionOmit
   feedback?: Prisma.FeedbackOmit
+  contentItem?: Prisma.ContentItemOmit
+  executiveConversation?: Prisma.ExecutiveConversationOmit
+  youTubeConnection?: Prisma.YouTubeConnectionOmit
 }
 
 /* Types for Logging */

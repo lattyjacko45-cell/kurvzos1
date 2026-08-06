@@ -4,12 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
+  ArrowLeftIcon,
   CheckIcon,
   PauseIcon,
   PlayIcon,
   RotateCcwIcon,
   SquareIcon,
-  XIcon,
 } from "lucide-react";
 
 import type { TaskStatus } from "@/generated/prisma/client";
@@ -20,6 +20,8 @@ import {
   harperRecommendation,
   type MissionStep,
 } from "@/lib/mission";
+import { useDeferredRefresh } from "@/lib/use-deferred-refresh";
+import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 import {
   ESTIMATED_FOCUS_MINUTES,
   FOCUS_SESSION_MINUTES,
@@ -77,6 +79,8 @@ export function FocusMode({
   initialSession,
 }: FocusModeProps) {
   const router = useRouter();
+  const scheduleRefresh = useDeferredRefresh();
+  const scheduleHarperRefresh = useHarperAutoRefresh();
   const [steps, setSteps] = useState<MissionStep[]>(initialSteps);
   const [session, setSession] = useState<FocusSessionDto | null>(
     initialSession
@@ -202,7 +206,8 @@ export function FocusMode({
         method: "PATCH",
         body: JSON.stringify({ stepId: step.id, completed: true }),
       });
-      router.refresh();
+      scheduleRefresh();
+      scheduleHarperRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to complete the step"));
@@ -230,11 +235,9 @@ export function FocusMode({
 
   return (
     <main className="flex min-h-screen flex-col bg-background">
-      <header className="flex items-center justify-between gap-4 border-b px-6 py-4 sm:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Focus Mode
-        </p>
-
+      {/* Sticky so the way out is reachable without scrolling, whatever the
+          checklist length. */}
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b bg-background px-6 py-4 sm:px-10">
         <Button
           type="button"
           variant="ghost"
@@ -242,9 +245,13 @@ export function FocusMode({
           onClick={exitFocusMode}
           disabled={isLeaving}
         >
-          <XIcon />
-          Exit Focus Mode
+          <ArrowLeftIcon />
+          Back to Dashboard
         </Button>
+
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+          Focus Mode
+        </p>
       </header>
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-10 px-6 py-12 sm:px-10">

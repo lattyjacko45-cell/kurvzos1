@@ -9,6 +9,11 @@ const createTaskSchema = z.object({
   projectId: z.string().uuid(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).default("MEDIUM"),
   description: z.string().max(1000).optional(),
+  /**
+   * Optional checklist, created with the task in a single atomic write.
+   * Array order becomes step position, so templates keep their sequence.
+   */
+  steps: z.array(z.string().trim().min(1).max(200)).max(50).optional(),
 });
 
 export async function POST(request: Request) {
@@ -40,12 +45,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
+    // Nested create: Prisma runs the task and its steps as one transaction, so
+    // a failure can never leave a task with a partial checklist.
     const task = await prisma.task.create({
       data: {
         title: data.title,
         description: data.description,
         priority: data.priority,
         projectId: data.projectId,
+        ...(data.steps && data.steps.length > 0
+          ? {
+              steps: {
+                create: data.steps.map((title, index) => ({
+                  title,
+                  position: index,
+                })),
+              },
+            }
+          : {}),
+      },
+      include: {
+        steps: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] },
       },
     });
 

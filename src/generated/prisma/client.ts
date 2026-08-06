@@ -84,3 +84,18 @@ export type FocusSession = Prisma.FocusSessionModel
  * 
  */
 export type Feedback = Prisma.FeedbackModel
+/**
+ * Model ContentItem
+ * 
+ */
+export type ContentItem = Prisma.ContentItemModel
+/**
+ * Model ExecutiveConversation
+ * 
+ */
+export type ExecutiveConversation = Prisma.ExecutiveConversationModel
+/**
+ * Model YouTubeConnection
+ * 
+ */
+export type YouTubeConnection = Prisma.YouTubeConnectionModel

@@ -16,10 +16,13 @@ model Profile {
   avatarUrl        String?           @map("avatar_url")
   createdAt        DateTime          @default(now()) @map("created_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
-  focusSessions    FocusSession[]
-  feedback         Feedback[]
-  assignedTasks    Task[]            @relation("TaskAssignee")
-  workspaceMembers WorkspaceMember[]
+  focusSessions     FocusSession[]
+  feedback          Feedback[]
+  contentItems      ContentItem[]
+  youtubeConnection YouTubeConnection?
+  executiveConversations ExecutiveConversation[]
+  assignedTasks     Task[]            @relation("TaskAssignee")
+  workspaceMembers  WorkspaceMember[]
 
   @@map("profiles")
 }
@@ -58,8 +61,9 @@ model Project {
   workspaceId String        @map("workspace_id")
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
-  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  tasks       Task[]
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tasks        Task[]
+  contentItems ContentItem[]
 
   @@map("projects")
 }
@@ -77,6 +81,7 @@ model Task {
   updatedAt     DateTime       @updatedAt @map("updated_at")
   focusSessions FocusSession[]
   steps         TaskStep[]
+  contentItems  ContentItem[]
   assignee      Profile?       @relation("TaskAssignee", fields: [assigneeId], references: [id])
   project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -184,4 +189,107 @@ enum FeedbackStatus {
   REVIEWING
   FIXED
   DISMISSED
+}
+
+model ContentItem {
+  id        String  @id @default(uuid())
+  profileId String  @map("profile_id")
+  projectId String? @map("project_id")
+  taskId    String? @map("task_id")
+
+  title       String
+  description String        @default("")
+  /// Comma-free list of YouTube tags.
+  tags        String[]      @default([])
+  /// YouTube category id, e.g. "22" (People & Blogs).
+  categoryId  String        @default("22") @map("category_id")
+  madeForKids Boolean       @default(false) @map("made_for_kids")
+  contentType ContentType   @default(LONG_FORM) @map("content_type")
+  status      ContentStatus @default(DRAFT)
+
+  /// Absolute publish instant, stored in UTC.
+  scheduledAt DateTime? @map("scheduled_at")
+  /// IANA zone the user picked the time in, kept for display.
+  timezone    String    @default("UTC")
+
+  youtubeVideoId   String? @map("youtube_video_id")
+  youtubeUrl       String? @map("youtube_url")
+  /// 0-100, updated as the browser uploads.
+  uploadProgress   Int     @default(0) @map("upload_progress")
+  processingStatus String? @map("processing_status")
+
+  publishedAt  DateTime? @map("published_at")
+  errorMessage String?   @map("error_message")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  task    Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([profileId, createdAt])
+  @@index([taskId])
+  @@map("content_items")
+}
+
+enum ContentType {
+  LONG_FORM
+  SHORT
+}
+
+enum ContentStatus {
+  DRAFT
+  READY
+  UPLOADING
+  PROCESSING
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+model ExecutiveConversation {
+  id        String    @id @default(uuid())
+  profileId String    @map("profile_id")
+  executive Executive @default(HARPER)
+
+  /// Null when the advice was generated without a question.
+  userMessage String? @map("user_message")
+  /// Harper's reply, stored as JSON so structured advice survives a reload.
+  response    Json
+  /// Exactly what was sent to the model, for auditability.
+  contextSnapshot Json @map("context_snapshot")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, executive, createdAt])
+  @@map("executive_conversations")
+}
+
+enum Executive {
+  HARPER
+  RENEE
+  SOPHIA
+  OLIVIA
+  MARCUS
+}
+
+model YouTubeConnection {
+  id        String @id @default(uuid())
+  profileId String @unique @map("profile_id")
+
+  channelId    String @map("channel_id")
+  channelTitle String @map("channel_title")
+  /// AES-256-GCM ciphertext. Never returned to the browser.
+  encryptedRefreshToken String    @map("encrypted_refresh_token")
+  tokenExpiresAt        DateTime? @map("token_expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("youtube_connections")
 }

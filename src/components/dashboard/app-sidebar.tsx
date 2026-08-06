@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   CheckSquare,
+  Clapperboard,
   FileText,
   FolderKanban,
   LayoutDashboard,
   LogOut,
   Settings,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -46,7 +48,9 @@ const iconMap = {
   LayoutDashboard,
   FolderKanban,
   CheckSquare,
+  Clapperboard,
   FileText,
+  Users,
   Settings,
 } as const;
 

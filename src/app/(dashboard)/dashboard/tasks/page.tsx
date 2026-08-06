@@ -1,5 +1,5 @@
-
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import {
   getCurrentUser,
@@ -8,6 +8,10 @@ import {
 } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CreateTaskDialog } from "@/components/dashboard/create-dialogs";
+import {
+  CompletedTaskRow,
+  type CompletedTaskRowData,
+} from "@/components/dashboard/completed-task-row";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -16,30 +20,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   TaskStatusSelect,
   type TaskStatus,
 } from "@/components/dashboard/task-status-select";
+
 export const metadata: Metadata = {
   title: "Tasks",
 };
 
-const statusLabels: Record<string, string> = {
-  TODO: "To Do",
-  IN_PROGRESS: "In Progress",
-  REVIEW: "Review",
-  DONE: "Done",
-};
+/** Everything that is not DONE is active work. */
+const ACTIVE_STATUSES = ["TODO", "IN_PROGRESS", "REVIEW"] as const;
 
-const priorityVariants: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
+const priorityVariants: Record<
+  string,
+  "default" | "secondary" | "outline" | "destructive"
+> = {
   LOW: "secondary",
   MEDIUM: "default",
   HIGH: "outline",
   URGENT: "destructive",
 };
 
-export default async function TasksPage() {
+interface TasksPageProps {
+  searchParams: Promise<{ tab?: string }>;
+}
+
+export default async function TasksPage({ searchParams }: TasksPageProps) {
   const user = await getCurrentUser();
   if (!user) return null;
 
@@ -50,11 +57,28 @@ export default async function TasksPage() {
   );
   const workspace = await getUserWorkspace(profile.id);
 
-  const [tasks, projects] = await Promise.all([
+  const { tab } = await searchParams;
+  const activeTab = tab === "completed" ? "completed" : "active";
+
+  const [activeTasks, completedTasks, projects] = await Promise.all([
     prisma.task.findMany({
-      where: { project: { workspaceId: workspace.id } },
+      where: {
+        project: { workspaceId: workspace.id },
+        status: { in: [...ACTIVE_STATUSES] },
+      },
       include: { project: { select: { name: true } } },
       orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
+    }),
+    prisma.task.findMany({
+      where: { project: { workspaceId: workspace.id }, status: "DONE" },
+      include: {
+        project: { select: { name: true } },
+        steps: {
+          orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+          select: { id: true, title: true, completed: true },
+        },
+      },
+      orderBy: { updatedAt: "desc" },
     }),
     prisma.project.findMany({
       where: { workspaceId: workspace.id },
@@ -62,12 +86,24 @@ export default async function TasksPage() {
     }),
   ]);
 
-  const grouped = {
-    TODO: tasks.filter((t) => t.status === "TODO"),
-    IN_PROGRESS: tasks.filter((t) => t.status === "IN_PROGRESS"),
-    REVIEW: tasks.filter((t) => t.status === "REVIEW"),
-    DONE: tasks.filter((t) => t.status === "DONE"),
-  };
+  const completedRows: CompletedTaskRowData[] = completedTasks.map((task) => ({
+    id: task.id,
+    title: task.title,
+    projectName: task.project.name,
+    priority: task.priority,
+    completedSteps: task.steps.filter((step) => step.completed).length,
+    totalSteps: task.steps.length,
+    // No completedAt column exists; updatedAt is the closest real signal.
+    completedAt: task.updatedAt.toISOString(),
+    steps: task.steps,
+  }));
+
+  const tabClass = (isCurrent: boolean) =>
+    `rounded-lg border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${
+      isCurrent
+        ? "bg-primary text-primary-foreground"
+        : "bg-background hover:bg-muted"
+    }`;
 
   return (
     <div className="space-y-8">
@@ -81,78 +117,80 @@ export default async function TasksPage() {
         <CreateTaskDialog projects={projects} />
       </div>
 
-      {tasks.length === 0 ? (
+      {/* Link-driven tabs so the Completed stat on the dashboard can deep-link. */}
+      <nav aria-label="Task views" className="flex gap-2">
+        <Link
+          href="/dashboard/tasks"
+          aria-current={activeTab === "active" ? "page" : undefined}
+          className={tabClass(activeTab === "active")}
+        >
+          Active ({activeTasks.length})
+        </Link>
+
+        <Link
+          href="/dashboard/tasks?tab=completed"
+          aria-current={activeTab === "completed" ? "page" : undefined}
+          className={tabClass(activeTab === "completed")}
+        >
+          Completed ({completedRows.length})
+        </Link>
+      </nav>
+
+      {activeTab === "active" ? (
+        activeTasks.length === 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>No active tasks</CardTitle>
+              <CardDescription>
+                {projects.length === 0
+                  ? "Create a project first, then add tasks to it."
+                  : "Everything is done. Add a task or reopen one from Completed."}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        ) : (
+          <div className="grid gap-3">
+            {activeTasks.map((task) => (
+              <Card key={task.id}>
+                <CardContent className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="font-medium">{task.title}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {task.project.name}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Badge variant={priorityVariants[task.priority]}>
+                      {task.priority.toLowerCase()}
+                    </Badge>
+
+                    <TaskStatusSelect
+                      taskId={task.id}
+                      status={task.status as TaskStatus}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )
+      ) : completedRows.length === 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>No tasks yet</CardTitle>
+            <CardTitle>No completed work yet</CardTitle>
             <CardDescription>
-              {projects.length === 0
-                ? "Create a project first, then add tasks to it."
-                : "Add your first task to get started."}
+              Finished tasks move here and keep their checklist history.
             </CardDescription>
           </CardHeader>
         </Card>
       ) : (
-        <Tabs defaultValue="all">
-          <TabsList>
-            <TabsTrigger value="all">All ({tasks.length})</TabsTrigger>
-            {Object.entries(grouped).map(([status, items]) => (
-              <TabsTrigger key={status} value={status}>
-                {statusLabels[status]} ({items.length})
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          <TabsContent value="all" className="mt-6">
-            <TaskGrid tasks={tasks} />
-          </TabsContent>
-
-          {Object.entries(grouped).map(([status, items]) => (
-            <TabsContent key={status} value={status} className="mt-6">
-              <TaskGrid tasks={items} />
-            </TabsContent>
+        <div className="grid gap-3">
+          {completedRows.map((task) => (
+            <CompletedTaskRow key={task.id} task={task} />
           ))}
-        </Tabs>
+        </div>
       )}
-    </div>
-  );
-}
-
-function TaskGrid({
-  tasks,
-}: {
-  tasks: Array<{
-    id: string;
-    title: string;
-    status: string;
-    priority: string;
-    project: { name: string };
-  }>;
-}) {
-  return (
-    <div className="grid gap-3">
-      {tasks.map((task) => (
-        <Card key={task.id}>
-          <CardContent className="flex items-center justify-between py-4">
-            <div>
-              <p className="font-medium">{task.title}</p>
-              <p className="text-muted-foreground text-sm">
-                {task.project.name}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant={priorityVariants[task.priority]}>
-                {task.priority.toLowerCase()}
-              </Badge>
-              <TaskStatusSelect
-  taskId={task.id}
-  status={task.status as TaskStatus}
-  />
-
-            </div>
-          </CardContent>
-        </Card>
-      ))}
     </div>
   );
 }

@@ -13,6 +13,8 @@ export const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
   { title: "Projects", href: "/dashboard/projects", icon: "FolderKanban" },
   { title: "Tasks", href: "/dashboard/tasks", icon: "CheckSquare" },
+  { title: "Executive Team", href: "/executive-team", icon: "Users" },
+  { title: "Content", href: "/content", icon: "Clapperboard" },
   { title: "CEO Packet", href: "/ceo-packet", icon: "FileText" },
   { title: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ] as const;

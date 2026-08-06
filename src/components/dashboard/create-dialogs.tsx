@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { TASK_TEMPLATES, getTaskTemplate } from "@/config/task-templates";
 import { createTaskWithSteps } from "@/lib/task-creation";
+import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 
 interface CreateProjectDialogProps {
   workspaceId: string;
@@ -121,8 +122,10 @@ export function CreateTaskDialog({
   triggerLabel = "New Task",
 }: CreateTaskDialogProps) {
   const router = useRouter();
+  const scheduleHarperRefresh = useHarperAutoRefresh();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const inFlight = useRef(false);
   const [mode, setMode] = useState<CreateMode>("BLANK");
   const [templateId, setTemplateId] = useState<string>(
     TASK_TEMPLATES[0]?.id ?? ""
@@ -161,11 +164,17 @@ export function CreateTaskDialog({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Guards against a double click or an Enter-key repeat firing twice before
+    // React has re-rendered with isLoading.
+    if (inFlight.current) return;
+
     if (!projectId) {
       toast.error("Create a project first");
       return;
     }
 
+    inFlight.current = true;
     setIsLoading(true);
 
     try {
@@ -175,22 +184,21 @@ export function CreateTaskDialog({
         steps
       );
 
-      if (result.failedSteps.length > 0) {
-        toast.warning(
-          `Task created with ${result.stepsCreated} of ${steps.length} steps. Add the rest from the mission card.`
-        );
-      } else if (result.stepsCreated > 0) {
-        toast.success(`Task created with ${result.stepsCreated} steps!`);
-      } else {
-        toast.success("Task created!");
-      }
+      toast.success(
+        result.stepsCreated > 0
+          ? `Task created with ${result.stepsCreated} steps!`
+          : "Task created!"
+      );
 
       setOpen(false);
       resetForm();
+      // A new task can outrank the current mission.
+      scheduleHarperRefresh();
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
+      inFlight.current = false;
       setIsLoading(false);
     }
   }

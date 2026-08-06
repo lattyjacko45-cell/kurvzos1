@@ -56,7 +56,10 @@ export const ModelName = {
   Task: 'Task',
   TaskStep: 'TaskStep',
   FocusSession: 'FocusSession',
-  Feedback: 'Feedback'
+  Feedback: 'Feedback',
+  ContentItem: 'ContentItem',
+  ExecutiveConversation: 'ExecutiveConversation',
+  YouTubeConnection: 'YouTubeConnection'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -185,12 +188,73 @@ export const FeedbackScalarFieldEnum = {
 export type FeedbackScalarFieldEnum = (typeof FeedbackScalarFieldEnum)[keyof typeof FeedbackScalarFieldEnum]
 
 
+export const ContentItemScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  projectId: 'projectId',
+  taskId: 'taskId',
+  title: 'title',
+  description: 'description',
+  tags: 'tags',
+  categoryId: 'categoryId',
+  madeForKids: 'madeForKids',
+  contentType: 'contentType',
+  status: 'status',
+  scheduledAt: 'scheduledAt',
+  timezone: 'timezone',
+  youtubeVideoId: 'youtubeVideoId',
+  youtubeUrl: 'youtubeUrl',
+  uploadProgress: 'uploadProgress',
+  processingStatus: 'processingStatus',
+  publishedAt: 'publishedAt',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContentItemScalarFieldEnum = (typeof ContentItemScalarFieldEnum)[keyof typeof ContentItemScalarFieldEnum]
+
+
+export const ExecutiveConversationScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  executive: 'executive',
+  userMessage: 'userMessage',
+  response: 'response',
+  contextSnapshot: 'contextSnapshot',
+  createdAt: 'createdAt'
+} as const
+
+export type ExecutiveConversationScalarFieldEnum = (typeof ExecutiveConversationScalarFieldEnum)[keyof typeof ExecutiveConversationScalarFieldEnum]
+
+
+export const YouTubeConnectionScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  channelId: 'channelId',
+  channelTitle: 'channelTitle',
+  encryptedRefreshToken: 'encryptedRefreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type YouTubeConnectionScalarFieldEnum = (typeof YouTubeConnectionScalarFieldEnum)[keyof typeof YouTubeConnectionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -207,4 +271,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

@@ -75,3 +75,35 @@ export const FeedbackStatus = {
 } as const
 
 export type FeedbackStatus = (typeof FeedbackStatus)[keyof typeof FeedbackStatus]
+
+
+export const ContentType = {
+  LONG_FORM: 'LONG_FORM',
+  SHORT: 'SHORT'
+} as const
+
+export type ContentType = (typeof ContentType)[keyof typeof ContentType]
+
+
+export const ContentStatus = {
+  DRAFT: 'DRAFT',
+  READY: 'READY',
+  UPLOADING: 'UPLOADING',
+  PROCESSING: 'PROCESSING',
+  SCHEDULED: 'SCHEDULED',
+  PUBLISHED: 'PUBLISHED',
+  FAILED: 'FAILED'
+} as const
+
+export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus]
+
+
+export const Executive = {
+  HARPER: 'HARPER',
+  RENEE: 'RENEE',
+  SOPHIA: 'SOPHIA',
+  OLIVIA: 'OLIVIA',
+  MARCUS: 'MARCUS'
+} as const
+
+export type Executive = (typeof Executive)[keyof typeof Executive]
