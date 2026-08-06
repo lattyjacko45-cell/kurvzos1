@@ -15,6 +15,7 @@ import { DailyBriefingSection } from "@/components/dashboard/daily-briefing";
 import { getDailyBriefing } from "@/lib/daily-briefing.server";
 import { getHarperView } from "@/lib/harper/view.server";
 import { getReneeView } from "@/lib/renee/view.server";
+import { getSophiaView } from "@/lib/sophia/view.server";
 import { ExecutiveSummary } from "@/components/dashboard/executive-summary";
 
 export const metadata: Metadata = {
@@ -32,14 +33,22 @@ export default async function DashboardPage() {
   );
   const workspace = await getUserWorkspace(profile.id);
 
-  const [stats, briefing, harperView, reneeView, projects, tasks] =
-    await Promise.all([
+  const [
+    stats,
+    briefing,
+    harperView,
+    reneeView,
+    sophiaView,
+    projects,
+    tasks,
+  ] = await Promise.all([
       getDashboardStats(workspace.id),
       getDailyBriefing(workspace.id),
-      // Neither view calls the model: each returns saved advice only while it
-      // still matches the live context, otherwise a deterministic read.
+      // No view calls the model: each returns saved advice only while it still
+      // matches the live context, otherwise a deterministic read.
       getHarperView(profile.id, workspace.id),
       getReneeView(profile.id, workspace.id),
+      getSophiaView(profile.id, workspace.id),
       prisma.project.findMany({
         where: { workspaceId: workspace.id },
         include: { _count: { select: { tasks: true } } },
@@ -100,6 +109,7 @@ export default async function DashboardPage() {
       <ExecutiveSummary
         harperNextMove={harperView.advice.nextMove}
         reneeStrategicPriority={reneeView.advice.strategicPriority}
+        sophiaMarketingPriority={sophiaView.advice.marketingPriority}
       />
 
       <section className="grid gap-6 lg:grid-cols-[1.45fr_1fr]">

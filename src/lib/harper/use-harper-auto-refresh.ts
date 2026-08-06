@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 /**
  * Asks the server to consider a background refresh for every active executive.
  *
- * Each executive owns its own gate (`/api/harper/auto`, `/api/renee/auto`) and
- * decides independently whether the change was significant enough to spend a
- * model call. Harper cares about execution — the mission and its checklist.
- * Renee cares about the portfolio — projects, weekly priority, shipped content.
- * The same user action can therefore be significant to one and not the other.
+ * Each executive owns its own gate and decides independently whether the
+ * change was significant enough to spend a model call. Harper cares about
+ * execution — the mission and its checklist. Renee cares about the portfolio —
+ * projects, weekly priority, shipped content. Sophia cares about the pipeline —
+ * content stages, the schedule, publishing cadence. The same user action can
+ * therefore be significant to one and not the others.
  *
  * Three layers stop duplicate spend:
  *  1. Here — a debounce plus an in-flight guard, so a burst of clicks produces
@@ -24,6 +25,7 @@ import { useRouter } from "next/navigation";
 const AUTO_REFRESH_ENDPOINTS = [
   "/api/harper/auto",
   "/api/renee/auto",
+  "/api/sophia/auto",
 ] as const;
 
 export function useHarperAutoRefresh(delayMs = 1200): () => void {

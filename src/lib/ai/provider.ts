@@ -97,7 +97,8 @@ export type AiFailureStage =
   | "empty-output"
   | "incomplete-output"
   | "no-json"
-  | "json-parse";
+  | "json-parse"
+  | "schema";
 
 export interface AiFailureDiagnostics {
   provider: AiProviderName;
@@ -163,10 +164,39 @@ function readErrorIdentifiers(payload: unknown): {
   };
 }
 
-export interface StructuredRequest {
+/**
+ * A JSON Schema an executive wants the model to conform to.
+ *
+ * For OpenAI this is sent as a strict `json_schema` response format, which the
+ * API enforces during decoding — the model cannot return prose. Providers
+ * without that capability fall back to the prompt wording plus the defensive
+ * parser below.
+ *
+ * OpenAI strict mode requires every property to appear in `required` and
+ * `additionalProperties: false`; optional fields are expressed as nullable
+ * types rather than omitted keys.
+ */
+export interface JsonSchemaSpec {
+  /** Identifier sent to the provider, e.g. "sophia_advice". */
+  name: string;
+  schema: Record<string, unknown>;
+}
+
+/** Minimal shape of a Zod schema, so this module needn't import zod. */
+export interface StructuredValidator<T> {
+  safeParse(value: unknown):
+    | { success: true; data: T }
+    | { success: false; error: { issues: Array<{ path: PropertyKey[] }> } };
+}
+
+export interface StructuredRequest<T = unknown> {
   systemPrompt: string;
   userPrompt: string;
   maxTokens?: number;
+  /** Enables provider-enforced structured output where supported. */
+  jsonSchema?: JsonSchemaSpec;
+  /** Final gate: output that fails this is rejected, never patched up. */
+  validator?: StructuredValidator<T>;
 }
 
 /** Pulls the first JSON object out of a model reply. */
@@ -329,7 +359,19 @@ async function callOpenAi(
       // ask can be consumed entirely, leaving an empty message and a silent
       // fallback — hence the floor.
       max_output_tokens: Math.max(request.maxTokens ?? 0, MIN_OPENAI_OUTPUT_TOKENS),
-      text: { format: { type: "json_object" } },
+      // Strict json_schema is enforced during decoding, so the model cannot
+      // return prose or a fenced block. json_object is the weaker fallback for
+      // callers that supply no schema.
+      text: request.jsonSchema
+        ? {
+            format: {
+              type: "json_schema",
+              name: request.jsonSchema.name,
+              strict: true,
+              schema: request.jsonSchema.schema,
+            },
+          }
+        : { format: { type: "json_object" } },
     }),
     cache: "no-store",
   });
@@ -378,12 +420,19 @@ async function callOpenAi(
 }
 
 /**
- * Sends a prompt and returns parsed JSON. Callers must still validate the
- * shape against their own schema — this only guarantees it is JSON.
+ * Sends a prompt and returns structured output.
+ *
+ * Three layers, strongest first:
+ *  1. Provider-enforced schema (`jsonSchema`) where the API supports it.
+ *  2. A defensive parser that strips markdown fences and isolates the JSON
+ *     object — for providers without enforcement, or older models.
+ *  3. The caller's Zod validator (`validator`), which rejects anything that
+ *     still does not match. Rejection throws, so callers fall back rather than
+ *     rendering malformed advice.
  */
-export async function generateStructured(
-  request: StructuredRequest
-): Promise<unknown> {
+export async function generateStructured<T = unknown>(
+  request: StructuredRequest<T>
+): Promise<T> {
   const config = getConfig();
   if (!config) throw new AiUnavailableError();
 
@@ -392,7 +441,31 @@ export async function generateStructured(
       ? await callAnthropic(config, request)
       : await callOpenAi(config, request);
 
-  return extractJson(text, config);
+  const parsed = extractJson(text, config);
+
+  if (!request.validator) return parsed as T;
+
+  const validated = request.validator.safeParse(parsed);
+
+  if (!validated.success) {
+    const diagnostics: AiFailureDiagnostics = {
+      provider: config.provider,
+      model: config.model,
+      stage: "schema",
+      // Field paths only — never the offending values.
+      errorParam: validated.error.issues
+        .map((issue) => issue.path.join(".") || "(root)")
+        .join(", "),
+    };
+
+    logAiFailure(diagnostics);
+    throw new AiRequestError(
+      "The model response did not match the expected schema.",
+      diagnostics
+    );
+  }
+
+  return validated.data;
 }
 
 /** Provider and model actually in effect, for setup diagnostics. */

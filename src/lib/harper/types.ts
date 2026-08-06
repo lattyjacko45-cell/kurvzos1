@@ -24,6 +24,26 @@ export const harperAnswerSchema = harperAdviceSchema.extend({
 
 export type HarperAnswer = z.infer<typeof harperAnswerSchema>;
 
+/** Provider-enforced shape for Harper's reply. Mirrors harperAnswerSchema. */
+export const HARPER_JSON_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    currentPriority: { type: "string" },
+    nextMove: { type: "string" },
+    whyThisMatters: { type: "string" },
+    watchOutFor: { type: ["string", "null"] },
+    answer: { type: ["string", "null"] },
+  },
+  required: [
+    "currentPriority",
+    "nextMove",
+    "whyThisMatters",
+    "watchOutFor",
+    "answer",
+  ],
+} as const satisfies Record<string, unknown>;
+
 export type HarperSource = "AI" | "FALLBACK";
 
 export interface HarperResult {

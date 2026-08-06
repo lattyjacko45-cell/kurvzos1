@@ -14,6 +14,7 @@ import {
   type ContentTypeValue,
 } from "@/lib/content";
 import { browserTimeZone } from "@/lib/timezone";
+import { useExecutiveAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 
 export interface SelectableTask {
   id: string;
@@ -36,6 +37,7 @@ export function NewContentForm({
   missionTaskId,
 }: NewContentFormProps) {
   const router = useRouter();
+  const scheduleExecutiveRefresh = useExecutiveAutoRefresh();
   const inFlight = useRef(false);
 
   const [source, setSource] = useState<Source>(
@@ -105,6 +107,8 @@ export function NewContentForm({
 
       const created = (await response.json()) as { id: string };
       toast.success("Content created");
+      // A new content item changes the pipeline Sophia reads.
+      scheduleExecutiveRefresh();
       router.push(`/content/${created.id}`);
       router.refresh();
     } catch (error) {

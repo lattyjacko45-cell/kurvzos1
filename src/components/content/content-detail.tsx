@@ -43,6 +43,7 @@ import {
   formatInTimeZone,
   zonedTimeToUtc,
 } from "@/lib/timezone";
+import { useExecutiveAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 
 export interface ContentDetailItem {
   id: string;
@@ -121,6 +122,8 @@ export function ContentDetail({
   browserTimezone,
 }: ContentDetailProps) {
   const router = useRouter();
+  // Pipeline changes are Sophia's significance trigger.
+  const scheduleExecutiveRefresh = useExecutiveAutoRefresh();
 
   const initialSchedule = useMemo(
     () => splitInstant(item.scheduledAt, item.timezone),
@@ -361,6 +364,7 @@ export function ContentDetail({
       }
 
       toast.success("Video uploaded to YouTube");
+      scheduleExecutiveRefresh();
       router.refresh();
     } catch (error) {
       const message =
@@ -415,6 +419,7 @@ export function ContentDetail({
       }
 
       toast.success("Status refreshed");
+      scheduleExecutiveRefresh();
       router.refresh();
     } catch (error) {
       toast.error(
@@ -442,6 +447,7 @@ export function ContentDetail({
 
       toast.success("Video published");
       setPublishOpen(false);
+      scheduleExecutiveRefresh();
       router.refresh();
     } catch (error) {
       toast.error(

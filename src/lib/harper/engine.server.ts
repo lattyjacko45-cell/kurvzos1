@@ -11,7 +11,11 @@ import {
   HARPER_SYSTEM_PROMPT,
   buildHarperUserPrompt,
 } from "@/lib/harper/prompt";
-import { harperAnswerSchema, type HarperResult } from "@/lib/harper/types";
+import {
+  HARPER_JSON_SCHEMA,
+  harperAnswerSchema,
+  type HarperResult,
+} from "@/lib/harper/types";
 
 /**
  * Server-only record of why Harper fell back. Carries no prompt text, no
@@ -57,6 +61,11 @@ export async function runHarper(
         systemPrompt: HARPER_SYSTEM_PROMPT,
         userPrompt: buildHarperUserPrompt(context, question),
         maxTokens: 900,
+        jsonSchema: {
+          name: "harper_advice",
+          schema: HARPER_JSON_SCHEMA,
+        },
+        validator: harperAnswerSchema,
       });
 
       // Strict validation: an off-shape reply is treated as a failure, not

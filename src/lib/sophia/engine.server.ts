@@ -6,23 +6,23 @@ import {
   getAiSetupState,
 } from "@/lib/ai/provider";
 import { humanizeAdvice } from "@/lib/executives/language";
-import { buildReneeContext } from "@/lib/renee/context.server";
-import { buildReneeFallback } from "@/lib/renee/fallback";
+import { buildSophiaContext } from "@/lib/sophia/context.server";
+import { buildSophiaFallback } from "@/lib/sophia/fallback";
 import {
-  RENEE_SYSTEM_PROMPT,
-  buildReneeUserPrompt,
-} from "@/lib/renee/prompt";
+  SOPHIA_SYSTEM_PROMPT,
+  buildSophiaUserPrompt,
+} from "@/lib/sophia/prompt";
 import {
-  RENEE_JSON_SCHEMA,
-  reneeAnswerSchema,
-  type ReneeResult,
-} from "@/lib/renee/types";
+  SOPHIA_JSON_SCHEMA,
+  sophiaAnswerSchema,
+  type SophiaResult,
+} from "@/lib/sophia/types";
 
-/** Server-only fallback record. No prompt text, no business data, no keys. */
-function logReneeFallback(stage: string, detail?: string): void {
+/** Server-only fallback record. No prompt text, no pipeline data, no keys. */
+function logSophiaFallback(stage: string, detail?: string): void {
   const active = getActiveModelInfo();
 
-  console.error("[renee] falling back to deterministic strategy", {
+  console.error("[sophia] falling back to deterministic marketing read", {
     stage,
     provider: active?.provider ?? null,
     model: active?.model ?? null,
@@ -30,43 +30,44 @@ function logReneeFallback(stage: string, detail?: string): void {
   });
 }
 
-export async function runRenee(
+export async function runSophia(
   profileId: string,
   workspaceId: string,
   question: string | null
-): Promise<ReneeResult> {
-  const context = await buildReneeContext(profileId, workspaceId);
+): Promise<SophiaResult> {
+  const context = await buildSophiaContext(profileId, workspaceId);
   const setup = getAiSetupState();
 
-  let result: ReneeResult;
+  let result: SophiaResult;
 
   if (!setup.configured) {
-    logReneeFallback("not-configured", setup.missing.join(", "));
+    logSophiaFallback("not-configured", setup.missing.join(", "));
 
     result = {
-      advice: buildReneeFallback(context, question),
+      advice: buildSophiaFallback(context, question),
       source: "FALLBACK",
       fallbackReason: "No AI provider is configured.",
     };
   } else {
     try {
       const raw = await generateStructured({
-        systemPrompt: RENEE_SYSTEM_PROMPT,
-        userPrompt: buildReneeUserPrompt(context, question),
+        systemPrompt: SOPHIA_SYSTEM_PROMPT,
+        userPrompt: buildSophiaUserPrompt(context, question),
         maxTokens: 1200,
+        // Enforced during decoding, so "no-json" cannot recur.
         jsonSchema: {
-          name: "renee_strategy",
-          schema: RENEE_JSON_SCHEMA,
+          name: "sophia_marketing_read",
+          schema: SOPHIA_JSON_SCHEMA,
         },
-        validator: reneeAnswerSchema,
+        validator: sophiaAnswerSchema,
       });
 
-      const parsed = reneeAnswerSchema.safeParse(raw);
+      const parsed = sophiaAnswerSchema.safeParse(raw);
 
       if (parsed.success) {
         result = { advice: parsed.data, source: "AI" };
       } else {
-        logReneeFallback(
+        logSophiaFallback(
           "schema-validation",
           parsed.error.issues
             .map((issue) => issue.path.join(".") || "(root)")
@@ -74,13 +75,13 @@ export async function runRenee(
         );
 
         result = {
-          advice: buildReneeFallback(context, question),
+          advice: buildSophiaFallback(context, question),
           source: "FALLBACK",
-          fallbackReason: "The model response did not match Renee's schema.",
+          fallbackReason: "The model response did not match Sophia's schema.",
         };
       }
     } catch (error) {
-      logReneeFallback(
+      logSophiaFallback(
         error instanceof AiRequestError
           ? (error.diagnostics?.stage ?? "provider-request")
           : "provider-request",
@@ -88,7 +89,7 @@ export async function runRenee(
       );
 
       result = {
-        advice: buildReneeFallback(context, question),
+        advice: buildSophiaFallback(context, question),
         source: "FALLBACK",
         fallbackReason:
           error instanceof Error ? error.message : "The model request failed.",
@@ -96,15 +97,13 @@ export async function runRenee(
     }
   }
 
-  // Belt and braces: the prompt forbids internal identifiers, this guarantees
-  // it — and it applies to the deterministic path too. Done before persisting
-  // so the stored row is already clean.
+  // Language guard applies to both paths, before persisting.
   result = { ...result, advice: humanizeAdvice(result.advice) };
 
   await prisma.executiveConversation.create({
     data: {
       profileId,
-      executive: "RENEE",
+      executive: "SOPHIA",
       userMessage: question,
       response: {
         ...result.advice,
@@ -120,19 +119,19 @@ export async function runRenee(
   return result;
 }
 
-export async function getLatestReneeAdvice(profileId: string) {
+export async function getLatestSophiaAdvice(profileId: string) {
   return prisma.executiveConversation.findFirst({
-    where: { profileId, executive: "RENEE" },
+    where: { profileId, executive: "SOPHIA" },
     orderBy: { createdAt: "desc" },
   });
 }
 
-export async function getRecentReneeConversations(
+export async function getRecentSophiaConversations(
   profileId: string,
   take = 10
 ) {
   return prisma.executiveConversation.findMany({
-    where: { profileId, executive: "RENEE" },
+    where: { profileId, executive: "SOPHIA" },
     orderBy: { createdAt: "desc" },
     take,
   });

@@ -28,6 +28,28 @@ export const reneeAnswerSchema = reneeAdviceSchema.extend({
 
 export type ReneeAnswer = z.infer<typeof reneeAnswerSchema>;
 
+/** Provider-enforced shape for Renee's reply. Mirrors reneeAnswerSchema. */
+export const RENEE_JSON_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    strategicPriority: { type: "string" },
+    alignmentCheck: { type: "string" },
+    strategicRecommendation: { type: "string" },
+    whatToDeprioritize: { type: ["string", "null"] },
+    whyThisMatters: { type: "string" },
+    answer: { type: ["string", "null"] },
+  },
+  required: [
+    "strategicPriority",
+    "alignmentCheck",
+    "strategicRecommendation",
+    "whatToDeprioritize",
+    "whyThisMatters",
+    "answer",
+  ],
+} as const satisfies Record<string, unknown>;
+
 export type ReneeSource = "AI" | "FALLBACK";
 
 export interface ReneeResult {

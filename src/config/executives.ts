@@ -35,10 +35,11 @@ export const EXECUTIVES: readonly ExecutiveProfile[] = [
   {
     id: "SOPHIA",
     name: "Sophia",
-    role: "Brand Strategist",
-    description: "Keeps positioning and audience direction consistent.",
-    href: null,
-    active: false,
+    role: "Chief Marketing Officer",
+    description:
+      "Decides what to publish, promote or improve to grow the audience.",
+    href: "/executive-team/sophia",
+    active: true,
   },
   {
     id: "OLIVIA",
