@@ -50,23 +50,55 @@ export async function POST(_request: Request, context: RouteContext) {
       );
     }
 
+    const hasPublishAt = Boolean(status.publishAt);
+
+    // Safe diagnostics: the four fields the mapping actually reads. No video
+    // id, no publishAt value, no channel id, no title, no URL, no tokens.
+    console.error("[youtube] video status", {
+      processingStatus: status.processingStatus,
+      uploadStatus: status.uploadStatus,
+      privacyStatus: status.privacyStatus,
+      hasPublishAt,
+    });
+
     let nextStatus: ContentStatus = item.status;
     let publishedAt = item.publishedAt;
     let errorMessage: string | null = null;
 
-    if (status.uploadStatus === "failed" || status.uploadStatus === "rejected") {
+    // Rules are evaluated in this order deliberately: failure first, then
+    // in-flight, then the three terminal states.
+    //
+    // The previous version had no branch for uploadStatus "uploaded", so a
+    // finished private video matched nothing and silently kept its old value —
+    // which is why items sat on PROCESSING forever.
+    if (
+      status.processingStatus === "failed" ||
+      status.uploadStatus === "failed" ||
+      status.uploadStatus === "rejected"
+    ) {
+      // B — processing failed, or YouTube rejected the upload.
       nextStatus = "FAILED";
       errorMessage = status.failureReason ?? "YouTube rejected the video.";
     } else if (status.processingStatus === "processing") {
+      // A — genuinely still being processed.
       nextStatus = "PROCESSING";
+    } else if (hasPublishAt) {
+      // C — a publish time exists, so YouTube accepted the schedule.
+      nextStatus = "SCHEDULED";
     } else if (status.privacyStatus === "public") {
+      // D — live on YouTube.
       nextStatus = "PUBLISHED";
       publishedAt = publishedAt ?? new Date();
-    } else if (status.publishAt) {
-      nextStatus = "SCHEDULED";
-    } else if (status.uploadStatus === "processed") {
-      // Processed, private, no publishAt: uploaded but never scheduled.
-      nextStatus = item.scheduledAt ? "SCHEDULED" : "PROCESSING";
+    } else {
+      // E — on YouTube, not processing, private, no publish time.
+      // Truthfully complete. We do NOT claim Scheduled here even when the user
+      // asked for a schedule: absent publishAt, YouTube did not accept one.
+      nextStatus = "UPLOADED";
+
+      if (item.scheduledAt) {
+        errorMessage =
+          "The video uploaded successfully but YouTube did not record a publish time. If the API project is unverified, uploads can be forced private until Google completes its audit. Set the publish time in YouTube Studio, or re-check after verification.";
+      }
     }
 
     const updated = await prisma.contentItem.update({

@@ -15,6 +15,7 @@ export const CONTENT_STATUS_LABELS = {
   READY: "Ready",
   UPLOADING: "Uploading",
   PROCESSING: "Processing",
+  UPLOADED: "Uploaded",
   SCHEDULED: "Scheduled",
   PUBLISHED: "Published",
   FAILED: "Failed",
@@ -160,6 +161,8 @@ export function uploadProgressLabel(
       return `Uploading video, ${percent} percent complete.`;
     case "PROCESSING":
       return "Upload complete. YouTube is processing the video.";
+    case "UPLOADED":
+      return "Upload complete. The video is private on YouTube.";
     case "SCHEDULED":
       return "Video is scheduled on YouTube.";
     case "PUBLISHED":

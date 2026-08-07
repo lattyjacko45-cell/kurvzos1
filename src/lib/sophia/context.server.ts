@@ -171,7 +171,8 @@ export async function buildSophiaContext(
       readyOrUploading:
         countByStatus("READY") +
         countByStatus("UPLOADING") +
-        countByStatus("PROCESSING"),
+        countByStatus("PROCESSING") +
+        countByStatus("UPLOADED"),
       scheduled: countByStatus("SCHEDULED"),
       published: publishedItems.length,
       failed: countByStatus("FAILED"),

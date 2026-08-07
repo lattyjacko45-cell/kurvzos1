@@ -12,9 +12,12 @@ import {
 import {
   YouTubeApiError,
   createResumableUploadSession,
-  getAccessTokenForProfile,
+  mintAccessTokenForProfile,
 } from "@/lib/youtube/client";
-import { YouTubeNotConfiguredError } from "@/lib/youtube/config";
+import {
+  YouTubeNotConfiguredError,
+  requireYouTubeEnv,
+} from "@/lib/youtube/config";
 
 interface RouteContext {
   params: Promise<{ contentId: string }>;
@@ -95,25 +98,43 @@ export async function POST(request: Request, context: RouteContext) {
       );
     }
 
-    const accessToken = await getAccessTokenForProfile(profileId);
+    // Minted fresh for this upload. The refresh token stays server-side; only
+    // this short-lived token is returned, because the YouTube resumable
+    // protocol requires an Authorization header on the browser's PUT.
+    const { accessToken, expiresIn } = await mintAccessTokenForProfile(
+      profileId
+    );
 
-    const uploadUrl = await createResumableUploadSession(accessToken, {
-      title: item.title,
-      description: item.description,
-      tags: item.tags,
-      categoryId: item.categoryId,
-      madeForKids: item.madeForKids,
-      publishAt: item.scheduledAt ? item.scheduledAt.toISOString() : null,
-      fileSize: data.fileSize,
-      mimeType: data.mimeType,
-    });
+    // Forwarded as Origin on the initiation call. See the note in
+    // createResumableUploadSession — defensive, not a verified requirement.
+    const browserOrigin = requireYouTubeEnv().appUrl;
+
+    const uploadUrl = await createResumableUploadSession(
+      accessToken,
+      {
+        title: item.title,
+        description: item.description,
+        tags: item.tags,
+        categoryId: item.categoryId,
+        madeForKids: item.madeForKids,
+        publishAt: item.scheduledAt ? item.scheduledAt.toISOString() : null,
+        fileSize: data.fileSize,
+        mimeType: data.mimeType,
+      },
+      browserOrigin
+    );
 
     await prisma.contentItem.update({
       where: { id: contentId },
       data: { status: "UPLOADING", uploadProgress: 0, errorMessage: null },
     });
 
-    return NextResponse.json({ uploadUrl });
+    // no-store: the body carries a bearer token, so it must never be cached
+    // by the browser, a proxy, or the Next.js data cache.
+    return NextResponse.json(
+      { uploadUrl, accessToken, expiresIn },
+      { headers: { "Cache-Control": "no-store, private" } }
+    );
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(

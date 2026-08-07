@@ -138,6 +138,7 @@ const ENUM_LABELS: Record<string, string> = {
   READY: "ready",
   UPLOADING: "uploading",
   PROCESSING: "processing",
+  UPLOADED: "uploaded and private",
   SCHEDULED: "scheduled",
   PUBLISHED: "published",
   FAILED: "failed",

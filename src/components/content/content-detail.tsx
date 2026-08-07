@@ -11,7 +11,7 @@ import {
   UploadIcon,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -99,6 +99,69 @@ function splitInstant(
     date: `${map.year}-${map.month}-${map.day}`,
     time: `${map.hour}:${map.minute}`,
   };
+}
+
+/**
+ * How a browser → Google upload failed.
+ *
+ * XMLHttpRequest reports status 0 for anything that never produced an HTTP
+ * response — a blocked CORS preflight looks identical to a dropped connection
+ * from JavaScript. Calling that "the network dropped" sent us chasing the
+ * wrong problem once already, so status 0 is now reported as what it actually
+ * is: could not reach Google, or the browser refused the response.
+ */
+type UploadFailureKind =
+  | "cors_or_network"
+  | "unauthorized_upload"
+  | "expired_session"
+  | "google_4xx"
+  | "google_5xx"
+  | "aborted"
+  | "unexpected";
+
+const UPLOAD_FAILURE_MESSAGES: Record<UploadFailureKind, string> = {
+  cors_or_network:
+    "The upload could not reach YouTube. This is usually a blocked cross-origin request rather than a dropped connection — the browser reports no HTTP status for either. Retry, and if it repeats check that NEXT_PUBLIC_APP_URL matches the address you are browsing from.",
+  unauthorized_upload:
+    "YouTube rejected the upload session as unauthorized. Reconnect the channel and try again.",
+  expired_session:
+    "The upload session expired before the file finished.",
+  google_4xx:
+    "YouTube rejected the upload. Check the video file type and size, then retry.",
+  google_5xx:
+    "YouTube had a server error during the upload. Retrying usually clears it.",
+  aborted: "The upload was cancelled.",
+  unexpected: "The upload failed for an unexpected reason.",
+};
+
+class UploadFailure extends Error {
+  readonly kind: UploadFailureKind;
+  /** 0 when no HTTP response was produced. */
+  readonly status: number;
+
+  constructor(kind: UploadFailureKind, status: number) {
+    super(UPLOAD_FAILURE_MESSAGES[kind]);
+    this.name = "UploadFailure";
+    this.kind = kind;
+    this.status = status;
+  }
+}
+
+/**
+ * Safe client diagnostics. Records only what went wrong and the HTTP status —
+ * never the session URI, an access token, or any authorization header.
+ */
+function logUploadFailure(kind: UploadFailureKind, status: number): void {
+  console.error("[content] browser upload failed", { kind, status });
+}
+
+function classifyUploadStatus(status: number): UploadFailureKind {
+  if (status === 0) return "cors_or_network";
+  if (status === 401 || status === 403) return "unauthorized_upload";
+  if (status === 404 || status === 410) return "expired_session";
+  if (status >= 400 && status < 500) return "google_4xx";
+  if (status >= 500) return "google_5xx";
+  return "unexpected";
 }
 
 async function readError(response: Response): Promise<{
@@ -228,11 +291,25 @@ export function ContentDetail({
     }
   }
 
-  /** PUTs the file straight to Google's resumable session URL. */
-  function putToYouTube(uploadUrl: string, file: File): Promise<string> {
+  /**
+   * PUTs the file straight to Google's resumable session URL.
+   *
+   * The YouTube resumable protocol requires Authorization on this request, so
+   * the caller passes a short-lived access token. Content-Length is set by the
+   * browser from the File — it is a forbidden header we must not set manually.
+   *
+   * The token is a parameter only. It is never written to state, storage, a
+   * URL, or a log.
+   */
+  function putToYouTube(
+    uploadUrl: string,
+    file: File,
+    accessToken: string
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       const request = new XMLHttpRequest();
       request.open("PUT", uploadUrl, true);
+      request.setRequestHeader("Authorization", `Bearer ${accessToken}`);
       request.setRequestHeader("Content-Type", file.type);
 
       request.upload.onprogress = (event) => {
@@ -242,25 +319,39 @@ export function ContentDetail({
 
       request.onload = () => {
         if (request.status < 200 || request.status >= 300) {
-          reject(new Error(`YouTube returned status ${request.status}`));
+          // 404/410 means the session URI expired — recoverable by opening a
+          // fresh one rather than failing the upload outright.
+          const kind = classifyUploadStatus(request.status);
+          logUploadFailure(kind, request.status);
+          reject(new UploadFailure(kind, request.status));
           return;
         }
 
         try {
           const payload = JSON.parse(request.responseText) as { id?: string };
           if (!payload.id) {
-            reject(new Error("YouTube did not return a video id."));
+            logUploadFailure("unexpected", request.status);
+            reject(new UploadFailure("unexpected", request.status));
             return;
           }
           resolve(payload.id);
         } catch {
-          reject(new Error("Could not read the YouTube response."));
+          logUploadFailure("unexpected", request.status);
+          reject(new UploadFailure("unexpected", request.status));
         }
       };
 
-      request.onerror = () =>
-        reject(new Error("The network dropped during upload."));
-      request.onabort = () => reject(new Error("Upload cancelled."));
+      // status is 0 here: no HTTP response was produced. A refused CORS
+      // preflight and a genuine connection failure are indistinguishable.
+      request.onerror = () => {
+        logUploadFailure("cors_or_network", request.status);
+        reject(new UploadFailure("cors_or_network", request.status));
+      };
+
+      request.onabort = () => {
+        logUploadFailure("aborted", request.status);
+        reject(new UploadFailure("aborted", request.status));
+      };
 
       request.send(file);
     });
@@ -304,20 +395,30 @@ export function ContentDetail({
       return;
     }
 
+    // Captured after the guard so the nested helper has a non-null File.
+    const file = videoFile;
+
     uploadInFlight.current = true;
     setIsUploading(true);
     setProgress(0);
     setThumbnailWarning(null);
 
-    try {
+    /**
+     * Opens a resumable session. Returns the session URI plus the short-lived
+     * access token the PUT needs. The refresh token stays on the server.
+     */
+    async function openSession(): Promise<{
+      uploadUrl: string;
+      accessToken: string;
+    }> {
       const sessionResponse = await fetch(
         `/api/content/${item.id}/upload-session`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            fileSize: videoFile.size,
-            mimeType: videoFile.type,
+            fileSize: file.size,
+            mimeType: file.type,
           }),
         }
       );
@@ -330,11 +431,49 @@ export function ContentDetail({
         throw new Error(message);
       }
 
-      const { uploadUrl } = (await sessionResponse.json()) as {
+      const { uploadUrl, accessToken } = (await sessionResponse.json()) as {
         uploadUrl: string;
+        accessToken: string;
       };
 
-      const videoId = await putToYouTube(uploadUrl, videoFile);
+      return { uploadUrl, accessToken };
+    }
+
+    try {
+      /**
+       * One upload attempt. The session URI and its access token live only in
+       * this scope — they are never stored, and they fall out of memory when
+       * the attempt resolves or throws.
+       */
+      const attempt = async (): Promise<string> => {
+        const session = await openSession();
+        return putToYouTube(session.uploadUrl, file, session.accessToken);
+      };
+
+      let videoId: string;
+
+      try {
+        videoId = await attempt();
+      } catch (error) {
+        // Both cases are recoverable by starting over with a fresh session and
+        // a freshly minted token: an expired session URI (404/410), or an
+        // expired or rejected access token (401/403).
+        const recoverable =
+          error instanceof UploadFailure &&
+          (error.kind === "expired_session" ||
+            error.kind === "unauthorized_upload");
+
+        if (!recoverable) throw error;
+
+        toast.info(
+          error instanceof UploadFailure && error.kind === "expired_session"
+            ? "The upload session expired. Starting a new one."
+            : "The upload authorization expired. Starting a new session."
+        );
+
+        setProgress(0);
+        videoId = await attempt();
+      }
 
       const completeResponse = await fetch(
         `/api/content/${item.id}/complete-upload`,
@@ -573,22 +712,17 @@ export function ContentDetail({
             </Button>
           ) : null}
 
+          {/* External navigation — a styled anchor, not a Button. */}
           {item.youtubeUrl ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              render={
-                <a
-                  href={item.youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              }
+            <a
+              href={item.youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
             >
               <ExternalLinkIcon />
               Open on YouTube
-            </Button>
+            </a>
           ) : null}
         </div>
 
@@ -887,6 +1021,14 @@ export function ContentDetail({
         <p className="text-xs text-muted-foreground">
           Uploading with a scheduled time keeps the video private on YouTube
           until that moment.
+        </p>
+
+        {/* Not a failure state: unaudited API projects have their uploads
+            locked to private regardless of the requested privacy. */}
+        <p className="text-xs text-muted-foreground">
+          While the YouTube API project is unverified, uploads may stay private
+          even after the scheduled time passes, until Google completes its
+          audit. That is a project restriction, not an upload failure.
         </p>
       </section>
 

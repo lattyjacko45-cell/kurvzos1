@@ -5,18 +5,39 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CheckIcon, LinkIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 interface YouTubeConnectionCardProps {
   configured: boolean;
   missingEnv: string[];
   channelTitle: string | null;
+  /** Exact values to paste into Google Cloud. Never contains a secret. */
+  oauthSetup: {
+    origin: string;
+    redirectUri: string;
+    isFallback: boolean;
+  };
+}
+
+function CopyableValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+        {label}
+      </p>
+
+      <p className="break-all rounded-lg border bg-muted/40 px-3 py-2 font-mono text-xs">
+        {value}
+      </p>
+    </div>
+  );
 }
 
 export function YouTubeConnectionCard({
   configured,
   missingEnv,
   channelTitle,
+  oauthSetup,
 }: YouTubeConnectionCardProps) {
   const router = useRouter();
   const [isWorking, setIsWorking] = useState(false);
@@ -56,16 +77,54 @@ export function YouTubeConnectionCard({
           YouTube setup required
         </h2>
 
-        <p className="text-sm text-muted-foreground">
-          Add these environment variables, then restart the server to enable
-          publishing:
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Add these environment variables, then restart the server:
+          </p>
 
-        <ul className="space-y-1 font-mono text-xs">
-          {missingEnv.map((name) => (
-            <li key={name}>{name}</li>
-          ))}
-        </ul>
+          <ul className="space-y-1 font-mono text-xs">
+            {missingEnv.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Values only — a secret is never rendered here. */}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <CopyableValue
+            label="Authorised JavaScript origin"
+            value={oauthSetup.origin}
+          />
+
+          <CopyableValue
+            label="Authorised redirect URI"
+            value={oauthSetup.redirectUri}
+          />
+        </div>
+
+        {oauthSetup.isFallback ? (
+          <p className="text-xs text-muted-foreground">
+            NEXT_PUBLIC_APP_URL is not set, so these show the local development
+            defaults. They must match your Google Cloud client exactly.
+          </p>
+        ) : null}
+
+        <div className="space-y-2 rounded-xl border p-4 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">In Google Cloud:</p>
+
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>Enable the YouTube Data API v3 for the project.</li>
+            <li>
+              Create an OAuth client of type Web application and paste the two
+              values above.
+            </li>
+            <li>
+              While the OAuth consent screen is in Testing mode, add the Google
+              account that owns the channel as a test user — otherwise consent
+              will be refused.
+            </li>
+          </ol>
+        </div>
       </section>
     );
   }
@@ -90,15 +149,31 @@ export function YouTubeConnectionCard({
           </p>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={disconnect}
-          disabled={isWorking}
-        >
-          Disconnect
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Re-running consent replaces the stored refresh token, which is the
+              recovery path when authorization expires.
+
+              A plain anchor styled with buttonVariants: this navigates to a
+              server route that redirects to Google, so it is a link, not a
+              button. Routing it through the Base UI Button would make the
+              component claim button semantics for an anchor. */}
+          <a
+            href="/api/youtube/connect"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            Reconnect
+          </a>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={disconnect}
+            disabled={isWorking}
+          >
+            Disconnect
+          </Button>
+        </div>
       </section>
     );
   }
@@ -121,11 +196,14 @@ export function YouTubeConnectionCard({
         </p>
       </div>
 
-      {/* A plain link: the server route redirects to Google. */}
-      <Button type="button" render={<a href="/api/youtube/connect" />}>
+      {/* A plain link: the server route redirects to Google consent. */}
+      <a
+        href="/api/youtube/connect"
+        className={buttonVariants({ variant: "default" })}
+      >
         <LinkIcon />
         Connect YouTube
-      </Button>
+      </a>
     </section>
   );
 }

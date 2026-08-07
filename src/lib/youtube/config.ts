@@ -83,3 +83,30 @@ export function requireYouTubeEnv(): YouTubeEnv {
 export function getRedirectUri(appUrl: string): string {
   return `${appUrl}/api/youtube/callback`;
 }
+
+/** Shown in the setup card so the values can be pasted into Google Cloud. */
+export interface OAuthSetupDetails {
+  /** Authorised JavaScript origin. */
+  origin: string;
+  /** Authorised redirect URI. */
+  redirectUri: string;
+  /** True when we fell back to the local default because the env is unset. */
+  isFallback: boolean;
+}
+
+const LOCAL_APP_URL = "http://localhost:3000";
+
+/**
+ * Derives the two values Google Cloud needs. When NEXT_PUBLIC_APP_URL is not
+ * set we show the local development defaults rather than a blank card, so the
+ * user can still complete setup.
+ */
+export function getOAuthSetupDetails(): OAuthSetupDetails {
+  const appUrl = readAppUrl();
+
+  return {
+    origin: appUrl ?? LOCAL_APP_URL,
+    redirectUri: getRedirectUri(appUrl ?? LOCAL_APP_URL),
+    isFallback: !appUrl,
+  };
+}

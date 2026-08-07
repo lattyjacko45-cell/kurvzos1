@@ -240,7 +240,8 @@ export async function buildMarcusContext(
         countContent("DRAFT") +
         countContent("READY") +
         countContent("UPLOADING") +
-        countContent("PROCESSING"),
+        countContent("PROCESSING") +
+        countContent("UPLOADED"),
       recentTitles: contentItems.slice(0, 5).map((item) => item.title),
     },
     weeklyPacket: {

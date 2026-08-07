@@ -3,7 +3,10 @@ import { notFound, redirect } from "next/navigation";
 
 import { getCurrentUser, ensureProfile } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getYouTubeSetupState } from "@/lib/youtube/config";
+import {
+  getOAuthSetupDetails,
+  getYouTubeSetupState,
+} from "@/lib/youtube/config";
 import { YouTubeConnectionCard } from "@/components/content/youtube-connection-card";
 import {
   ContentDetail,
@@ -82,6 +85,7 @@ export default async function ContentDetailPage({
         configured={setupState.configured}
         missingEnv={setupState.missing}
         channelTitle={connection?.channelTitle ?? null}
+        oauthSetup={getOAuthSetupDetails()}
       />
 
       <ContentDetail

@@ -244,6 +244,8 @@ enum ContentStatus {
   READY
   UPLOADING
   PROCESSING
+  /// On YouTube and finished processing, private, with no publish time set.
+  UPLOADED
   SCHEDULED
   PUBLISHED
   FAILED

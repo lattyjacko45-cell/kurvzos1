@@ -12,6 +12,7 @@ const VARIANTS: Record<
   READY: "secondary",
   UPLOADING: "secondary",
   PROCESSING: "secondary",
+  UPLOADED: "secondary",
   SCHEDULED: "default",
   PUBLISHED: "default",
   FAILED: "destructive",
