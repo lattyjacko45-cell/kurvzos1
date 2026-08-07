@@ -9,6 +9,7 @@ import { getLatestSophiaAdvice } from "@/lib/sophia/engine.server";
 import { sophiaAnswerSchema } from "@/lib/sophia/types";
 import { CONTENT_STATUS_LABELS, type ContentStatusValue } from "@/lib/content";
 import { deriveMissionProgress } from "@/lib/mission";
+import { getScheduleForProfile } from "@/lib/calendar/read.server";
 import type { OliviaContext } from "@/lib/olivia/types";
 
 /**
@@ -64,6 +65,7 @@ export async function buildOliviaContext(
     harper,
     renee,
     sophia,
+    calendar,
   ] = await Promise.all([
     getDailyBriefing(workspaceId, now),
     getWeeklyPacket(workspaceId, now),
@@ -116,6 +118,7 @@ export async function buildOliviaContext(
     getLatestHarperAdvice(profileId),
     getLatestReneeAdvice(profileId),
     getLatestSophiaAdvice(profileId),
+    getScheduleForProfile(profileId, now),
   ]);
 
   const withProgress = openTasks.map((task) => ({
@@ -276,5 +279,16 @@ export async function buildOliviaContext(
     latestSophiaMarketingPriority: sophiaParsed?.success
       ? sophiaParsed.data.marketingPriority
       : null,
+    schedule:
+      calendar.state === "not_connected"
+        ? null
+        : {
+            eventsToday: calendar.schedule.eventsToday,
+            allDayEventsToday: calendar.schedule.allDayEventsToday,
+            bookedMinutesToday: calendar.schedule.bookedMinutesToday,
+            largestFreeGapMinutes: calendar.schedule.largestGapMinutes,
+            freeMinutesRemainingToday:
+              calendar.schedule.freeMinutesRemainingToday,
+          },
   };
 }

@@ -77,6 +77,21 @@ export type ExecutiveConversation = Prisma.ExecutiveConversationModel
  */
 export type FinancialSnapshot = Prisma.FinancialSnapshotModel
 /**
+ * Model CalendarConnection
+ * *
+ *  * Google Calendar authorization, stored separately from YouTubeConnection.
+ *  *
+ *  * Separate rows and separate refresh tokens mean re-consenting to one can
+ *  * never corrupt the other's stored token, and KurvzOS can use either
+ *  * independently.
+ *  *
+ *  * Note the limit of that independence: both are granted through the same
+ *  * Google Cloud project with include_granted_scopes=true, so Google holds them
+ *  * as ONE combined authorization. Revoking at Google drops both. That is why
+ *  * neither disconnect route revokes — see /api/calendar/disconnect.
+ */
+export type CalendarConnection = Prisma.CalendarConnectionModel
+/**
  * Model YouTubeConnection
  * 
  */

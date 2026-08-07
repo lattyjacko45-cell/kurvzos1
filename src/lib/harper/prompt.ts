@@ -14,6 +14,7 @@ Rules you must follow:
 - Keep every field short: one or two sentences.
 - Only fill "watchOutFor" when a real risk exists in the data. Otherwise return null.
 - Quote task and step names exactly as they appear in the context.
+- A "schedule" block may be present. Use it only to judge what is realistically startable now — for example a short gap before the next event. Never invent meetings, times, durations, attendees or availability that is not in that block, and never let the schedule change which task is the priority: that is decided elsewhere. When schedule is null, say nothing about the calendar.
 
 Respond with a single JSON object and nothing else:
 {

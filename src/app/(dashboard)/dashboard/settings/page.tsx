@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
 
 import { getCurrentUser, ensureProfile } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import {
+  getCalendarOAuthSetupDetails,
+  getCalendarSetupState,
+} from "@/lib/calendar/config";
+import { getScheduleForProfile } from "@/lib/calendar/read.server";
+import {
+  CalendarConnectionCard,
+  type CalendarConnectionState,
+} from "@/components/calendar/calendar-connection-card";
 import {
   Card,
   CardContent,
@@ -27,7 +37,22 @@ function getInitials(name?: string | null, email?: string) {
   return email?.slice(0, 2).toUpperCase() ?? "U";
 }
 
-export default async function SettingsPage() {
+const CALENDAR_MESSAGES: Record<string, string> = {
+  connected: "Google Calendar connected.",
+  denied: "Calendar access was declined.",
+  invalid: "That connection attempt expired. Please try again.",
+  failed: "Could not finish connecting Google Calendar.",
+  no_refresh_token:
+    "Google did not return a refresh token. Remove KurvzOS at myaccount.google.com/permissions, then connect again.",
+};
+
+interface SettingsPageProps {
+  searchParams: Promise<{ calendar?: string }>;
+}
+
+export default async function SettingsPage({
+  searchParams,
+}: SettingsPageProps) {
   const user = await getCurrentUser();
   if (!user) return null;
 
@@ -37,6 +62,28 @@ export default async function SettingsPage() {
     user.fullName ?? undefined
   );
 
+  const { calendar } = await searchParams;
+  const calendarMessage = calendar ? CALENDAR_MESSAGES[calendar] : undefined;
+  const calendarSetup = getCalendarSetupState();
+
+  const calendarConnection = await prisma.calendarConnection.findUnique({
+    where: { profileId: profile.id },
+    select: { calendarLabel: true, calendarTimeZone: true },
+  });
+
+  // Uses the cached read, so opening Settings does not hammer Google.
+  const schedule = calendarConnection
+    ? await getScheduleForProfile(profile.id)
+    : null;
+
+  const calendarState: CalendarConnectionState = !calendarConnection
+    ? "not_connected"
+    : schedule?.state === "reconnect_required"
+      ? "reconnect_required"
+      : schedule?.state === "error"
+        ? "error"
+        : "connected";
+
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
@@ -45,6 +92,31 @@ export default async function SettingsPage() {
           Manage your account and preferences.
         </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Connected apps</CardTitle>
+          <CardDescription>
+            Services KurvzOS reads from. Each is authorised separately.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {calendarMessage ? (
+            <p role="status" className="rounded-xl border p-3 text-sm">
+              {calendarMessage}
+            </p>
+          ) : null}
+
+          <CalendarConnectionCard
+            configured={calendarSetup.configured}
+            missingEnv={calendarSetup.missing}
+            state={calendarState}
+            calendarLabel={calendarConnection?.calendarLabel ?? null}
+            timeZone={calendarConnection?.calendarTimeZone ?? null}
+            oauthSetup={getCalendarOAuthSetupDetails()}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

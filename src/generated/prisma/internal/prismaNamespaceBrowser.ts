@@ -60,6 +60,7 @@ export const ModelName = {
   ContentItem: 'ContentItem',
   ExecutiveConversation: 'ExecutiveConversation',
   FinancialSnapshot: 'FinancialSnapshot',
+  CalendarConnection: 'CalendarConnection',
   YouTubeConnection: 'YouTubeConnection'
 } as const
 
@@ -245,6 +246,21 @@ export const FinancialSnapshotScalarFieldEnum = {
 } as const
 
 export type FinancialSnapshotScalarFieldEnum = (typeof FinancialSnapshotScalarFieldEnum)[keyof typeof FinancialSnapshotScalarFieldEnum]
+
+
+export const CalendarConnectionScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  calendarLabel: 'calendarLabel',
+  calendarTimeZone: 'calendarTimeZone',
+  encryptedRefreshToken: 'encryptedRefreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  grantedScopes: 'grantedScopes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CalendarConnectionScalarFieldEnum = (typeof CalendarConnectionScalarFieldEnum)[keyof typeof CalendarConnectionScalarFieldEnum]
 
 
 export const YouTubeConnectionScalarFieldEnum = {

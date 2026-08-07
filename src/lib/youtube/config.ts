@@ -22,6 +22,11 @@ export const OAUTH_STATE_COOKIE = "kurvzos_yt_oauth_state";
 
 export const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 export const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+/**
+ * Present for reference only — nothing calls it. See the note in
+ * /api/youtube/disconnect: revocation is combined across this project's
+ * grants and would disconnect Calendar too.
+ */
 export const GOOGLE_REVOKE_URL = "https://oauth2.googleapis.com/revoke";
 export const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
 export const YOUTUBE_UPLOAD_BASE =

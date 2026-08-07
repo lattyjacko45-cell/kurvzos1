@@ -86,6 +86,17 @@ export const oliviaContextSchema = z.object({
   latestHarperNextMove: z.string().nullable(),
   latestReneeStrategicPriority: z.string().nullable(),
   latestSophiaMarketingPriority: z.string().nullable(),
+  // Optional so snapshots written before Calendar existed still parse.
+  schedule: z
+    .object({
+      eventsToday: z.number(),
+      allDayEventsToday: z.number(),
+      bookedMinutesToday: z.number(),
+      largestFreeGapMinutes: z.number().nullable(),
+      freeMinutesRemainingToday: z.number(),
+    })
+    .nullable()
+    .optional(),
 });
 
 export function parseStoredOliviaContext(
@@ -138,6 +149,10 @@ export function oliviaFingerprint(context: OliviaContext): string {
     context.focus.sessionsLast7Days,
     context.feedback.unresolved,
     stageSignature(context.contentPipeline),
+    // Commitment load changes the diagnosis. Free-minutes-remaining is
+    // excluded: it decreases every minute without changing anything.
+    context.schedule?.eventsToday ?? 0,
+    context.schedule?.bookedMinutesToday ?? 0,
   ].join("|");
 }
 
@@ -206,6 +221,12 @@ export function isOliviaSignificantChange(
     stageSignature(saved.contentPipeline) !==
     stageSignature(current.contentPipeline)
   ) {
+    return true;
+  }
+
+  // The day's commitment load changed — an added or cancelled meeting can
+  // genuinely change whether there is execution space left.
+  if ((saved.schedule?.eventsToday ?? 0) !== (current.schedule?.eventsToday ?? 0)) {
     return true;
   }
 

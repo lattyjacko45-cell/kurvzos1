@@ -401,6 +401,7 @@ export const ModelName = {
   ContentItem: 'ContentItem',
   ExecutiveConversation: 'ExecutiveConversation',
   FinancialSnapshot: 'FinancialSnapshot',
+  CalendarConnection: 'CalendarConnection',
   YouTubeConnection: 'YouTubeConnection'
 } as const
 
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback" | "contentItem" | "executiveConversation" | "financialSnapshot" | "youTubeConnection"
+    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback" | "contentItem" | "executiveConversation" | "financialSnapshot" | "calendarConnection" | "youTubeConnection"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1235,6 +1236,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CalendarConnection: {
+      payload: Prisma.$CalendarConnectionPayload<ExtArgs>
+      fields: Prisma.CalendarConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CalendarConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CalendarConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.CalendarConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CalendarConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.CalendarConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.CalendarConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.CalendarConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CalendarConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.CalendarConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>
+        }
+        update: {
+          args: Prisma.CalendarConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.CalendarConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CalendarConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CalendarConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.CalendarConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.CalendarConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCalendarConnection>
+        }
+        groupBy: {
+          args: Prisma.CalendarConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CalendarConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
     YouTubeConnection: {
       payload: Prisma.$YouTubeConnectionPayload<ExtArgs>
       fields: Prisma.YouTubeConnectionFieldRefs
@@ -1514,6 +1589,21 @@ export const FinancialSnapshotScalarFieldEnum = {
 } as const
 
 export type FinancialSnapshotScalarFieldEnum = (typeof FinancialSnapshotScalarFieldEnum)[keyof typeof FinancialSnapshotScalarFieldEnum]
+
+
+export const CalendarConnectionScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  calendarLabel: 'calendarLabel',
+  calendarTimeZone: 'calendarTimeZone',
+  encryptedRefreshToken: 'encryptedRefreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  grantedScopes: 'grantedScopes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CalendarConnectionScalarFieldEnum = (typeof CalendarConnectionScalarFieldEnum)[keyof typeof CalendarConnectionScalarFieldEnum]
 
 
 export const YouTubeConnectionScalarFieldEnum = {
@@ -1890,6 +1980,7 @@ export type GlobalOmitConfig = {
   contentItem?: Prisma.ContentItemOmit
   executiveConversation?: Prisma.ExecutiveConversationOmit
   financialSnapshot?: Prisma.FinancialSnapshotOmit
+  calendarConnection?: Prisma.CalendarConnectionOmit
   youTubeConnection?: Prisma.YouTubeConnectionOmit
 }
 

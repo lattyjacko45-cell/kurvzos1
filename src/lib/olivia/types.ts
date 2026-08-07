@@ -134,4 +134,16 @@ export interface OliviaContext {
   latestHarperNextMove: string | null;
   latestReneeStrategicPriority: string | null;
   latestSophiaMarketingPriority: string | null;
+  /**
+   * Shape of the day's commitments, so Olivia can spot a calendar that leaves
+   * no execution space. Counts and durations only — no titles, attendees,
+   * locations or event ids. Null when no calendar is connected.
+   */
+  schedule: {
+    eventsToday: number;
+    allDayEventsToday: number;
+    bookedMinutesToday: number;
+    largestFreeGapMinutes: number | null;
+    freeMinutesRemainingToday: number;
+  } | null;
 }

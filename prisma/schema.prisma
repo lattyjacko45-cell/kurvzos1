@@ -22,6 +22,7 @@ model Profile {
   youtubeConnection YouTubeConnection?
   executiveConversations ExecutiveConversation[]
   financialSnapshots     FinancialSnapshot[]
+  calendarConnection     CalendarConnection?
   assignedTasks     Task[]            @relation("TaskAssignee")
   workspaceMembers  WorkspaceMember[]
 
@@ -309,6 +310,40 @@ enum Executive {
   SOPHIA
   OLIVIA
   MARCUS
+}
+
+/**
+ * Google Calendar authorization, stored separately from YouTubeConnection.
+ *
+ * Separate rows and separate refresh tokens mean re-consenting to one can
+ * never corrupt the other's stored token, and KurvzOS can use either
+ * independently.
+ *
+ * Note the limit of that independence: both are granted through the same
+ * Google Cloud project with include_granted_scopes=true, so Google holds them
+ * as ONE combined authorization. Revoking at Google drops both. That is why
+ * neither disconnect route revokes — see /api/calendar/disconnect.
+ */
+model CalendarConnection {
+  id        String @id @default(uuid())
+  profileId String @unique @map("profile_id")
+
+  /// Display label only, e.g. the primary calendar's summary.
+  calendarLabel String  @map("calendar_label")
+  /// IANA zone reported by Google for the calendar.
+  calendarTimeZone String @default("UTC") @map("calendar_time_zone")
+  /// AES-256-GCM ciphertext. Never returned to the browser.
+  encryptedRefreshToken String    @map("encrypted_refresh_token")
+  tokenExpiresAt        DateTime? @map("token_expires_at")
+  /// Space-separated scopes Google reported granting.
+  grantedScopes String @default("") @map("granted_scopes")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("calendar_connections")
 }
 
 model YouTubeConnection {

@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { decryptSecret, encryptSecret } from "@/lib/crypto";
 import {
   GOOGLE_TOKEN_URL,
-  GOOGLE_REVOKE_URL,
   YOUTUBE_API_BASE,
   YOUTUBE_UPLOAD_BASE,
   YOUTUBE_SCOPES,
@@ -584,15 +583,13 @@ export async function publishVideoNow(
   }
 }
 
-export async function revokeRefreshToken(refreshToken: string): Promise<void> {
-  await fetch(GOOGLE_REVOKE_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ token: refreshToken }).toString(),
-    cache: "no-store",
-  }).catch(() => {
-    // Revocation is best-effort; local deletion is what matters.
-  });
-}
+/*
+ * The revoke helper was removed deliberately.
+ *
+ * Google treats this project's incremental grants as one combined
+ * authorization, so revoking the YouTube token would also drop the Calendar
+ * scopes. Both disconnects are local operations. Provider-side revocation, if
+ * ever wanted, must be a separate explicit action that disconnects both.
+ */
 
 export { encryptSecret, decryptSecret };

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getDailyBriefing } from "@/lib/daily-briefing.server";
 import { getWeeklyPacket } from "@/lib/weekly-packet.server";
+import { getScheduleForProfile } from "@/lib/calendar/read.server";
 import type { HarperContext } from "@/lib/harper/types";
 
 /**
@@ -22,7 +23,7 @@ export async function buildHarperContext(
 ): Promise<HarperContext> {
   const since = new Date(now.getTime() - SEVEN_DAYS_MS);
 
-  const [briefing, packet, focusSessions, completedTasks, feedback] =
+  const [briefing, packet, focusSessions, completedTasks, feedback, calendar] =
     await Promise.all([
       getDailyBriefing(workspaceId, now),
       getWeeklyPacket(workspaceId, now),
@@ -50,6 +51,7 @@ export async function buildHarperContext(
         orderBy: { createdAt: "desc" },
         take: 3,
       }),
+      getScheduleForProfile(profileId, now),
     ]);
 
   const activeProjects = packet.projects.filter(
@@ -102,5 +104,25 @@ export async function buildHarperContext(
       type: entry.type,
       description: entry.description.slice(0, 200),
     })),
+    // Titles and counts only. Nothing identifying anyone else travels here.
+    schedule:
+      calendar.state === "not_connected"
+        ? null
+        : {
+            currentEvent: calendar.schedule.currentEvent?.title ?? null,
+            nextEvent: calendar.schedule.nextEvent?.title ?? null,
+            minutesUntilNextEvent: calendar.schedule.nextEvent?.startsAt
+              ? Math.max(
+                  0,
+                  Math.round(
+                    (new Date(calendar.schedule.nextEvent.startsAt).getTime() -
+                      now.getTime()) /
+                      60000
+                  )
+                )
+              : null,
+            eventsRemainingToday: calendar.schedule.eventsRemainingToday,
+            largestFreeGapMinutes: calendar.schedule.largestGapMinutes,
+          },
   };
 }

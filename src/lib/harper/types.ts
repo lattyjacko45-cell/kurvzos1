@@ -93,4 +93,18 @@ export interface HarperContext {
     nextMove: string;
   };
   unresolvedFeedback: Array<{ type: string; description: string }>;
+  /**
+   * Lightweight schedule awareness so Harper can answer "what can I
+   * realistically start now?". Null when no calendar is connected.
+   *
+   * Titles only — no attendees, organisers, locations, links or event ids.
+   * This never overrides the mission selector; it only informs the framing.
+   */
+  schedule: {
+    currentEvent: string | null;
+    nextEvent: string | null;
+    minutesUntilNextEvent: number | null;
+    eventsRemainingToday: number;
+    largestFreeGapMinutes: number | null;
+  } | null;
 }

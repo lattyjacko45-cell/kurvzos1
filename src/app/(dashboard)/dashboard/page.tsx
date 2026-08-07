@@ -18,6 +18,8 @@ import { getReneeView } from "@/lib/renee/view.server";
 import { getSophiaView } from "@/lib/sophia/view.server";
 import { getOliviaView } from "@/lib/olivia/view.server";
 import { getMarcusView } from "@/lib/marcus/view.server";
+import { getScheduleForProfile } from "@/lib/calendar/read.server";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { ExecutiveSummary } from "@/components/dashboard/executive-summary";
 
 export const metadata: Metadata = {
@@ -43,6 +45,7 @@ export default async function DashboardPage() {
     sophiaView,
     oliviaView,
     marcusView,
+    calendar,
     projects,
     tasks,
   ] = await Promise.all([
@@ -55,6 +58,8 @@ export default async function DashboardPage() {
       getSophiaView(profile.id, workspace.id),
       getOliviaView(profile.id, workspace.id),
       getMarcusView(profile.id, workspace.id),
+      // Cached read: no Google call within the TTL, and never a model call.
+      getScheduleForProfile(profile.id),
       prisma.project.findMany({
         where: { workspaceId: workspace.id },
         include: { _count: { select: { tasks: true } } },
@@ -111,6 +116,8 @@ export default async function DashboardPage() {
       </section>
 
       <DailyBriefingSection briefing={briefing} firstName={firstName} />
+
+      <TodaySchedule state={calendar.state} schedule={calendar.schedule} />
 
       <ExecutiveSummary
         harperNextMove={harperView.advice.nextMove}

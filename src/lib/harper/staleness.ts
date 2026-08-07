@@ -60,6 +60,17 @@ export const harperContextSchema = z.object({
   unresolvedFeedback: z.array(
     z.object({ type: z.string(), description: z.string() })
   ),
+  // Optional so snapshots written before Calendar existed still parse.
+  schedule: z
+    .object({
+      currentEvent: z.string().nullable(),
+      nextEvent: z.string().nullable(),
+      minutesUntilNextEvent: z.number().nullable(),
+      eventsRemainingToday: z.number(),
+      largestFreeGapMinutes: z.number().nullable(),
+    })
+    .nullable()
+    .optional(),
 });
 
 export function parseStoredContext(value: unknown): HarperContext | null {
@@ -84,6 +95,11 @@ export function contextFingerprint(context: HarperContext): string {
     context.counts.dueToday,
     context.counts.openTasks,
     context.counts.completedThisWeek,
+    // Schedule facts that change what is realistically startable. Minutes
+    // until the next event are excluded: they tick down constantly.
+    context.schedule?.currentEvent ?? "none",
+    context.schedule?.nextEvent ?? "none",
+    context.schedule?.eventsRemainingToday ?? 0,
   ].join("|");
 }
 
