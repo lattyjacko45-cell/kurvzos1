@@ -1,26 +1,165 @@
 @import "tailwindcss";
 
-:root {
-  --background: #fafaf9;
-  --foreground: #1c1917;
+/**
+ * KurvzOS design tokens.
+ *
+ * Previously this file defined only --background and --foreground, while the
+ * components referenced ~470 usages of tokens that did not exist
+ * (text-muted-foreground, bg-card, border-input, ring-ring and the rest). This
+ * @theme block is the missing foundation.
+ *
+ * Light theme only. The structure is dark-mode ready — every colour is a
+ * semantic role rather than a literal — but no dark variables are defined yet.
+ */
+@theme {
+  /* Foundation — warm stone */
+  --color-background: #f7f5f1;
+  --color-foreground: #1c1a17;
+  --color-card: #fffefc;
+  --color-card-foreground: #1c1a17;
+  --color-popover: #fffefc;
+  --color-popover-foreground: #1c1a17;
+  --color-muted: #f2f0eb;
+  --color-muted-foreground: #6e6a62;
+  /* Neutral hover fill. Deliberately NOT olive: Tailwind's accent slot is used
+     by hover states throughout, and a hue here would tint the whole UI. */
+  --color-accent: #efede7;
+  --color-accent-foreground: #1c1a17;
+  --color-border: #e5e2db;
+  --color-input: #dbd7ce;
+  --color-ring: #55603c;
+
+  /* Primary — deep olive */
+  --color-primary: #55603c;
+  --color-primary-foreground: #fbfbf8;
+  --color-primary-hover: #434d2e;
+  --color-primary-deep: #2f3720;
+  --color-primary-tint: #f1f2ea;
+
+  /* Secondary — quiet stone, for low-emphasis controls */
+  --color-secondary: #eeece6;
+  --color-secondary-foreground: #1c1a17;
+
+  /* Semantic — status only, never decoration */
+  --color-success: #4e6b52;
+  --color-success-foreground: #fbfbf8;
+  --color-success-tint: #edf1ec;
+  --color-warning: #8a6a2f;
+  --color-warning-foreground: #fbfbf8;
+  --color-warning-tint: #f6f0e4;
+  --color-destructive: #8c3f3a;
+  --color-destructive-foreground: #fbfbf8;
+  --color-destructive-tint: #f6ebea;
+  --color-info: #4f5b66;
+  --color-info-foreground: #fbfbf8;
+  --color-info-tint: #edeff1;
+
+  /* Executive identity — identifiers only. Never buttons, never navigation. */
+  --color-exec-harper: #5a6b54;
+  --color-exec-harper-tint: #eef1ec;
+  --color-exec-renee: #6e4f63;
+  --color-exec-renee-tint: #f1ecf0;
+  --color-exec-sophia: #9a5f45;
+  --color-exec-sophia-tint: #f6ede9;
+  --color-exec-olivia: #4f6274;
+  --color-exec-olivia-tint: #eceff2;
+  --color-exec-marcus: #7d6440;
+  --color-exec-marcus-tint: #f4f0e8;
+
+  /**
+   * Sidebar surface tokens.
+   *
+   * The sidebar primitive references these throughout (bg-sidebar-accent,
+   * ring-sidebar-ring, border-sidebar-border). They were never defined, so
+   * those utilities produced nothing while `focus-visible:ring-2` still fired
+   * with Tailwind's default ring colour — currentColor — drawing a heavy dark
+   * outline around a focused nav item.
+   */
+  --color-sidebar: #fbfaf7;
+  --color-sidebar-foreground: #1c1a17;
+  --color-sidebar-accent: #f2f0eb;
+  --color-sidebar-accent-foreground: #1c1a17;
+  --color-sidebar-primary: #55603c;
+  --color-sidebar-primary-foreground: #fbfbf8;
+  --color-sidebar-border: #e5e2db;
+  --color-sidebar-ring: #55603c;
+
+  /* Typography. Inter carries the interface; the serif is display only. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-serif: var(--font-dm-serif), ui-serif, Georgia, serif;
+
+  --text-display-lg: 2.5rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--letter-spacing: -0.01em;
+  --text-display-md: 1.875rem;
+  --text-display-md--line-height: 1.15;
+  --text-display-sm: 1.5rem;
+  --text-display-sm--line-height: 1.2;
+  --text-heading: 1.125rem;
+  --text-heading--line-height: 1.4;
+  --text-body-lg: 1rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.6;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.5;
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.18em;
+
+  /* Three radii. Everything else was swept to the nearest of these. */
+  --radius-lg: 8px;
+  --radius-2xl: 16px;
+
+  /* Three container widths. */
+  --container-focused: 48rem;
+  --container-standard: 56rem;
+  --container-page: 72rem;
 }
 
-* {
-  box-sizing: border-box;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  /**
+   * Default border colour.
+   *
+   * Tailwind v4 changed the default from a light grey to `currentColor`, so
+   * every bare `border` utility was inheriting the near-charcoal text colour —
+   * which is why the large in-flow cards had hard outlines. Pinning the default
+   * to the soft stone token fixes all of them at once, with no component
+   * changes. Anything needing a stronger edge still opts in with an explicit
+   * border-* colour.
+   */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
 
-body {
-  margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
+  body {
+    margin: 0;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Numbers align in columns wherever they are compared. */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
 }

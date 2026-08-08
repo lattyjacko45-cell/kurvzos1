@@ -61,7 +61,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Link
             key={card.title}
             href={card.href}
-            className="rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="rounded-2xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {body}
           </Link>

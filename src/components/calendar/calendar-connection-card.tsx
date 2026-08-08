@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { CalendarIcon, CheckIcon } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export type CalendarConnectionState =
   | "not_connected"
@@ -25,9 +26,9 @@ interface CalendarConnectionCardProps {
 function SetupValue({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <SectionLabel>
         {label}
-      </p>
+      </SectionLabel>
 
       <p className="break-all rounded-lg border bg-muted/40 px-3 py-2 font-mono text-xs">
         {value}
@@ -71,9 +72,9 @@ export function CalendarConnectionCard({
   if (!configured) {
     return (
       <section className="space-y-4 rounded-2xl border border-dashed p-5">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+        <SectionLabel as="h3">
           Google Calendar setup required
-        </h3>
+        </SectionLabel>
 
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">
@@ -112,9 +113,9 @@ export function CalendarConnectionCard({
     return (
       <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5">
         <div className="space-y-1">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+          <SectionLabel as="h3">
             Google Calendar
-          </h3>
+          </SectionLabel>
 
           {needsReconnect ? (
             <p className="text-sm text-destructive">
@@ -166,9 +167,9 @@ export function CalendarConnectionCard({
   return (
     <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5">
       <div className="space-y-1">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+        <SectionLabel as="h3">
           Google Calendar
-        </h3>
+        </SectionLabel>
 
         <p className="text-sm text-muted-foreground">
           Connect to show your schedule in KurvzOS. Read-only — events are never

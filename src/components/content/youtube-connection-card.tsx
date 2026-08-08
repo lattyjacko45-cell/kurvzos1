@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { CheckIcon, LinkIcon } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { SectionLabel } from "@/components/ui/section-label";
 
 interface YouTubeConnectionCardProps {
   configured: boolean;
@@ -22,9 +23,9 @@ interface YouTubeConnectionCardProps {
 function CopyableValue({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <SectionLabel>
         {label}
-      </p>
+      </SectionLabel>
 
       <p className="break-all rounded-lg border bg-muted/40 px-3 py-2 font-mono text-xs">
         {value}
@@ -70,12 +71,9 @@ export function YouTubeConnectionCard({
         aria-labelledby="youtube-setup-heading"
         className="space-y-3 rounded-2xl border border-dashed p-5"
       >
-        <h2
-          id="youtube-setup-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"youtube-setup-heading"}>
           YouTube setup required
-        </h2>
+        </SectionLabel>
 
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">
@@ -109,7 +107,7 @@ export function YouTubeConnectionCard({
           </p>
         ) : null}
 
-        <div className="space-y-2 rounded-xl border p-4 text-sm text-muted-foreground">
+        <div className="space-y-2 rounded-2xl border p-4 text-sm text-muted-foreground">
           <p className="font-medium text-foreground">In Google Cloud:</p>
 
           <ol className="list-decimal space-y-1 pl-5">
@@ -136,12 +134,9 @@ export function YouTubeConnectionCard({
         className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5"
       >
         <div className="space-y-1">
-          <h2
-            id="youtube-connected-heading"
-            className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-          >
+          <SectionLabel as="h2" id={"youtube-connected-heading"}>
             YouTube channel
-          </h2>
+          </SectionLabel>
 
           <p className="flex items-center gap-2 text-sm font-medium">
             <CheckIcon className="size-4" aria-hidden="true" />
@@ -184,12 +179,9 @@ export function YouTubeConnectionCard({
       className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5"
     >
       <div className="space-y-1">
-        <h2
-          id="youtube-connect-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"youtube-connect-heading"}>
           YouTube channel
-        </h2>
+        </SectionLabel>
 
         <p className="text-sm text-muted-foreground">
           Connect a channel to upload and schedule videos.

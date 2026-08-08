@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { siteConfig, navItems } from "@/config/site";
+import { siteConfig, navGroups, navUtilityItems } from "@/config/site";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthUser } from "@/types";
 import {
@@ -100,19 +100,63 @@ export function AppSidebar({ user }: { user: AuthUser }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+        {navGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel className="text-label font-semibold uppercase text-muted-foreground">
+              {group.label}
+            </SidebarGroupLabel>
+
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const Icon = iconMap[item.icon as keyof typeof iconMap];
+                  const isActive = pathname === item.href;
+
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        tooltip={item.title}
+                        render={<Link href={item.href} />}
+                        /* Restrained active state: an olive rule and a
+                           weight change rather than a filled block. */
+                        className={
+                          isActive
+                            ? "border-l-2 border-primary bg-primary-tint font-medium text-foreground shadow-none hover:bg-primary-tint hover:text-foreground hover:shadow-none"
+                            : "border-l-2 border-transparent"
+                        }
+                      >
+                        <Icon />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+
+        {/* Utility destinations sit below the labelled groups, unlabelled, so
+            Settings reads as chrome rather than part of Review. */}
+        <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => {
+              {navUtilityItems.map((item) => {
                 const Icon = iconMap[item.icon as keyof typeof iconMap];
                 const isActive = pathname === item.href;
+
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       isActive={isActive}
                       tooltip={item.title}
                       render={<Link href={item.href} />}
+                      className={
+                        isActive
+                          ? "border-l-2 border-primary bg-primary-tint font-medium text-foreground shadow-none hover:bg-primary-tint hover:text-foreground hover:shadow-none"
+                          : "border-l-2 border-transparent"
+                      }
                     >
                       <Icon />
                       <span>{item.title}</span>
@@ -195,7 +239,7 @@ export function DashboardShell({
           <Separator orientation="vertical" className="h-6" />
           <div className="flex-1" />
         </header>
-        <div className="flex-1 overflow-auto p-6">{children}</div>
+        <div className="flex-1 overflow-auto px-6 py-8 sm:px-8">{children}</div>
       </main>
     </SidebarProvider>
   );

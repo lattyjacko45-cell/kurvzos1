@@ -122,7 +122,7 @@ export function CompletedTaskRow({ task }: { task: CompletedTaskRowData }) {
         </div>
 
         {isOpen ? (
-          <div id={detailsId} className="rounded-xl border p-4">
+          <div id={detailsId} className="rounded-2xl border p-4">
             {task.steps.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 This task had no checklist.

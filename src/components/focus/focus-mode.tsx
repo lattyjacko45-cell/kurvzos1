@@ -32,6 +32,7 @@ import {
   type FocusSessionAction,
   type FocusSessionDto,
 } from "@/lib/focus";
+import { SectionLabel } from "@/components/ui/section-label";
 
 interface FocusMission {
   id: string;
@@ -252,16 +253,16 @@ export function FocusMode({
           Back to Dashboard
         </Button>
 
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+        <SectionLabel>
           Focus Mode
-        </p>
+        </SectionLabel>
       </header>
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-10 px-6 py-12 sm:px-10">
         <section className="space-y-3 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+          <SectionLabel>
             {mission.projectName}
-          </p>
+          </SectionLabel>
 
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             {mission.title}
@@ -269,11 +270,11 @@ export function FocusMode({
         </section>
 
         {progress.isComplete ? (
-          <section className="space-y-6 rounded-3xl border p-10 text-center">
+          <section className="space-y-6 rounded-2xl border p-10 text-center">
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+              <SectionLabel>
                 Mission Complete
-              </p>
+              </SectionLabel>
 
               <p className="text-2xl font-semibold tracking-tight">
                 All {progress.totalSteps} steps are done.
@@ -313,9 +314,9 @@ export function FocusMode({
         ) : (
           <section className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+              <SectionLabel>
                 Current Step
-              </p>
+              </SectionLabel>
 
               <p className="text-xl font-semibold tracking-tight">
                 {progress.currentStep?.title ?? "No checklist yet"}
@@ -323,9 +324,9 @@ export function FocusMode({
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+              <SectionLabel>
                 Next Step
-              </p>
+              </SectionLabel>
 
               <p className="text-xl font-semibold tracking-tight text-muted-foreground">
                 {progress.nextStep?.title ?? "—"}
@@ -336,9 +337,9 @@ export function FocusMode({
 
         <section className="space-y-3">
           <div className="flex items-baseline justify-between gap-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+            <SectionLabel>
               Mission Progress
-            </p>
+            </SectionLabel>
 
             <p className="text-sm font-semibold tabular-nums">
               {progress.completedCount} / {progress.totalSteps} Complete
@@ -444,9 +445,9 @@ export function FocusMode({
             )}
           </div>
 
-          <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+          <SectionLabel>
             Estimated Focus · {ESTIMATED_FOCUS_MINUTES} min
-          </p>
+          </SectionLabel>
         </section>
 
         {progress.isComplete ? null : (

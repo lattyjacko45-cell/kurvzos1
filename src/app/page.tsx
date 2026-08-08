@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SectionLabel } from "@/components/ui/section-label";
 
 const features = [
   {
@@ -46,9 +47,9 @@ export default function HomePage() {
 
         <section className="py-24 sm:py-32">
           <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
+            <SectionLabel>
               Your Execution Operating System
-            </p>
+            </SectionLabel>
 
             <h1 className="mt-6 text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
               Turn your vision into
@@ -89,11 +90,11 @@ export default function HomePage() {
           className="border-t border-gray-200 py-20 sm:py-24"
         >
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
+            <SectionLabel>
               Built for focused execution
-            </p>
+            </SectionLabel>
 
-            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mt-4 font-serif text-display-lg sm:text-4xl">
               Less mental clutter. More meaningful progress.
             </h2>
           </div>
@@ -119,13 +120,13 @@ export default function HomePage() {
         </section>
 
         <section className="border-t border-gray-200 py-20">
-          <div className="rounded-3xl bg-gray-950 px-6 py-12 text-white sm:px-10">
+          <div className="rounded-2xl bg-gray-950 px-6 py-12 text-white sm:px-10">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-400">
               Start with clarity
             </p>
 
             <div className="mt-4 flex flex-col justify-between gap-8 md:flex-row md:items-end">
-              <h2 className="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="max-w-2xl font-serif text-display-lg sm:text-4xl">
                 Know what to do next—and why it matters.
               </h2>
 

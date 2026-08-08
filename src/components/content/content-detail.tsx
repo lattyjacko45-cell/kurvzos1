@@ -44,6 +44,7 @@ import {
   zonedTimeToUtc,
 } from "@/lib/timezone";
 import { useExecutiveAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export interface ContentDetailItem {
   id: string;
@@ -645,12 +646,9 @@ export function ContentDetail({
         aria-labelledby="status-heading"
         className="space-y-3 rounded-2xl border p-5"
       >
-        <h2
-          id="status-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"status-heading"}>
           Publishing status
-        </h2>
+        </SectionLabel>
 
         <p role="status" aria-live="polite" className="text-sm">
           {isUploading
@@ -750,9 +748,9 @@ export function ContentDetail({
       <Separator />
 
       <form onSubmit={saveDetails} className="space-y-6" noValidate>
-        <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+        <SectionLabel as="h2">
           Publishing details
-        </h2>
+        </SectionLabel>
 
         <div className="space-y-2">
           <Label htmlFor="content-title">YouTube title</Label>
@@ -934,12 +932,9 @@ export function ContentDetail({
       <Separator />
 
       <section aria-labelledby="upload-heading" className="space-y-5">
-        <h2
-          id="upload-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"upload-heading"}>
           Video and thumbnail
-        </h2>
+        </SectionLabel>
 
         {!youtubeConnected ? (
           <p className="text-sm text-muted-foreground">

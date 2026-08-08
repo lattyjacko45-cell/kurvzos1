@@ -21,6 +21,7 @@ import { getMarcusView } from "@/lib/marcus/view.server";
 import { getScheduleForProfile } from "@/lib/calendar/read.server";
 import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { ExecutiveSummary } from "@/components/dashboard/executive-summary";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -93,18 +94,18 @@ export default async function DashboardPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="mx-auto w-full max-w-page space-y-10">
       <Suspense fallback={null}>
         <FocusSessionToast />
       </Suspense>
 
-      <section className="rounded-3xl border bg-gradient-to-br from-background via-background to-muted/40 p-8 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+      <section className="rounded-2xl border bg-gradient-to-br from-background via-background to-muted/40 p-8">
+        <SectionLabel>
           Mission Control
-        </p>
+        </SectionLabel>
 
         <div className="mt-4 flex flex-col gap-2">
-          <h1 className="text-4xl font-bold tracking-tight">
+          <h1 className="font-serif text-display-lg">
             Welcome back
             {firstName ? `, ${firstName}` : ""}
           </h1>

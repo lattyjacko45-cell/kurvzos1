@@ -13,6 +13,7 @@ const CHECKLIST = [
   "Do not use Publish Now during testing — it makes the video public immediately.",
   "After uploading, verify the video appears in YouTube Studio with the expected schedule.",
 ] as const;
+import { SectionLabel } from "@/components/ui/section-label";
 
 export function TestUploadChecklist() {
   return (
@@ -21,12 +22,9 @@ export function TestUploadChecklist() {
       className="space-y-3 rounded-2xl border border-dashed p-5"
     >
       <div className="space-y-1">
-        <h2
-          id="test-upload-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"test-upload-heading"}>
           Test upload checklist
-        </h2>
+        </SectionLabel>
 
         <p className="text-sm text-muted-foreground">
           Shown in development only.

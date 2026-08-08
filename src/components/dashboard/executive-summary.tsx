@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { SectionLabel } from "@/components/ui/section-label";
 
 interface ExecutiveSummaryProps {
   harperNextMove: string;
@@ -21,9 +22,9 @@ function ExecutiveCell({ label, value, href, action }: ExecutiveCellProps) {
   return (
     <div className="flex flex-col gap-3">
       <div className="space-y-1">
-        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+        <SectionLabel>
           {label}
-        </p>
+        </SectionLabel>
 
         <p className="text-sm leading-6">{value}</p>
       </div>
@@ -62,14 +63,11 @@ export function ExecutiveSummary({
   return (
     <section
       aria-labelledby="executive-summary-heading"
-      className="rounded-3xl border bg-card p-6 shadow-sm"
+      className="rounded-2xl border bg-card p-6"
     >
-      <h2
-        id="executive-summary-heading"
-        className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-      >
+      <SectionLabel as="h2" id={"executive-summary-heading"}>
         Executive Team
-      </h2>
+      </SectionLabel>
 
       {/* One column on phones, two on tablets, three then five on wide
           screens — the cells stay readable rather than collapsing to slivers. */}

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { MAX_QUESTION_LENGTH } from "@/lib/harper/prompt";
 import type { HarperAnswer, HarperSource } from "@/lib/harper/types";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export interface HarperHistoryEntry {
   id: string;
@@ -48,9 +49,9 @@ function AdviceBlock({
 
   return (
     <div className="space-y-1">
-      <h3 className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <SectionLabel as="h3">
         {label}
-      </h3>
+      </SectionLabel>
 
       <p className="text-sm leading-6">{value}</p>
     </div>
@@ -124,12 +125,9 @@ export function HarperWorkspace({
           aria-labelledby="harper-setup-heading"
           className="space-y-3 rounded-2xl border border-dashed p-5"
         >
-          <h2
-            id="harper-setup-heading"
-            className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-          >
+          <SectionLabel as="h2" id={"harper-setup-heading"}>
             Model provider not configured
-          </h2>
+          </SectionLabel>
 
           <p className="text-sm text-muted-foreground">
             Harper is running on deterministic rules. Set these to enable
@@ -146,15 +144,12 @@ export function HarperWorkspace({
 
       <section
         aria-labelledby="harper-advice-heading"
-        className="space-y-5 rounded-2xl border bg-card p-6 shadow-sm"
+        className="space-y-5 rounded-2xl border bg-card p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2
-            id="harper-advice-heading"
-            className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-          >
+          <SectionLabel as="h2" id={"harper-advice-heading"}>
             Harper&apos;s read
-          </h2>
+          </SectionLabel>
 
           <Button
             type="button"
@@ -204,12 +199,9 @@ export function HarperWorkspace({
       </section>
 
       <section aria-labelledby="ask-harper-heading" className="space-y-4">
-        <h2
-          id="ask-harper-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"ask-harper-heading"}>
           Ask Harper
-        </h2>
+        </SectionLabel>
 
         <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
           <div className="min-w-0 flex-1 space-y-1">
@@ -255,12 +247,9 @@ export function HarperWorkspace({
           <Separator />
 
           <section aria-labelledby="harper-history-heading" className="space-y-4">
-            <h2
-              id="harper-history-heading"
-              className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-            >
+            <SectionLabel as="h2" id={"harper-history-heading"}>
               Recent advice
-            </h2>
+            </SectionLabel>
 
             <ul className="space-y-3">
               {history.map((entry) => (

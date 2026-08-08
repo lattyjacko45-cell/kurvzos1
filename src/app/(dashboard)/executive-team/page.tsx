@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { EXECUTIVES } from "@/config/executives";
 import { Badge } from "@/components/ui/badge";
+import { SectionLabel } from "@/components/ui/section-label";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Executive Team",
@@ -17,33 +19,26 @@ export default async function ExecutiveTeamPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Executive Team
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">Your leadership</h1>
-
-        <p className="max-w-2xl text-muted-foreground">
-          Each executive reads your KurvzOS data and advises on their area.
-          Harper is live today.
-        </p>
-      </header>
+    <div className="mx-auto w-full max-w-standard space-y-8">
+      <PageHeader
+        eyebrow="Executive Team"
+        title="Your leadership"
+        description="Each executive reads your KurvzOS data and advises on their area. Harper is live today."
+      />
 
       <ul className="grid gap-4 sm:grid-cols-2">
         {EXECUTIVES.map((executive) => {
           const card = (
-            <div className="h-full space-y-3 rounded-2xl border bg-card p-6 shadow-sm">
+            <div className="h-full space-y-3 rounded-2xl border bg-card p-6">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <p className="text-lg font-semibold tracking-tight">
                     {executive.name}
                   </p>
 
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                  <SectionLabel>
                     {executive.role}
-                  </p>
+                  </SectionLabel>
                 </div>
 
                 <Badge

@@ -75,7 +75,7 @@ export function TaskStatusSelect({ taskId, status }: TaskStatusSelectProps) {
       onChange={handleChange}
       disabled={isSaving || isPending}
       aria-label="Task status"
-      className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+      className="h-9 rounded-lg border border-input bg-background px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
     >
       {STATUS_OPTIONS.map((option) => (
         <option key={option.value} value={option.value}>

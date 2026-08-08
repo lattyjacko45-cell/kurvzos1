@@ -15,6 +15,7 @@ import { ContentStatusBadge } from "@/components/content/content-status-badge";
 import { YouTubeConnectionCard } from "@/components/content/youtube-connection-card";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export const metadata: Metadata = {
   title: "Content",
@@ -106,14 +107,14 @@ export default async function ContentPage({ searchParams }: ContentPageProps) {
   ]);
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-8">
+    <div className="mx-auto w-full max-w-standard space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+          <SectionLabel>
             Content Studio
-          </p>
+          </SectionLabel>
 
-          <h1 className="text-4xl font-bold tracking-tight">Content</h1>
+          <h1 className="font-serif text-display-lg">Content</h1>
 
           <p className="text-muted-foreground">
             Plan, upload and schedule YouTube videos from KurvzOS.
@@ -169,7 +170,7 @@ export default async function ContentPage({ searchParams }: ContentPageProps) {
             <li key={item.id}>
               <Link
                 href={`/content/${item.id}`}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-5 shadow-sm transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-5 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 <div className="min-w-0 space-y-1">
                   <p className="truncate text-base font-medium">{item.title}</p>

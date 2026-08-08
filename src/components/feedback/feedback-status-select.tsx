@@ -64,7 +64,7 @@ export function FeedbackStatusSelect({
       onChange={handleChange}
       disabled={isSaving}
       aria-label="Feedback status"
-      className="h-8 rounded-md border border-input bg-background px-2.5 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+      className="h-8 rounded-lg border border-input bg-background px-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
     >
       {Object.entries(FEEDBACK_STATUS_LABELS).map(([optionValue, label]) => (
         <option key={optionValue} value={optionValue}>

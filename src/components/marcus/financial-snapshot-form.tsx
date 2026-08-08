@@ -14,6 +14,7 @@ import {
   parseMoneyToCents,
 } from "@/lib/finance/money";
 import { useExecutiveAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export interface SnapshotFormValues {
   currency: string;
@@ -145,9 +146,9 @@ export function FinancialSnapshotForm({
       noValidate
     >
       <div className="space-y-1">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+        <SectionLabel as="h2">
           Financial snapshot
-        </h2>
+        </SectionLabel>
 
         <p className="text-sm text-muted-foreground">
           {period} · entered by you. Nothing is imported from a bank or payment

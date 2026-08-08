@@ -9,15 +9,63 @@ export const siteConfig = {
   },
 } as const;
 
-export const navItems = [
-  { title: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-  { title: "Projects", href: "/dashboard/projects", icon: "FolderKanban" },
-  { title: "Tasks", href: "/dashboard/tasks", icon: "CheckSquare" },
-  { title: "Executive Team", href: "/executive-team", icon: "Users" },
-  { title: "Content", href: "/content", icon: "Clapperboard" },
-  { title: "CEO Packet", href: "/ceo-packet", icon: "FileText" },
+/**
+ * Sidebar navigation, grouped by intent rather than listed flat.
+ *
+ * Seven equal-weight items gave no sense of what the product is for. The
+ * grouping says it: command the day, do the work, take advice, review.
+ */
+export interface NavItem {
+  title: string;
+  href: string;
+  icon: string;
+}
+
+export interface NavGroup {
+  label: string;
+  items: readonly NavItem[];
+}
+
+export const navGroups: readonly NavGroup[] = [
+  {
+    label: "Command",
+    items: [
+      { title: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
+    ],
+  },
+  {
+    label: "Work",
+    items: [
+      { title: "Projects", href: "/dashboard/projects", icon: "FolderKanban" },
+      { title: "Tasks", href: "/dashboard/tasks", icon: "CheckSquare" },
+      { title: "Content", href: "/content", icon: "Clapperboard" },
+    ],
+  },
+  {
+    label: "Advisory",
+    items: [
+      { title: "Executive Team", href: "/executive-team", icon: "Users" },
+    ],
+  },
+  {
+    label: "Review",
+    items: [{ title: "CEO Packet", href: "/ceo-packet", icon: "FileText" }],
+  },
+];
+
+/**
+ * Utility destinations. Rendered below the labelled groups and deliberately
+ * outside them — Settings is not part of the review workflow.
+ */
+export const navUtilityItems: readonly NavItem[] = [
   { title: "Settings", href: "/dashboard/settings", icon: "Settings" },
-] as const;
+];
+
+/** Flat list retained for any consumer that needs every destination. */
+export const navItems: readonly NavItem[] = [
+  ...navGroups.flatMap((group) => group.items),
+  ...navUtilityItems,
+];
 
 export const features = [
   {

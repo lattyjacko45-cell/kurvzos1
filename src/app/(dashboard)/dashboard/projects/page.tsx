@@ -38,10 +38,10 @@ export default async function ProjectsPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto w-full max-w-page space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+          <h1 className="font-serif text-display-lg">Projects</h1>
           <p className="text-muted-foreground mt-1">
             Manage and organize your team&apos;s projects.
           </p>

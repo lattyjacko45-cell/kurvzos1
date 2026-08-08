@@ -9,6 +9,8 @@ import {
   type FeedbackStatusValue,
 } from "@/components/feedback/feedback-status-select";
 import { Separator } from "@/components/ui/separator";
+import { SectionLabel } from "@/components/ui/section-label";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Feedback",
@@ -32,18 +34,12 @@ export default async function FeedbackPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Internal Alpha
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">Feedback</h1>
-
-        <p className="text-muted-foreground">
-          Everything you&apos;ve reported, newest first.
-        </p>
-      </header>
+    <div className="mx-auto w-full max-w-standard space-y-8">
+      <PageHeader
+        eyebrow="Internal Alpha"
+        title="Feedback"
+        description="Everything you've reported, newest first."
+      />
 
       <Separator />
 
@@ -57,13 +53,13 @@ export default async function FeedbackPage() {
           {feedback.map((entry) => (
             <li
               key={entry.id}
-              className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm"
+              className="space-y-3 rounded-2xl border bg-card p-5"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                  <SectionLabel>
                     {FEEDBACK_TYPE_LABELS[entry.type]}
-                  </p>
+                  </SectionLabel>
 
                   <p className="text-sm leading-6">{entry.description}</p>
                 </div>

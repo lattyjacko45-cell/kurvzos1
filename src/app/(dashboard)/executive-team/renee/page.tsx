@@ -16,6 +16,7 @@ import {
   ReneeWorkspace,
   type ReneeHistoryEntry,
 } from "@/components/renee/renee-workspace";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Renee",
@@ -75,18 +76,12 @@ export default async function ReneePage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Chief Business Strategist
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">Renee</h1>
-
-        <p className="text-muted-foreground">
-          Whether you are working on the right thing — not what to do next.
-        </p>
-      </header>
+    <div className="mx-auto w-full max-w-focused space-y-8">
+      <PageHeader
+        eyebrow="Chief Business Strategist"
+        title="Renee"
+        description="Whether you are working on the right thing — not what to do next."
+      />
 
       <ReneeWorkspace
         initialAdvice={reneeView.advice}

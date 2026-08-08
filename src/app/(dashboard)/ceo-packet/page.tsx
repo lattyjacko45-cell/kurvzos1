@@ -5,6 +5,8 @@ import { getCurrentUser, ensureProfile, getUserWorkspace } from "@/lib/auth";
 import { getWeeklyPacket } from "@/lib/weekly-packet.server";
 import { formatWeekRange, NO_ACTIVITY } from "@/lib/weekly-packet";
 import { Separator } from "@/components/ui/separator";
+import { SectionLabel } from "@/components/ui/section-label";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "CEO Packet",
@@ -18,18 +20,18 @@ const STATUS_LABELS: Record<string, string> = {
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+    <SectionLabel as="h2">
       {children}
-    </h2>
+    </SectionLabel>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="space-y-1">
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <SectionLabel>
         {label}
-      </p>
+      </SectionLabel>
 
       <p className="text-2xl font-semibold tabular-nums tracking-tight">
         {value}
@@ -58,18 +60,12 @@ export default async function CeoPacketPage() {
   );
 
   return (
-    <article className="mx-auto w-full max-w-4xl space-y-10 print:max-w-none">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Weekly CEO Packet
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">
-          {formatWeekRange(packet.range)}
-        </h1>
-
-        <p className="text-muted-foreground">{workspace.name}</p>
-      </header>
+    <article className="mx-auto w-full max-w-standard space-y-10 print:max-w-none">
+      <PageHeader
+        eyebrow="Weekly CEO Packet"
+        title={formatWeekRange(packet.range)}
+        description={workspace.name}
+      />
 
       <Separator />
 
@@ -90,9 +86,9 @@ export default async function CeoPacketPage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                <SectionLabel>
                   Current Step
-                </p>
+                </SectionLabel>
 
                 <p className="text-sm font-medium">
                   {priorityProgress.currentStep?.title ??
@@ -104,9 +100,9 @@ export default async function CeoPacketPage() {
 
               <div className="space-y-2">
                 <div className="flex items-baseline justify-between gap-4">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                  <SectionLabel>
                     Progress
-                  </p>
+                  </SectionLabel>
 
                   <p className="text-sm font-semibold tabular-nums">
                     {priorityProgress.completedCount} /{" "}
@@ -157,16 +153,16 @@ export default async function CeoPacketPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left">
-                <th className="py-2 pr-4 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
                   Project
                 </th>
-                <th className="py-2 pr-4 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
                   Open
                 </th>
-                <th className="py-2 pr-4 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
                   Completed
                 </th>
-                <th className="py-2 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                <th className="py-2 text-label font-semibold uppercase text-muted-foreground">
                   Status
                 </th>
               </tr>

@@ -1,6 +1,7 @@
 import { CLEAR_FOR_TODAY, type DailyBriefing } from "@/lib/daily-briefing";
 import { DailyGreeting } from "@/components/dashboard/daily-greeting";
 import { Separator } from "@/components/ui/separator";
+import { SectionLabel } from "@/components/ui/section-label";
 
 interface DailyBriefingSectionProps {
   briefing: DailyBriefing;
@@ -10,9 +11,9 @@ interface DailyBriefingSectionProps {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <SectionLabel>
         {label}
-      </p>
+      </SectionLabel>
 
       <p className="truncate text-sm font-medium">{value}</p>
     </div>
@@ -34,11 +35,11 @@ export function DailyBriefingSection({
   } = briefing;
 
   return (
-    <section className="rounded-3xl border bg-card p-6 shadow-sm">
+    <section className="rounded-2xl border bg-card p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+        <SectionLabel>
           Daily Briefing
-        </p>
+        </SectionLabel>
 
         <div className="flex items-center gap-2 text-xs tabular-nums">
           <span className="rounded-full border px-2.5 py-1 font-medium">
@@ -83,9 +84,9 @@ export function DailyBriefingSection({
           <Separator className="my-5" />
 
           <div className="space-y-1">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            <SectionLabel>
               Recommended next action
-            </p>
+            </SectionLabel>
 
             <p className="text-sm leading-6">{recommendation}</p>
           </div>

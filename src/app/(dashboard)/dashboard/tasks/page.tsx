@@ -106,10 +106,10 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     }`;
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto w-full max-w-page space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
+          <h1 className="font-serif text-display-lg">Tasks</h1>
           <p className="text-muted-foreground mt-1">
             Track and manage work across all projects.
           </p>

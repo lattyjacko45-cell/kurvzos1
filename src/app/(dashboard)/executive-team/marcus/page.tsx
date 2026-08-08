@@ -20,6 +20,7 @@ import {
   type MarcusHistoryEntry,
 } from "@/components/marcus/marcus-workspace";
 import { FinancialSnapshotForm } from "@/components/marcus/financial-snapshot-form";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Marcus",
@@ -89,18 +90,12 @@ export default async function MarcusPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Chief Financial Officer
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">Marcus</h1>
-
-        <p className="text-muted-foreground">
-          Where the business should spend, save, or earn next.
-        </p>
-      </header>
+    <div className="mx-auto w-full max-w-focused space-y-8">
+      <PageHeader
+        eyebrow="Chief Financial Officer"
+        title="Marcus"
+        description="Where the business should spend, save, or earn next."
+      />
 
       <FinancialSnapshotForm
         period={formatPeriod(period)}

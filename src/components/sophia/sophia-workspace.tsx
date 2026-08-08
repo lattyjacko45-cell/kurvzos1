@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { MAX_QUESTION_LENGTH } from "@/lib/sophia/prompt";
 import type { SophiaAnswer, SophiaSource } from "@/lib/sophia/types";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export interface SophiaHistoryEntry {
   id: string;
@@ -48,9 +49,9 @@ function AdviceBlock({
 
   return (
     <div className="space-y-1">
-      <h3 className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <SectionLabel as="h3">
         {label}
-      </h3>
+      </SectionLabel>
 
       <p className="text-sm leading-6">{value}</p>
     </div>
@@ -124,12 +125,9 @@ export function SophiaWorkspace({
           aria-labelledby="sophia-setup-heading"
           className="space-y-3 rounded-2xl border border-dashed p-5"
         >
-          <h2
-            id="sophia-setup-heading"
-            className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-          >
+          <SectionLabel as="h2" id={"sophia-setup-heading"}>
             Model provider not configured
-          </h2>
+          </SectionLabel>
 
           <p className="text-sm text-muted-foreground">
             Sophia is running on deterministic rules. Set these to enable
@@ -146,15 +144,12 @@ export function SophiaWorkspace({
 
       <section
         aria-labelledby="sophia-advice-heading"
-        className="space-y-5 rounded-2xl border bg-card p-6 shadow-sm"
+        className="space-y-5 rounded-2xl border bg-card p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2
-            id="sophia-advice-heading"
-            className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-          >
+          <SectionLabel as="h2" id={"sophia-advice-heading"}>
             Sophia&apos;s read
-          </h2>
+          </SectionLabel>
 
           <Button
             type="button"
@@ -215,12 +210,9 @@ export function SophiaWorkspace({
       </section>
 
       <section aria-labelledby="ask-sophia-heading" className="space-y-4">
-        <h2
-          id="ask-sophia-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"ask-sophia-heading"}>
           Ask Sophia
-        </h2>
+        </SectionLabel>
 
         <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
           <div className="min-w-0 flex-1">
@@ -269,12 +261,9 @@ export function SophiaWorkspace({
             aria-labelledby="sophia-history-heading"
             className="space-y-4"
           >
-            <h2
-              id="sophia-history-heading"
-              className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-            >
+            <SectionLabel as="h2" id={"sophia-history-heading"}>
               Recent marketing reads
-            </h2>
+            </SectionLabel>
 
             <ul className="space-y-3">
               {history.map((entry) => (

@@ -85,9 +85,9 @@ export default async function SettingsPage({
         : "connected";
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="mx-auto w-full max-w-focused space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <h1 className="font-serif text-display-lg">Settings</h1>
         <p className="text-muted-foreground mt-1">
           Manage your account and preferences.
         </p>
@@ -102,7 +102,7 @@ export default async function SettingsPage({
         </CardHeader>
         <CardContent className="space-y-4">
           {calendarMessage ? (
-            <p role="status" className="rounded-xl border p-3 text-sm">
+            <p role="status" className="rounded-2xl border p-3 text-sm">
               {calendarMessage}
             </p>
           ) : null}

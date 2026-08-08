@@ -37,6 +37,7 @@ import {
 import { ESTIMATED_FOCUS_MINUTES } from "@/lib/focus";
 import { useDeferredRefresh } from "@/lib/use-deferred-refresh";
 import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export type { MissionStep };
 
@@ -362,16 +363,16 @@ export function MissionSection({
 
   return (
     <>
-      <Card className="rounded-3xl shadow-sm">
+      <Card className="rounded-2xl">
         <CardContent className="p-8">
           {mission ? (
             <div className="flex items-start justify-between gap-6">
               <div className="min-w-0 space-y-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                <SectionLabel>
                   Today&apos;s Mission
-                </p>
+                </SectionLabel>
 
-                <h2 className="text-4xl font-semibold leading-tight tracking-tight">
+                <h2 className="font-serif text-display-lg">
                   {mission.title}
                 </h2>
 
@@ -395,11 +396,11 @@ export function MissionSection({
             /* No actionable task: completed missions stay in history, they
                just stop being "today's mission". */
             <div className="space-y-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+              <SectionLabel>
                 Today&apos;s Mission
-              </p>
+              </SectionLabel>
 
-              <h2 className="text-4xl font-semibold leading-tight tracking-tight">
+              <h2 className="font-serif text-display-lg">
                 You&apos;re clear for today.
               </h2>
 
@@ -417,9 +418,9 @@ export function MissionSection({
 
               <div className="space-y-5">
                 <div className="flex items-baseline justify-between gap-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                  <SectionLabel>
                     Mission Checklist
-                  </p>
+                  </SectionLabel>
 
                   <p className="text-sm font-semibold tabular-nums">
                     {completedCount} / {steps.length} Complete
@@ -467,7 +468,7 @@ export function MissionSection({
                       {steps.map((step, index) => (
                         <li
                           key={step.id}
-                          className="group flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-muted/60"
+                          className="group flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors hover:bg-muted/60"
                         >
                           <input
                             type="checkbox"
@@ -582,9 +583,9 @@ export function MissionSection({
 
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                  <SectionLabel>
                     Current Step
-                  </p>
+                  </SectionLabel>
 
                   <p className="text-lg font-semibold tracking-tight">
                     {currentStep?.title ??
@@ -595,9 +596,9 @@ export function MissionSection({
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                  <SectionLabel>
                     Next Step
-                  </p>
+                  </SectionLabel>
 
                   <p className="text-lg font-semibold tracking-tight text-muted-foreground">
                     {nextStep?.title ?? "—"}
@@ -609,9 +610,9 @@ export function MissionSection({
 
               <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                  <SectionLabel>
                     Estimated Focus
-                  </p>
+                  </SectionLabel>
 
                   <p className="text-3xl font-semibold tracking-tight">
                     {ESTIMATED_FOCUS_MINUTES} min
@@ -648,7 +649,7 @@ export function MissionSection({
         </CardContent>
       </Card>
 
-      <div className="rounded-3xl border bg-card p-7 shadow-sm">
+      <div className="self-start rounded-2xl border bg-card p-7">
         <p className="text-sm font-medium text-muted-foreground">
           Harper Briefing
         </p>
@@ -661,9 +662,9 @@ export function MissionSection({
           {mission ? (
             <>
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <SectionLabel>
                   Current priority
-                </p>
+                </SectionLabel>
 
                 <p className="text-sm font-medium leading-6">
                   {harper?.currentPriority ?? mission.title}
@@ -685,9 +686,9 @@ export function MissionSection({
         </div>
 
         <div className="mt-6 rounded-2xl bg-muted/60 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <SectionLabel>
             Next move
-          </p>
+          </SectionLabel>
 
           {/* Latest saved advice, or the deterministic rule when Harper has
               not run yet. Rendering never calls the model. */}

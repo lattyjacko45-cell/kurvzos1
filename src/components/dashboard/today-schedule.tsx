@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { DaySchedule } from "@/lib/calendar/schedule";
 import type { CalendarReadState } from "@/lib/calendar/read.server";
+import { SectionLabel } from "@/components/ui/section-label";
 
 interface TodayScheduleProps {
   state: CalendarReadState;
@@ -55,15 +56,12 @@ export function TodaySchedule({ state, schedule }: TodayScheduleProps) {
   return (
     <section
       aria-labelledby="today-schedule-heading"
-      className="rounded-3xl border bg-card p-6 shadow-sm"
+      className="rounded-2xl border bg-card p-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2
-          id="today-schedule-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"today-schedule-heading"}>
           Today&apos;s Schedule
-        </h2>
+        </SectionLabel>
 
         <p className="text-xs text-muted-foreground">{schedule.timeZone}</p>
       </div>
@@ -89,9 +87,9 @@ export function TodaySchedule({ state, schedule }: TodayScheduleProps) {
       <div className="mt-4 space-y-4">
         {currentEvent ? (
           <div className="space-y-1">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            <SectionLabel>
               Happening now
-            </p>
+            </SectionLabel>
 
             <p className="text-sm font-medium">{currentEvent.title}</p>
           </div>

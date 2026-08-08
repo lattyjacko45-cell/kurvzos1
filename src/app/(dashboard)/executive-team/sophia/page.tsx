@@ -16,6 +16,7 @@ import {
   SophiaWorkspace,
   type SophiaHistoryEntry,
 } from "@/components/sophia/sophia-workspace";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Sophia",
@@ -74,18 +75,12 @@ export default async function SophiaPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Chief Marketing Officer
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">Sophia</h1>
-
-        <p className="text-muted-foreground">
-          What to publish, promote or improve to grow.
-        </p>
-      </header>
+    <div className="mx-auto w-full max-w-focused space-y-8">
+      <PageHeader
+        eyebrow="Chief Marketing Officer"
+        title="Sophia"
+        description="What to publish, promote or improve to grow."
+      />
 
       <SophiaWorkspace
         initialAdvice={sophiaView.advice}

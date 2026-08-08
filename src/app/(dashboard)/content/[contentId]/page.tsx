@@ -80,7 +80,7 @@ export default async function ContentDetailPage({
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8">
+    <div className="mx-auto w-full max-w-focused space-y-8">
       <YouTubeConnectionCard
         configured={setupState.configured}
         missingEnv={setupState.missing}

@@ -16,6 +16,7 @@ import {
   OliviaWorkspace,
   type OliviaHistoryEntry,
 } from "@/components/olivia/olivia-workspace";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Olivia",
@@ -74,18 +75,12 @@ export default async function OliviaPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Chief Operations Officer
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">Olivia</h1>
-
-        <p className="text-muted-foreground">
-          What is slowing execution down, and how the process should change.
-        </p>
-      </header>
+    <div className="mx-auto w-full max-w-focused space-y-8">
+      <PageHeader
+        eyebrow="Chief Operations Officer"
+        title="Olivia"
+        description="What is slowing execution down, and how the process should change."
+      />
 
       <OliviaWorkspace
         initialAdvice={oliviaView.advice}

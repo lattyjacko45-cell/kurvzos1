@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { MAX_QUESTION_LENGTH } from "@/lib/renee/prompt";
 import type { ReneeAnswer, ReneeSource } from "@/lib/renee/types";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export interface ReneeHistoryEntry {
   id: string;
@@ -48,9 +49,9 @@ function AdviceBlock({
 
   return (
     <div className="space-y-1">
-      <h3 className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <SectionLabel as="h3">
         {label}
-      </h3>
+      </SectionLabel>
 
       <p className="text-sm leading-6">{value}</p>
     </div>
@@ -124,12 +125,9 @@ export function ReneeWorkspace({
           aria-labelledby="renee-setup-heading"
           className="space-y-3 rounded-2xl border border-dashed p-5"
         >
-          <h2
-            id="renee-setup-heading"
-            className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-          >
+          <SectionLabel as="h2" id={"renee-setup-heading"}>
             Model provider not configured
-          </h2>
+          </SectionLabel>
 
           <p className="text-sm text-muted-foreground">
             Renee is running on deterministic rules. Set these to enable
@@ -146,15 +144,12 @@ export function ReneeWorkspace({
 
       <section
         aria-labelledby="renee-advice-heading"
-        className="space-y-5 rounded-2xl border bg-card p-6 shadow-sm"
+        className="space-y-5 rounded-2xl border bg-card p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2
-            id="renee-advice-heading"
-            className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-          >
+          <SectionLabel as="h2" id={"renee-advice-heading"}>
             Renee&apos;s read
-          </h2>
+          </SectionLabel>
 
           <Button
             type="button"
@@ -214,12 +209,9 @@ export function ReneeWorkspace({
       </section>
 
       <section aria-labelledby="ask-renee-heading" className="space-y-4">
-        <h2
-          id="ask-renee-heading"
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-        >
+        <SectionLabel as="h2" id={"ask-renee-heading"}>
           Ask Renee
-        </h2>
+        </SectionLabel>
 
         <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
           <div className="min-w-0 flex-1">
@@ -265,12 +257,9 @@ export function ReneeWorkspace({
           <Separator />
 
           <section aria-labelledby="renee-history-heading" className="space-y-4">
-            <h2
-              id="renee-history-heading"
-              className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground"
-            >
+            <SectionLabel as="h2" id={"renee-history-heading"}>
               Recent strategy
-            </h2>
+            </SectionLabel>
 
             <ul className="space-y-3">
               {history.map((entry) => (

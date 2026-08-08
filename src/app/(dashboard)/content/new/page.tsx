@@ -9,6 +9,7 @@ import {
   NewContentForm,
   type SelectableTask,
 } from "@/components/content/new-content-form";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "New Content",
@@ -57,14 +58,11 @@ export default async function NewContentPage({
       : null;
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-          Content Studio
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight">New content</h1>
-      </header>
+    <div className="mx-auto w-full max-w-focused space-y-8">
+      <PageHeader
+        eyebrow="Content Studio"
+        title="New content"
+      />
 
       <NewContentForm
         tasks={selectableTasks}
