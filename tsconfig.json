@@ -6,9 +6,6 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    /* Lets the pure-logic tests import "./status-map.ts" with the explicit
-       extension Node's type stripping requires. Legal only with noEmit. */
-    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
