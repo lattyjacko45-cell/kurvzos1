@@ -1,4 +1,4 @@
-import { CLEAR_FOR_TODAY, type DailyBriefing } from "@/lib/daily-briefing";
+import { type DailyBriefing } from "@/lib/daily-briefing";
 import { DailyGreeting } from "@/components/dashboard/daily-greeting";
 import { Separator } from "@/components/ui/separator";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -32,7 +32,10 @@ export function DailyBriefingSection({
     estimatedFocusMinutes,
     recommendation,
     missionIsOverdue,
+    projectsNeedingNextTask,
   } = briefing;
+
+  const needsNextTask = projectsNeedingNextTask.length > 0;
 
   return (
     <section className="rounded-2xl border bg-card p-6">
@@ -91,9 +94,19 @@ export function DailyBriefingSection({
             <p className="text-sm leading-6">{recommendation}</p>
           </div>
         </>
+      ) : needsNextTask ? (
+        /* No mission, but an active project is out of tasks. Reuses the label
+           block above so the ask reads as an action, not a passive note. */
+        <div className="mt-5 space-y-1">
+          <SectionLabel>
+            Recommended next action
+          </SectionLabel>
+
+          <p className="text-sm leading-6">{recommendation}</p>
+        </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          {CLEAR_FOR_TODAY}
+          {recommendation}
         </p>
       )}
     </section>

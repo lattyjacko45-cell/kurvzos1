@@ -7,6 +7,7 @@
 import { prisma } from "@/lib/prisma";
 import {
   buildDailyBriefing,
+  isActionable,
   type BriefingTask,
   type DailyBriefing,
 } from "@/lib/daily-briefing";
@@ -20,17 +21,32 @@ export async function getDailyBriefing(
   workspaceId: string,
   now: Date = new Date()
 ): Promise<DailyBriefing> {
-  const tasks = await prisma.task.findMany({
-    where: {
-      project: { workspaceId },
-      status: { not: "DONE" },
-    },
-    include: {
-      project: { select: { name: true } },
-      steps: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+  const [tasks, activeProjects] = await Promise.all([
+    prisma.task.findMany({
+      where: {
+        project: { workspaceId },
+        status: { not: "DONE" },
+      },
+      include: {
+        project: { select: { name: true } },
+        steps: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] },
+      },
+      orderBy: { updatedAt: "desc" },
+    }),
+    /**
+     * The briefing used to see tasks only, so "no actionable task" and "nothing
+     * to do" were indistinguishable — it declared the day clear while the CEO
+     * Packet and Harper, which both read projects, asked for the next task.
+     *
+     * Same filter and ordering as the CEO Packet (`weekly-packet.server.ts`)
+     * so both surfaces name the same project.
+     */
+    prisma.project.findMany({
+      where: { workspaceId, status: "ACTIVE" },
+      select: { id: true, name: true },
+      orderBy: { updatedAt: "desc" },
+    }),
+  ]);
 
   const briefingTasks: BriefingTask[] = tasks.map((task) => ({
     id: task.id,
@@ -48,5 +64,15 @@ export async function getDailyBriefing(
     })),
   }));
 
-  return buildDailyBriefing(briefingTasks, now);
+  // Reuses the same `isActionable` predicate the mission selector and the CEO
+  // Packet's `buildProjectActivity` use, rather than re-deriving "open".
+  const projectIdsWithWork = new Set(
+    tasks.filter(isActionable).map((task) => task.projectId)
+  );
+
+  const projectsNeedingNextTask = activeProjects
+    .filter((project) => !projectIdsWithWork.has(project.id))
+    .map((project) => project.name);
+
+  return buildDailyBriefing(briefingTasks, now, projectsNeedingNextTask);
 }

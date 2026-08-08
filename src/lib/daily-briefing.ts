@@ -32,6 +32,14 @@ export interface BriefingTask {
 export interface DailyBriefing {
   greeting: string;
   mission: BriefingTask | null;
+  /**
+   * Active projects with no actionable task left.
+   *
+   * Without this, "no actionable task" and "nothing to do" were the same state
+   * to the briefing, so it declared the day clear while the CEO Packet and
+   * Harper — which do see projects — asked for the next task.
+   */
+  projectsNeedingNextTask: string[];
   progress: MissionProgress;
   overdueCount: number;
   dueTodayCount: number;
@@ -136,9 +144,18 @@ export function selectPrimaryMission<T extends BriefingTask>(
 export function buildRecommendation(
   mission: BriefingTask | null,
   progress: MissionProgress,
-  now: Date = new Date()
+  now: Date = new Date(),
+  projectsNeedingNextTask: string[] = []
 ): string {
-  if (!mission) return CLEAR_FOR_TODAY;
+  if (!mission) {
+    // An active project with nothing actionable is not a clear day — it is a
+    // planning gap. Phrasing matches the CEO Packet's next move exactly so the
+    // two surfaces read as one voice.
+    const [project] = projectsNeedingNextTask;
+    if (project) return `Create the next task for “${project}”.`;
+
+    return CLEAR_FOR_TODAY;
+  }
 
   const overdue = isOverdue(mission, now);
   const verb = mission.status === "IN_PROGRESS" ? "Continue" : "Start";
@@ -160,7 +177,8 @@ export function buildRecommendation(
 /** Composes the whole briefing from an already-loaded task list. */
 export function buildDailyBriefing(
   tasks: BriefingTask[],
-  now: Date = new Date()
+  now: Date = new Date(),
+  projectsNeedingNextTask: string[] = []
 ): DailyBriefing {
   const mission = selectPrimaryMission(tasks, now);
   const progress = deriveMissionProgress(mission?.steps ?? []);
@@ -168,11 +186,17 @@ export function buildDailyBriefing(
   return {
     greeting: greetingForHour(now.getHours()),
     mission,
+    projectsNeedingNextTask,
     progress,
     overdueCount: countOverdue(tasks, now),
     dueTodayCount: countDueToday(tasks, now),
     estimatedFocusMinutes: ESTIMATED_FOCUS_MINUTES,
-    recommendation: buildRecommendation(mission, progress, now),
+    recommendation: buildRecommendation(
+      mission,
+      progress,
+      now,
+      projectsNeedingNextTask
+    ),
     missionIsOverdue: mission ? isOverdue(mission, now) : false,
   };
 }
