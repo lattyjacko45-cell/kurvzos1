@@ -23,7 +23,6 @@ import {
 import type { Priority, TaskStatus } from "@/generated/prisma/client";
 import { TaskStatusSelect } from "@/components/dashboard/task-status-select";
 import { DailyGreeting } from "@/components/dashboard/daily-greeting";
-import { CreateTaskDialog } from "@/components/dashboard/create-dialogs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -59,8 +58,6 @@ interface MissionSectionProps {
   firstName: string | null;
   /** Server-computed greeting; DailyGreeting corrects it to local time. */
   greeting: string;
-  /** Projects available to the inline "Create Task" dialog. */
-  projects: Array<{ id: string; name: string }>;
   /**
    * Latest saved Harper advice. Read from the database — the dashboard never
    * triggers a model call on render.
@@ -136,7 +133,6 @@ export function MissionSection({
   initialSteps,
   firstName,
   greeting,
-  projects,
   harper,
 }: MissionSectionProps) {
   const router = useRouter();
@@ -363,9 +359,19 @@ export function MissionSection({
 
   return (
     <>
-      <Card className="rounded-2xl">
-        <CardContent className="p-8">
-          {mission ? (
+      {/*
+        The mission card renders only when a mission exists.
+
+        Its old empty state was headlined "You're clear for today." for BOTH
+        no-mission cases, which contradicted the Daily Briefing whenever an
+        active project simply needed its next task. The briefing already
+        distinguishes those two states truthfully, so it now owns the action
+        zone when there is no mission and this card steps aside rather than
+        competing with a second, less accurate answer.
+      */}
+      {mission ? (
+        <Card className="rounded-2xl">
+          <CardContent className="p-8">
             <div className="flex items-start justify-between gap-6">
               <div className="min-w-0 space-y-5">
                 <SectionLabel>
@@ -392,262 +398,240 @@ export function MissionSection({
                 {PRIORITY_LABELS[mission.priority]}
               </Badge>
             </div>
-          ) : (
-            /* No actionable task: completed missions stay in history, they
-               just stop being "today's mission". */
+
+            <Separator className="my-8" />
+
             <div className="space-y-5">
-              <SectionLabel>
-                Today&apos;s Mission
-              </SectionLabel>
+              <div className="flex items-baseline justify-between gap-4">
+                <SectionLabel>
+                  Mission Checklist
+                </SectionLabel>
 
-              <h2 className="font-serif text-display-lg">
-                You&apos;re clear for today.
-              </h2>
+                <p className="text-sm font-semibold tabular-nums">
+                  {completedCount} / {steps.length} Complete
+                </p>
+              </div>
 
-              <p className="text-base text-muted-foreground">
-                Create or select a new task when you&apos;re ready.
-              </p>
-
-              <CreateTaskDialog projects={projects} triggerLabel="Create Task" />
-            </div>
-          )}
-
-          {mission ? (
-            <>
-              <Separator className="my-8" />
-
-              <div className="space-y-5">
-                <div className="flex items-baseline justify-between gap-4">
-                  <SectionLabel>
-                    Mission Checklist
-                  </SectionLabel>
-
-                  <p className="text-sm font-semibold tabular-nums">
-                    {completedCount} / {steps.length} Complete
-                  </p>
-                </div>
-
+              <div
+                role="progressbar"
+                aria-label="Mission progress"
+                aria-valuenow={progressPercent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                className="h-2 w-full overflow-hidden rounded-full bg-muted"
+              >
                 <div
-                  role="progressbar"
-                  aria-label="Mission progress"
-                  aria-valuenow={progressPercent}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  className="h-2 w-full overflow-hidden rounded-full bg-muted"
-                >
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
-                  />
+                  className="h-full rounded-full bg-primary transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+
+              {steps.length === 0 ? (
+                <div className="rounded-2xl border border-dashed p-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    No checklist yet.
+                  </p>
+
+                  {isAdding ? (
+                    <div className="mt-4 text-left">{addStepForm}</div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      className="mt-4"
+                      onClick={() => setIsAdding(true)}
+                    >
+                      <PlusIcon />
+                      Add First Step
+                    </Button>
+                  )}
                 </div>
-
-                {steps.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed p-6 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      No checklist yet.
-                    </p>
-
-                    {isAdding ? (
-                      <div className="mt-4 text-left">{addStepForm}</div>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="lg"
-                        className="mt-4"
-                        onClick={() => setIsAdding(true)}
+              ) : (
+                <>
+                  <ul className="space-y-1">
+                    {steps.map((step, index) => (
+                      <li
+                        key={step.id}
+                        className="group flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors hover:bg-muted/60"
                       >
-                        <PlusIcon />
-                        Add First Step
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <ul className="space-y-1">
-                      {steps.map((step, index) => (
-                        <li
-                          key={step.id}
-                          className="group flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors hover:bg-muted/60"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={step.completed}
-                            onChange={() => toggleStep(step)}
-                            aria-label={`Mark ${step.title} as ${
-                              step.completed ? "incomplete" : "complete"
-                            }`}
-                            className="size-4 shrink-0 accent-foreground disabled:cursor-not-allowed"
-                          />
+                        <input
+                          type="checkbox"
+                          checked={step.completed}
+                          onChange={() => toggleStep(step)}
+                          aria-label={`Mark ${step.title} as ${
+                            step.completed ? "incomplete" : "complete"
+                          }`}
+                          className="size-4 shrink-0 accent-foreground disabled:cursor-not-allowed"
+                        />
 
-                          {editingId === step.id ? (
-                            <Input
-                              autoFocus
-                              value={editingTitle}
-                              maxLength={200}
-                              onChange={(event) =>
-                                setEditingTitle(event.target.value)
+                        {editingId === step.id ? (
+                          <Input
+                            autoFocus
+                            value={editingTitle}
+                            maxLength={200}
+                            onChange={(event) =>
+                              setEditingTitle(event.target.value)
+                            }
+                            onBlur={() => saveTitle(step)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                saveTitle(step);
                               }
-                              onBlur={() => saveTitle(step)}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter") {
-                                  event.preventDefault();
-                                  saveTitle(step);
-                                }
-                                if (event.key === "Escape") {
-                                  setEditingId(null);
-                                }
-                              }}
-                              className="h-8"
-                            />
-                          ) : (
-                            <span
-                              className={`flex-1 truncate text-sm ${
-                                step.completed
-                                  ? "text-muted-foreground line-through"
-                                  : ""
-                              }`}
-                            >
-                              {step.title}
-                            </span>
-                          )}
+                              if (event.key === "Escape") {
+                                setEditingId(null);
+                              }
+                            }}
+                            className="h-8"
+                          />
+                        ) : (
+                          <span
+                            className={`flex-1 truncate text-sm ${
+                              step.completed
+                                ? "text-muted-foreground line-through"
+                                : ""
+                            }`}
+                          >
+                            {step.title}
+                          </span>
+                        )}
 
-                          <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-                            <Button
-                              type="button"
-                              size="icon-xs"
-                              variant="ghost"
-                              aria-label="Move step up"
-                              disabled={index === 0}
-                              onClick={() => moveStep(index, -1)}
-                            >
-                              <ChevronUpIcon />
-                            </Button>
+                        <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                          <Button
+                            type="button"
+                            size="icon-xs"
+                            variant="ghost"
+                            aria-label="Move step up"
+                            disabled={index === 0}
+                            onClick={() => moveStep(index, -1)}
+                          >
+                            <ChevronUpIcon />
+                          </Button>
 
-                            <Button
-                              type="button"
-                              size="icon-xs"
-                              variant="ghost"
-                              aria-label="Move step down"
-                              disabled={index === steps.length - 1}
-                              onClick={() => moveStep(index, 1)}
-                            >
-                              <ChevronDownIcon />
-                            </Button>
+                          <Button
+                            type="button"
+                            size="icon-xs"
+                            variant="ghost"
+                            aria-label="Move step down"
+                            disabled={index === steps.length - 1}
+                            onClick={() => moveStep(index, 1)}
+                          >
+                            <ChevronDownIcon />
+                          </Button>
 
-                            <Button
-                              type="button"
-                              size="icon-xs"
-                              variant="ghost"
-                              aria-label="Rename step"
-                              onClick={() => {
-                                setEditingId(step.id);
-                                setEditingTitle(step.title);
-                              }}
-                            >
-                              <PencilIcon />
-                            </Button>
+                          <Button
+                            type="button"
+                            size="icon-xs"
+                            variant="ghost"
+                            aria-label="Rename step"
+                            onClick={() => {
+                              setEditingId(step.id);
+                              setEditingTitle(step.title);
+                            }}
+                          >
+                            <PencilIcon />
+                          </Button>
 
-                            <Button
-                              type="button"
-                              size="icon-xs"
-                              variant="ghost"
-                              aria-label="Delete step"
-                              onClick={() => deleteStep(step)}
-                            >
-                              <Trash2Icon />
-                            </Button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                          <Button
+                            type="button"
+                            size="icon-xs"
+                            variant="ghost"
+                            aria-label="Delete step"
+                            onClick={() => deleteStep(step)}
+                          >
+                            <Trash2Icon />
+                          </Button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
 
-                    {isAdding ? (
-                      addStepForm
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsAdding(true)}
-                      >
-                        <PlusIcon />
-                        Add Step
-                      </Button>
-                    )}
-                  </>
-                )}
+                  {isAdding ? (
+                    addStepForm
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsAdding(true)}
+                    >
+                      <PlusIcon />
+                      Add Step
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+
+            <Separator className="my-8" />
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <SectionLabel>
+                  Current Step
+                </SectionLabel>
+
+                <p className="text-lg font-semibold tracking-tight">
+                  {currentStep?.title ??
+                    (steps.length === 0
+                      ? "Add your first step"
+                      : "All steps complete")}
+                </p>
               </div>
 
-              <Separator className="my-8" />
+              <div className="space-y-2">
+                <SectionLabel>
+                  Next Step
+                </SectionLabel>
 
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <SectionLabel>
-                    Current Step
-                  </SectionLabel>
+                <p className="text-lg font-semibold tracking-tight text-muted-foreground">
+                  {nextStep?.title ?? "—"}
+                </p>
+              </div>
+            </div>
 
-                  <p className="text-lg font-semibold tracking-tight">
-                    {currentStep?.title ??
-                      (steps.length === 0
-                        ? "Add your first step"
-                        : "All steps complete")}
-                  </p>
-                </div>
+            <Separator className="my-8" />
 
-                <div className="space-y-2">
-                  <SectionLabel>
-                    Next Step
-                  </SectionLabel>
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <div className="space-y-2">
+                <SectionLabel>
+                  Estimated Focus
+                </SectionLabel>
 
-                  <p className="text-lg font-semibold tracking-tight text-muted-foreground">
-                    {nextStep?.title ?? "—"}
-                  </p>
-                </div>
+                <p className="text-3xl font-semibold tracking-tight">
+                  {ESTIMATED_FOCUS_MINUTES} min
+                </p>
               </div>
 
-              <Separator className="my-8" />
+              <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="h-12 px-6 text-base"
+                  onClick={() =>
+                    router.push(`/content/new?taskId=${mission.id}`)
+                  }
+                >
+                  <ClapperboardIcon />
+                  Create Content
+                </Button>
 
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                <div className="space-y-2">
-                  <SectionLabel>
-                    Estimated Focus
-                  </SectionLabel>
-
-                  <p className="text-3xl font-semibold tracking-tight">
-                    {ESTIMATED_FOCUS_MINUTES} min
-                  </p>
-                </div>
-
-                <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant="outline"
-                    className="h-12 px-6 text-base"
-                    onClick={() =>
-                      router.push(`/content/new?taskId=${mission.id}`)
-                    }
-                  >
-                    <ClapperboardIcon />
-                    Create Content
-                  </Button>
-
-                  <Button
-                    type="button"
-                    size="lg"
-                    className="h-12 px-8 text-base"
-                    onClick={() => router.push(`/focus/${mission.id}`)}
-                  >
-                    <PlayIcon />
-                    Start Focus Session
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  size="lg"
+                  className="h-12 px-8 text-base"
+                  onClick={() => router.push(`/focus/${mission.id}`)}
+                >
+                  <PlayIcon />
+                  Start Focus Session
+                </Button>
               </div>
-            </>
-          ) : null}
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="self-start rounded-2xl border bg-card p-7">
         <p className="text-sm font-medium text-muted-foreground">

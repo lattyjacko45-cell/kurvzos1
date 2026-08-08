@@ -166,7 +166,7 @@ export function TaskList({ tasks }: TaskListProps) {
       <Card>
         <CardHeader>
           <CardTitle>Recent Tasks</CardTitle>
-          <CardDescription>No tasks yet. Add tasks to your projects!</CardDescription>
+          <CardDescription>No open tasks right now.</CardDescription>
         </CardHeader>
       </Card>
     );
