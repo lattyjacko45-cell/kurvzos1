@@ -81,17 +81,23 @@ export default async function ContentDetailPage({
 
   return (
     <div className="mx-auto w-full max-w-focused space-y-8">
-      <YouTubeConnectionCard
-        configured={setupState.configured}
-        missingEnv={setupState.missing}
-        channelTitle={connection?.channelTitle ?? null}
-        oauthSetup={getOAuthSetupDetails()}
-      />
-
+      {/*
+        The connection card is passed through so it renders after the content
+        identity rather than above it. Same component, same props, same
+        conditional states — only its position in the page moved.
+      */}
       <ContentDetail
         item={detail}
         youtubeConnected={Boolean(connection) && setupState.configured}
         browserTimezone="UTC"
+        connectionUtility={
+          <YouTubeConnectionCard
+            configured={setupState.configured}
+            missingEnv={setupState.missing}
+            channelTitle={connection?.channelTitle ?? null}
+            oauthSetup={getOAuthSetupDetails()}
+          />
+        }
       />
     </div>
   );

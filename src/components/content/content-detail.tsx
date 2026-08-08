@@ -72,6 +72,13 @@ interface ContentDetailProps {
   item: ContentDetailItem;
   youtubeConnected: boolean;
   browserTimezone: string;
+  /**
+   * The YouTube connection card, rendered immediately after the content
+   * identity. It is a utility for this page, not the subject of it — showing
+   * it above the title meant every content item opened on the channel's state
+   * rather than its own.
+   */
+  connectionUtility?: React.ReactNode;
 }
 
 /** Splits a stored UTC instant into date/time inputs for a given zone. */
@@ -184,6 +191,7 @@ export function ContentDetail({
   item,
   youtubeConnected,
   browserTimezone,
+  connectionUtility,
 }: ContentDetailProps) {
   const router = useRouter();
   // Pipeline changes are Sophia's significance trigger.
@@ -647,10 +655,9 @@ export function ContentDetail({
   return (
     <div className="space-y-8">
       <section className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            {item.title}
-          </h1>
+        <div className="min-w-0 space-y-1">
+          {/* Display serif, matching every other page title in KurvzOS. */}
+          <h1 className="font-serif text-display-md">{item.title}</h1>
 
           <p className="text-sm text-muted-foreground">
             {item.projectName ?? "No project"}
@@ -661,9 +668,17 @@ export function ContentDetail({
         <ContentStatusBadge status={item.status} />
       </section>
 
+      {connectionUtility}
+
+      {/*
+        Publishing status is the operational centre of this page — it is where
+        the current state and the one action available right now both live — so
+        it carries card weight while the sections below it stay on the page
+        background. Every condition and action inside is unchanged.
+      */}
       <section
         aria-labelledby="status-heading"
-        className="space-y-3 rounded-2xl border p-5"
+        className="space-y-3 rounded-2xl border bg-card p-6"
       >
         <SectionLabel as="h2" id={"status-heading"}>
           Publishing status

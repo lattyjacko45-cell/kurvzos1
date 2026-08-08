@@ -15,7 +15,7 @@ import { ContentStatusBadge } from "@/components/content/content-status-badge";
 import { YouTubeConnectionCard } from "@/components/content/youtube-connection-card";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { SectionLabel } from "@/components/ui/section-label";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Content",
@@ -108,24 +108,24 @@ export default async function ContentPage({ searchParams }: ContentPageProps) {
 
   return (
     <div className="mx-auto w-full max-w-standard space-y-8">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-2">
-          <SectionLabel>
-            Content Studio
-          </SectionLabel>
-
-          <h1 className="font-serif text-display-lg">Content</h1>
-
-          <p className="text-muted-foreground">
-            Plan, upload and schedule YouTube videos from KurvzOS.
-          </p>
-        </div>
-
-        {/* Internal navigation — a styled Next Link, not a Button. */}
-        <Link href="/content/new" className={buttonVariants()}>
-          New content
-        </Link>
-      </header>
+      {/*
+        The hand-rolled header is replaced by the shared PageHeader, which
+        already carries the eyebrow, display serif title, description and a
+        right-aligned action slot. Same strings, same link, same destination —
+        the action now sits with the header on desktop and wraps beneath it on
+        mobile instead of being a separate flex child.
+      */}
+      <PageHeader
+        eyebrow="Content Studio"
+        title="Content"
+        description="Plan, upload and schedule YouTube videos from KurvzOS."
+        action={
+          /* Internal navigation — a styled Next Link, not a Button. */
+          <Link href="/content/new" className={buttonVariants()}>
+            New content
+          </Link>
+        }
+      />
 
       {youtube && OAUTH_MESSAGES[youtube] ? (
         <div role="status" className="space-y-2 rounded-2xl border p-4 text-sm">
@@ -156,46 +156,58 @@ export default async function ContentPage({ searchParams }: ContentPageProps) {
         oauthSetup={getOAuthSetupDetails()}
       />
 
-      {process.env.NODE_ENV !== "production" ? <TestUploadChecklist /> : null}
+      {/*
+        Landmark for the list, so the primary work of this page is reachable as
+        its own region. Labelled via aria-label rather than a visible heading:
+        adding one would be new copy, which this pass does not do.
+      */}
+      <section aria-label="Content">
+        {items.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No content yet. Create one from scratch or from an existing task.
+          </p>
+        ) : (
+          <ul className="space-y-3">
+            {items.map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={`/content/${item.id}`}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-5 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <div className="min-w-0 space-y-1">
+                    {/* Title is the strongest element in the row; the status
+                        badge holds the right edge and metadata stays quiet. */}
+                    <p className="truncate text-body-lg font-semibold">
+                      {item.title}
+                    </p>
+
+                    <p className="truncate text-xs text-muted-foreground">
+                      {CONTENT_TYPE_LABELS[item.contentType]}
+                      {item.project ? ` · ${item.project.name}` : ""}
+                      {item.task ? ` · ${item.task.title}` : ""}
+                    </p>
+
+                    {item.scheduledAt ? (
+                      <p className="text-xs text-muted-foreground">
+                        Scheduled{" "}
+                        {formatInTimeZone(item.scheduledAt, item.timezone)}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <ContentStatusBadge
+                    status={item.status as ContentStatusValue}
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <Separator />
 
-      {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No content yet. Create one from scratch or from an existing task.
-        </p>
-      ) : (
-        <ul className="space-y-3">
-          {items.map((item) => (
-            <li key={item.id}>
-              <Link
-                href={`/content/${item.id}`}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-5 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                <div className="min-w-0 space-y-1">
-                  <p className="truncate text-base font-medium">{item.title}</p>
-
-                  <p className="truncate text-xs text-muted-foreground">
-                    {CONTENT_TYPE_LABELS[item.contentType]}
-                    {item.project ? ` · ${item.project.name}` : ""}
-                    {item.task ? ` · ${item.task.title}` : ""}
-                  </p>
-
-                  {item.scheduledAt ? (
-                    <p className="text-xs text-muted-foreground">
-                      Scheduled {formatInTimeZone(item.scheduledAt, item.timezone)}
-                    </p>
-                  ) : null}
-                </div>
-
-                <ContentStatusBadge
-                  status={item.status as ContentStatusValue}
-                />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      {process.env.NODE_ENV !== "production" ? <TestUploadChecklist /> : null}
     </div>
   );
 }

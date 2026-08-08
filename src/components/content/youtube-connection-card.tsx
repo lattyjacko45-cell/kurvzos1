@@ -131,7 +131,7 @@ export function YouTubeConnectionCard({
     return (
       <section
         aria-labelledby="youtube-connected-heading"
-        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5"
+        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4"
       >
         <div className="space-y-1">
           <SectionLabel as="h2" id={"youtube-connected-heading"}>
@@ -176,7 +176,7 @@ export function YouTubeConnectionCard({
   return (
     <section
       aria-labelledby="youtube-connect-heading"
-      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5"
+      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4"
     >
       <div className="space-y-1">
         <SectionLabel as="h2" id={"youtube-connect-heading"}>

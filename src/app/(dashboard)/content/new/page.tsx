@@ -64,11 +64,19 @@ export default async function NewContentPage({
         title="New content"
       />
 
-      <NewContentForm
-        tasks={selectableTasks}
-        initialTaskId={validInitialTaskId}
-        missionTaskId={briefing.mission?.id ?? null}
-      />
+      {/*
+        The form is the entire purpose of this route, so it now sits on a card
+        rather than floating on the page background. Nothing inside the form
+        changed — same fields, labels, options, defaults, validation and
+        actions; it simply reads as the primary surface at the focused width.
+      */}
+      <section className="rounded-2xl border bg-card p-8">
+        <NewContentForm
+          tasks={selectableTasks}
+          initialTaskId={validInitialTaskId}
+          missionTaskId={briefing.mission?.id ?? null}
+        />
+      </section>
 
       <p className="text-sm">
         <Link href="/content" className="underline underline-offset-4">
