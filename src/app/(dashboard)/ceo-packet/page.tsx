@@ -69,66 +69,89 @@ export default async function CeoPacketPage() {
 
       <Separator />
 
-      <section className="space-y-4">
-        <SectionHeading>Weekly Priority</SectionHeading>
+      {/*
+        DECISION ZONE.
 
-        {priorityTask ? (
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <p className="text-2xl font-semibold tracking-tight">
-                {priorityTask.title}
-              </p>
+        The recommendation used to be the last thing on the page, below the
+        table and the risk list — a brief that made you read every input before
+        it told you what to do. It is the same string as before, moved and
+        given the dominant surface; nothing is recomputed or duplicated.
+        `items-start` keeps the narrower priority card at its natural height.
+      */}
+      <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:items-start">
+        <div className="space-y-2 rounded-2xl border bg-card p-8">
+          <SectionHeading>Next Recommended Move</SectionHeading>
 
-              <p className="text-sm text-muted-foreground">
-                {priorityTask.projectName} · {priorityTask.priority} priority
-              </p>
-            </div>
+          {/* Inter, at the existing heading token — the dominance comes from
+              the surface and the column, not from a larger or serif face. */}
+          <p className="text-heading font-medium leading-7">
+            {packet.nextMove}
+          </p>
+        </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-4 rounded-2xl border bg-card p-6">
+          <SectionHeading>Weekly Priority</SectionHeading>
+
+          {priorityTask ? (
+            <div className="space-y-4">
               <div className="space-y-1">
-                <SectionLabel>
-                  Current Step
-                </SectionLabel>
+                <p className="text-2xl font-semibold tracking-tight">
+                  {priorityTask.title}
+                </p>
 
-                <p className="text-sm font-medium">
-                  {priorityProgress.currentStep?.title ??
-                    (priorityProgress.hasSteps
-                      ? "All steps complete"
-                      : "No checklist yet")}
+                <p className="text-sm text-muted-foreground">
+                  {priorityTask.projectName} · {priorityTask.priority} priority
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-baseline justify-between gap-4">
+              {/* Stacked rather than two columns: this block now sits in the
+                  narrow supporting column, where side-by-side would cramp. */}
+              <div className="space-y-4">
+                <div className="space-y-1">
                   <SectionLabel>
-                    Progress
+                    Current Step
                   </SectionLabel>
 
-                  <p className="text-sm font-semibold tabular-nums">
-                    {priorityProgress.completedCount} /{" "}
-                    {priorityProgress.totalSteps}
+                  <p className="text-sm font-medium">
+                    {priorityProgress.currentStep?.title ??
+                      (priorityProgress.hasSteps
+                        ? "All steps complete"
+                        : "No checklist yet")}
                   </p>
                 </div>
 
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted print:border">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${priorityProgress.percent}%` }}
-                  />
+                <div className="space-y-2">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <SectionLabel>
+                      Progress
+                    </SectionLabel>
+
+                    <p className="text-sm font-semibold tabular-nums">
+                      {priorityProgress.completedCount} /{" "}
+                      {priorityProgress.totalSteps}
+                    </p>
+                  </div>
+
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted print:border">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${priorityProgress.percent}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            No actionable task this week.
-          </p>
-        )}
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No actionable task this week.
+            </p>
+          )}
+        </div>
       </section>
 
-      <Separator />
-
-      <section className="space-y-4">
+      {/* Results, risks and evidence: each on its own surface, so the section
+          boundaries no longer depend on a rule between two bare blocks. */}
+      <section className="space-y-4 rounded-2xl border bg-card p-6">
         <SectionHeading>Weekly Results</SectionHeading>
 
         {packet.hasWeeklyActivity ? (
@@ -144,53 +167,7 @@ export default async function CeoPacketPage() {
         )}
       </section>
 
-      <Separator />
-
-      <section className="space-y-4">
-        <SectionHeading>Project Activity</SectionHeading>
-
-        {activeProjects.length > 0 ? (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left">
-                <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
-                  Project
-                </th>
-                <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
-                  Open
-                </th>
-                <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
-                  Completed
-                </th>
-                <th className="py-2 text-label font-semibold uppercase text-muted-foreground">
-                  Status
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {activeProjects.map((project) => (
-                <tr key={project.id} className="border-b last:border-0">
-                  <td className="py-3 pr-4 font-medium">{project.name}</td>
-                  <td className="py-3 pr-4 tabular-nums">{project.openTasks}</td>
-                  <td className="py-3 pr-4 tabular-nums">
-                    {project.completedThisWeek}
-                  </td>
-                  <td className="py-3 text-muted-foreground">
-                    {STATUS_LABELS[project.status] ?? project.status}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-sm text-muted-foreground">No active projects.</p>
-        )}
-      </section>
-
-      <Separator />
-
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-2xl border bg-card p-6">
         <SectionHeading>Risks</SectionHeading>
 
         {risks.length > 0 ? (
@@ -210,12 +187,50 @@ export default async function CeoPacketPage() {
         )}
       </section>
 
-      <Separator />
+      {/* Supporting evidence, last and lightest: left on the page background
+          so it reads below the carded sections above it. */}
+      <section className="space-y-4">
+        <SectionHeading>Project Activity</SectionHeading>
 
-      <section className="space-y-2">
-        <SectionHeading>Next Recommended Move</SectionHeading>
+        {activeProjects.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
+                    Project
+                  </th>
+                  <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
+                    Open
+                  </th>
+                  <th className="py-2 pr-4 text-label font-semibold uppercase text-muted-foreground">
+                    Completed
+                  </th>
+                  <th className="py-2 text-label font-semibold uppercase text-muted-foreground">
+                    Status
+                  </th>
+                </tr>
+              </thead>
 
-        <p className="text-lg font-medium leading-7">{packet.nextMove}</p>
+              <tbody>
+                {activeProjects.map((project) => (
+                  <tr key={project.id} className="border-b last:border-0">
+                    <td className="py-3 pr-4 font-medium">{project.name}</td>
+                    <td className="py-3 pr-4 tabular-nums">{project.openTasks}</td>
+                    <td className="py-3 pr-4 tabular-nums">
+                      {project.completedThisWeek}
+                    </td>
+                    <td className="py-3 text-muted-foreground">
+                      {STATUS_LABELS[project.status] ?? project.status}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No active projects.</p>
+        )}
       </section>
     </article>
   );
