@@ -15,7 +15,7 @@ import {
   HarperWorkspace,
   type HarperHistoryEntry,
 } from "@/components/harper/harper-workspace";
-import { PageHeader } from "@/components/ui/page-header";
+import { ExecutiveHeader } from "@/components/executive/executive-header";
 
 export const metadata: Metadata = {
   title: "Harper",
@@ -79,11 +79,7 @@ export default async function HarperPage() {
 
   return (
     <div className="mx-auto w-full max-w-focused space-y-8">
-      <PageHeader
-        eyebrow="Chief of Staff"
-        title="Harper"
-        description="One priority, one next move, grounded in your workspace."
-      />
+      <ExecutiveHeader id="HARPER" />
 
       <HarperWorkspace
         initialAdvice={shownAdvice}

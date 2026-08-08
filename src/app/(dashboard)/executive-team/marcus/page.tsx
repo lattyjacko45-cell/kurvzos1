@@ -20,7 +20,7 @@ import {
   type MarcusHistoryEntry,
 } from "@/components/marcus/marcus-workspace";
 import { FinancialSnapshotForm } from "@/components/marcus/financial-snapshot-form";
-import { PageHeader } from "@/components/ui/page-header";
+import { ExecutiveHeader } from "@/components/executive/executive-header";
 
 export const metadata: Metadata = {
   title: "Marcus",
@@ -91,28 +91,7 @@ export default async function MarcusPage() {
 
   return (
     <div className="mx-auto w-full max-w-focused space-y-8">
-      <PageHeader
-        eyebrow="Chief Financial Officer"
-        title="Marcus"
-        description="Where the business should spend, save, or earn next."
-      />
-
-      <FinancialSnapshotForm
-        period={formatPeriod(period)}
-        initial={
-          snapshot
-            ? {
-                currency: snapshot.currency,
-                revenueCents: snapshot.revenueCents,
-                operatingExpensesCents: snapshot.operatingExpensesCents,
-                marketingSpendCents: snapshot.marketingSpendCents,
-                availableCashCents: snapshot.availableCashCents,
-                targetRevenueCents: snapshot.targetRevenueCents,
-                notes: snapshot.notes,
-              }
-            : null
-        }
-      />
+      <ExecutiveHeader id="MARCUS" />
 
       <MarcusWorkspace
         initialAdvice={marcusView.advice}
@@ -122,6 +101,31 @@ export default async function MarcusPage() {
         aiConfigured={aiState.configured}
         missingEnv={aiState.missing}
         missingFinancialData={marcusView.context.missingFinancialData}
+        /*
+          The snapshot form renders inside the workspace, directly beneath
+          Marcus's read. It stays secondary to the advice — it is an input, not
+          the answer — but close enough to the read to be obviously the source
+          of it, rather than stranded below the whole history list.
+        */
+        afterRead={
+          <FinancialSnapshotForm
+            key="financial-snapshot"
+            period={formatPeriod(period)}
+            initial={
+              snapshot
+                ? {
+                    currency: snapshot.currency,
+                    revenueCents: snapshot.revenueCents,
+                    operatingExpensesCents: snapshot.operatingExpensesCents,
+                    marketingSpendCents: snapshot.marketingSpendCents,
+                    availableCashCents: snapshot.availableCashCents,
+                    targetRevenueCents: snapshot.targetRevenueCents,
+                    notes: snapshot.notes,
+                  }
+                : null
+            }
+          />
+        }
       />
 
       <p className="text-sm">

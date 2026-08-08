@@ -16,7 +16,7 @@ import {
   SophiaWorkspace,
   type SophiaHistoryEntry,
 } from "@/components/sophia/sophia-workspace";
-import { PageHeader } from "@/components/ui/page-header";
+import { ExecutiveHeader } from "@/components/executive/executive-header";
 
 export const metadata: Metadata = {
   title: "Sophia",
@@ -76,11 +76,7 @@ export default async function SophiaPage() {
 
   return (
     <div className="mx-auto w-full max-w-focused space-y-8">
-      <PageHeader
-        eyebrow="Chief Marketing Officer"
-        title="Sophia"
-        description="What to publish, promote or improve to grow."
-      />
+      <ExecutiveHeader id="SOPHIA" />
 
       <SophiaWorkspace
         initialAdvice={sophiaView.advice}

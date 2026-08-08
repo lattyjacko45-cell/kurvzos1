@@ -16,7 +16,7 @@ import {
   OliviaWorkspace,
   type OliviaHistoryEntry,
 } from "@/components/olivia/olivia-workspace";
-import { PageHeader } from "@/components/ui/page-header";
+import { ExecutiveHeader } from "@/components/executive/executive-header";
 
 export const metadata: Metadata = {
   title: "Olivia",
@@ -76,11 +76,7 @@ export default async function OliviaPage() {
 
   return (
     <div className="mx-auto w-full max-w-focused space-y-8">
-      <PageHeader
-        eyebrow="Chief Operations Officer"
-        title="Olivia"
-        description="What is slowing execution down, and how the process should change."
-      />
+      <ExecutiveHeader id="OLIVIA" />
 
       <OliviaWorkspace
         initialAdvice={oliviaView.advice}

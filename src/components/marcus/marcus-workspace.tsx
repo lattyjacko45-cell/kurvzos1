@@ -30,6 +30,12 @@ interface MarcusWorkspaceProps {
   missingEnv: string[];
   /** Shown verbatim so the user knows what would sharpen the advice. */
   missingFinancialData: string[];
+  /**
+   * Rendered immediately after Marcus's read. Marcus is the only executive
+   * with an input of his own — the financial snapshot — and it belongs next to
+   * the read it feeds, ahead of the ask box and history.
+   */
+  afterRead?: React.ReactNode;
 }
 
 const SUGGESTIONS = [
@@ -68,6 +74,7 @@ export function MarcusWorkspace({
   aiConfigured,
   missingEnv,
   missingFinancialData,
+  afterRead,
 }: MarcusWorkspaceProps) {
   const router = useRouter();
   const [advice, setAdvice] = useState<MarcusAnswer | null>(initialAdvice);
@@ -164,7 +171,7 @@ export function MarcusWorkspace({
 
       <section
         aria-labelledby="marcus-advice-heading"
-        className="space-y-5 rounded-2xl border bg-card p-6"
+        className="space-y-6 rounded-2xl border bg-card p-8"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionLabel as="h2" id={"marcus-advice-heading"}>
@@ -230,6 +237,14 @@ export function MarcusWorkspace({
           Decision support only — not tax, credit, legal or investment advice.
         </p>
       </section>
+
+      {/*
+        The figures Marcus's read is derived from sit directly beneath it.
+        Rendered here rather than composed on the page so the form cannot drift
+        away from the read again — everything below this point is a control or
+        a record, not the answer.
+      */}
+      {afterRead}
 
       <section aria-labelledby="ask-marcus-heading" className="space-y-4">
         <SectionLabel as="h2" id={"ask-marcus-heading"}>

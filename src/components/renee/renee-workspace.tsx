@@ -144,7 +144,7 @@ export function ReneeWorkspace({
 
       <section
         aria-labelledby="renee-advice-heading"
-        className="space-y-5 rounded-2xl border bg-card p-6"
+        className="space-y-6 rounded-2xl border bg-card p-8"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionLabel as="h2" id={"renee-advice-heading"}>

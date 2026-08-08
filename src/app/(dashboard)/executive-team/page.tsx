@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowRightIcon } from "lucide-react";
 
 import { getCurrentUser } from "@/lib/auth";
 import { EXECUTIVES } from "@/config/executives";
@@ -23,22 +24,34 @@ export default async function ExecutiveTeamPage() {
       <PageHeader
         eyebrow="Executive Team"
         title="Your leadership"
-        description="Each executive reads your KurvzOS data and advises on their area. Harper is live today."
+        description="Each executive reads your KurvzOS data and advises on their area."
       />
 
-      <ul className="grid gap-4 sm:grid-cols-2">
+      <ul className="grid gap-5 sm:grid-cols-2">
         {EXECUTIVES.map((executive) => {
           const card = (
-            <div className="h-full space-y-3 rounded-2xl border bg-card p-6">
+            /*
+              flex-col + the description's flex-1 is what gives every card the
+              same height without padding one out: the responsibility line
+              absorbs the slack, so the route action always sits on the bottom
+              edge rather than floating in an empty area.
+            */
+            <div className="flex h-full flex-col gap-4 rounded-2xl border bg-card p-6">
               <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <p className="text-lg font-semibold tracking-tight">
-                    {executive.name}
-                  </p>
-
+                {/*
+                  Role above name, matching the eyebrow-then-title order of the
+                  workspace header, so a card and the page it opens read the
+                  same way round. The name carries the display serif — the one
+                  visual cue that marks these as people rather than features.
+                */}
+                <div className="min-w-0 space-y-1.5">
                   <SectionLabel>
                     {executive.role}
                   </SectionLabel>
+
+                  <p className="font-serif text-heading text-foreground">
+                    {executive.name}
+                  </p>
                 </div>
 
                 <Badge
@@ -49,9 +62,18 @@ export default async function ExecutiveTeamPage() {
                 </Badge>
               </div>
 
-              <p className="text-sm leading-6 text-muted-foreground">
+              <p className="flex-1 text-sm leading-6 text-muted-foreground">
                 {executive.description}
               </p>
+
+              {executive.active && executive.href ? (
+                /* Restrained affordance: the whole card is already the link,
+                   so this is a cue, not a second control. */
+                <p className="flex items-center gap-1.5 text-sm font-medium">
+                  Open workspace
+                  <ArrowRightIcon className="size-4" />
+                </p>
+              ) : null}
             </div>
           );
 
