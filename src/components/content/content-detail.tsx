@@ -234,8 +234,27 @@ export function ContentDetail({
   const uploadInFlight = useRef(false);
 
   const isLocked = Boolean(item.youtubeVideoId);
+
+  /**
+   * Statuses that mean a video already reached YouTube.
+   *
+   * These are checked alongside `youtubeVideoId` rather than instead of it. A
+   * successful PUT followed by a failed `complete-upload` call leaves the row
+   * with no video id, and the old guard — which looked only at the id — then
+   * re-enabled "Retry upload", which uploaded the same file a second time.
+   */
+  const UPLOAD_ALREADY_DONE: ContentStatusValue[] = [
+    "PROCESSING",
+    "UPLOADED",
+    "SCHEDULED",
+    "PUBLISHED",
+  ];
+
   const canUpload =
-    youtubeConnected && !isLocked && item.status !== "UPLOADING";
+    youtubeConnected &&
+    !isLocked &&
+    item.status !== "UPLOADING" &&
+    !UPLOAD_ALREADY_DONE.includes(item.status);
 
   function scheduledInstant(): string | null {
     if (!scheduleDate || !scheduleTime) return null;

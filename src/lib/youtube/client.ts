@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { decryptSecret, encryptSecret } from "@/lib/crypto";
+import type { YouTubeVideoFacts } from "@/lib/youtube/status-map";
 import {
   GOOGLE_TOKEN_URL,
   YOUTUBE_API_BASE,
@@ -485,18 +486,25 @@ export async function createResumableUploadSession(
   return uploadUrl;
 }
 
-export interface VideoStatus {
-  uploadStatus: string | null;
-  privacyStatus: string | null;
-  processingStatus: string | null;
-  publishAt: string | null;
-  failureReason: string | null;
-}
-
+/**
+ * Reads the live status of one video.
+ *
+ * `part=status,processingDetails` is required: `publishAt`, `privacyStatus`,
+ * `uploadStatus`, `failureReason` and `rejectionReason` all live on `status`,
+ * while `processingStatus` and `processingFailureReason` live on
+ * `processingDetails`. Requesting only one part silently yields nulls for the
+ * other half of the mapping.
+ *
+ * All three distinct "why did it go wrong" fields are read. They are NOT
+ * interchangeable: `failureReason` explains a failed upload, `rejectionReason`
+ * explains a rejected video, and `processingFailureReason` explains failed
+ * processing. Reading only `failureReason` — as this did — left every rejected
+ * video with a generic message.
+ */
 export async function fetchVideoStatus(
   accessToken: string,
   videoId: string
-): Promise<VideoStatus | null> {
+): Promise<YouTubeVideoFacts | null> {
   const response = await youtubeFetch(
     `${YOUTUBE_API_BASE}/videos?part=status,processingDetails&id=${encodeURIComponent(videoId)}`,
     accessToken
@@ -516,8 +524,12 @@ export async function fetchVideoStatus(
         privacyStatus?: string;
         publishAt?: string;
         failureReason?: string;
+        rejectionReason?: string;
       };
-      processingDetails?: { processingStatus?: string };
+      processingDetails?: {
+        processingStatus?: string;
+        processingFailureReason?: string;
+      };
     }>;
   };
 
@@ -530,6 +542,9 @@ export async function fetchVideoStatus(
     processingStatus: item.processingDetails?.processingStatus ?? null,
     publishAt: item.status?.publishAt ?? null,
     failureReason: item.status?.failureReason ?? null,
+    rejectionReason: item.status?.rejectionReason ?? null,
+    processingFailureReason:
+      item.processingDetails?.processingFailureReason ?? null,
   };
 }
 

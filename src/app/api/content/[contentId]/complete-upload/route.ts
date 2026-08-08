@@ -41,6 +41,27 @@ export async function POST(request: Request, context: RouteContext) {
     const data = completeSchema.parse(await request.json());
 
     if (data.failed) {
+      /**
+       * A recorded video id outranks a reported failure.
+       *
+       * The browser reports failure for anything thrown after the PUT — a
+       * failed thumbnail, a dropped `complete-upload` response. Stamping FAILED
+       * over a record that already holds a video id would both lie about a
+       * video that exists on YouTube and re-enable the retry button, which is
+       * exactly how a second upload of the same content gets created.
+       */
+      if (item.youtubeVideoId) {
+        const preserved = await prisma.contentItem.update({
+          where: { id: contentId },
+          data: {
+            errorMessage:
+              "The video reached YouTube, but a later step did not finish. Use Refresh status to read its current state.",
+          },
+        });
+
+        return NextResponse.json(preserved);
+      }
+
       const updated = await prisma.contentItem.update({
         where: { id: contentId },
         data: {
@@ -53,6 +74,30 @@ export async function POST(request: Request, context: RouteContext) {
     }
 
     if (data.youtubeVideoId) {
+      /**
+       * First id wins, permanently.
+       *
+       * If a record already points at a video, a second id means a duplicate
+       * was created on YouTube. Overwriting would orphan the original — we
+       * would lose the only reference to it. Reject instead, and keep pointing
+       * at the upload we already know about.
+       */
+      if (item.youtubeVideoId && item.youtubeVideoId !== data.youtubeVideoId) {
+        console.error("[content] duplicate video id rejected", {
+          contentId,
+          existingVideoId: item.youtubeVideoId,
+          rejectedVideoId: data.youtubeVideoId,
+        });
+
+        return NextResponse.json(
+          {
+            error:
+              "This content already points at a YouTube video. The newly uploaded video was not recorded — remove it in YouTube Studio if it is a duplicate.",
+          },
+          { status: 409 }
+        );
+      }
+
       const updated = await prisma.contentItem.update({
         where: { id: contentId },
         data: {

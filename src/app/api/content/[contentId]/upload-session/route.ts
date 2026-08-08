@@ -48,12 +48,53 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Content not found" }, { status: 404 });
   }
 
+  /**
+   * Duplicate-upload guards.
+   *
+   * Opening a session is the only call that can create a new video resource, so
+   * this is the single place duplication has to be stopped.
+   */
   if (item.youtubeVideoId) {
     return NextResponse.json(
-      { error: "This content already has a YouTube video." },
+      {
+        error:
+          "This content already has a YouTube video. Use Refresh status to read its current state, or create a new content item to upload a different video.",
+      },
       { status: 409 }
     );
   }
+
+  /**
+   * These statuses are only ever reached after a video id was recorded, so
+   * seeing one without an id means the id was cleared by hand. Opening a fresh
+   * session here would upload a second copy of content that is already live.
+   *
+   * UPLOADING is deliberately NOT blocked: an upload interrupted by a closed
+   * tab leaves the row stuck on UPLOADING with no video id, and blocking it
+   * would make that record permanently un-uploadable with no way out.
+   */
+  const COMPLETED_UPLOAD_STATUSES = [
+    "PROCESSING",
+    "UPLOADED",
+    "SCHEDULED",
+    "PUBLISHED",
+  ] as const;
+
+  if (
+    (COMPLETED_UPLOAD_STATUSES as readonly string[]).includes(item.status)
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "This content has already been uploaded to YouTube. Create a new content item to upload a different video.",
+      },
+      { status: 409 }
+    );
+  }
+
+  // Set only once this request owns the row, so the catch below can never
+  // release a claim belonging to a different in-flight upload.
+  let claimedByThisRequest = false;
 
   try {
     const data = sessionSchema.parse(await request.json());
@@ -98,6 +139,37 @@ export async function POST(request: Request, context: RouteContext) {
       );
     }
 
+    /**
+     * Atomically claim the row before talking to YouTube.
+     *
+     * The checks above read the row and then act on it; two requests arriving
+     * together can both pass them and both open a session, which is two videos.
+     * This conditional update is the actual mutual exclusion: only one caller
+     * can move the row out of a non-UPLOADING state, and the `youtubeVideoId:
+     * null` predicate re-verifies the duplicate guard inside the same
+     * statement the database serialises.
+     */
+    const claim = await prisma.contentItem.updateMany({
+      where: {
+        id: contentId,
+        youtubeVideoId: null,
+        status: { notIn: ["UPLOADING", ...COMPLETED_UPLOAD_STATUSES] },
+      },
+      data: { status: "UPLOADING", uploadProgress: 0, errorMessage: null },
+    });
+
+    claimedByThisRequest = claim.count === 1;
+
+    if (!claimedByThisRequest) {
+      return NextResponse.json(
+        {
+          error:
+            "An upload for this content is already in progress. Wait for it to finish, then use Refresh status.",
+        },
+        { status: 409 }
+      );
+    }
+
     // Minted fresh for this upload. The refresh token stays server-side; only
     // this short-lived token is returned, because the YouTube resumable
     // protocol requires an Authorization header on the browser's PUT.
@@ -124,10 +196,9 @@ export async function POST(request: Request, context: RouteContext) {
       browserOrigin
     );
 
-    await prisma.contentItem.update({
-      where: { id: contentId },
-      data: { status: "UPLOADING", uploadProgress: 0, errorMessage: null },
-    });
+    // The row was already moved to UPLOADING by the claim above, so there is no
+    // second write here. Doing it after the session call was what left the
+    // window open for a concurrent request in the first place.
 
     // no-store: the body carries a bearer token, so it must never be cached
     // by the browser, a proxy, or the Next.js data cache.
@@ -136,6 +207,23 @@ export async function POST(request: Request, context: RouteContext) {
       { headers: { "Cache-Control": "no-store, private" } }
     );
   } catch (err) {
+    /**
+     * Release the claim.
+     *
+     * Everything from the claim onward can throw before any video exists on
+     * YouTube. Leaving the row on UPLOADING would strand it, so it goes back to
+     * READY — but only while `youtubeVideoId` is still null, so this can never
+     * walk back a row that did reach YouTube.
+     */
+    if (claimedByThisRequest) {
+      await prisma.contentItem
+        .updateMany({
+          where: { id: contentId, youtubeVideoId: null, status: "UPLOADING" },
+          data: { status: "READY", uploadProgress: 0 },
+        })
+        .catch(() => undefined);
+    }
+
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         { error: err.issues[0].message },

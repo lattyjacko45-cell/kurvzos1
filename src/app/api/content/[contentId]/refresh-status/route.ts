@@ -8,6 +8,10 @@ import {
   getAccessTokenForProfile,
 } from "@/lib/youtube/client";
 import { YouTubeNotConfiguredError } from "@/lib/youtube/config";
+import {
+  mapYouTubeStatus,
+  type MappedContentStatus,
+} from "@/lib/youtube/status-map";
 import type { ContentStatus } from "@/generated/prisma/client";
 
 interface RouteContext {
@@ -15,9 +19,27 @@ interface RouteContext {
 }
 
 /**
+ * Compile-time guard: every status the mapping can produce must exist in the
+ * Prisma enum. If someone edits either side, this line fails `tsc` rather than
+ * throwing at runtime on a live refresh.
+ */
+const _statusesExistInPrisma: Record<MappedContentStatus, ContentStatus> = {
+  PROCESSING: "PROCESSING",
+  UPLOADED: "UPLOADED",
+  SCHEDULED: "SCHEDULED",
+  PUBLISHED: "PUBLISHED",
+  FAILED: "FAILED",
+};
+void _statusesExistInPrisma;
+
+/**
  * POST /api/content/[contentId]/refresh-status
  *
  * Reads the live YouTube state and maps it onto our status vocabulary.
+ *
+ * This route is READ-ONLY with respect to YouTube. It calls `videos.list` and
+ * nothing else — no upload session is opened, no video resource is created.
+ * Refreshing cannot produce a second video no matter how many times it runs.
  */
 export async function POST(_request: Request, context: RouteContext) {
   const profileId = await requireProfileId();
@@ -41,73 +63,54 @@ export async function POST(_request: Request, context: RouteContext) {
 
   try {
     const accessToken = await getAccessTokenForProfile(profileId);
-    const status = await fetchVideoStatus(accessToken, item.youtubeVideoId);
+    const facts = await fetchVideoStatus(accessToken, item.youtubeVideoId);
 
-    if (!status) {
+    if (!facts) {
       return NextResponse.json(
         { error: "YouTube no longer returns this video." },
         { status: 404 }
       );
     }
 
-    const hasPublishAt = Boolean(status.publishAt);
+    const mapped = mapYouTubeStatus(facts, new Date());
 
-    // Safe diagnostics: the four fields the mapping actually reads. No video
-    // id, no publishAt value, no channel id, no title, no URL, no tokens.
-    console.error("[youtube] video status", {
-      processingStatus: status.processingStatus,
-      uploadStatus: status.uploadStatus,
-      privacyStatus: status.privacyStatus,
-      hasPublishAt,
+    /**
+     * Safe diagnostics.
+     *
+     * Contains only our own record id, the YouTube video id (a public
+     * identifier, already stored and rendered in the watch URL), YouTube's
+     * fixed enum values, the publish instant, and the mapped result. It carries
+     * no access token, no refresh token, no client secret, no channel id and no
+     * user-authored text.
+     */
+    console.error("[youtube] status sync", {
+      contentId,
+      youtubeVideoId: item.youtubeVideoId,
+      uploadStatus: facts.uploadStatus,
+      processingStatus: facts.processingStatus,
+      privacyStatus: facts.privacyStatus,
+      publishAt: facts.publishAt,
+      failureReason: facts.failureReason,
+      rejectionReason: facts.rejectionReason,
+      processingFailureReason: facts.processingFailureReason,
+      previousStatus: item.status,
+      mappedStatus: mapped.status,
+      mappingReason: mapped.reason,
     });
-
-    let nextStatus: ContentStatus = item.status;
-    let publishedAt = item.publishedAt;
-    let errorMessage: string | null = null;
-
-    // Rules are evaluated in this order deliberately: failure first, then
-    // in-flight, then the three terminal states.
-    //
-    // The previous version had no branch for uploadStatus "uploaded", so a
-    // finished private video matched nothing and silently kept its old value —
-    // which is why items sat on PROCESSING forever.
-    if (
-      status.processingStatus === "failed" ||
-      status.uploadStatus === "failed" ||
-      status.uploadStatus === "rejected"
-    ) {
-      // B — processing failed, or YouTube rejected the upload.
-      nextStatus = "FAILED";
-      errorMessage = status.failureReason ?? "YouTube rejected the video.";
-    } else if (status.processingStatus === "processing") {
-      // A — genuinely still being processed.
-      nextStatus = "PROCESSING";
-    } else if (hasPublishAt) {
-      // C — a publish time exists, so YouTube accepted the schedule.
-      nextStatus = "SCHEDULED";
-    } else if (status.privacyStatus === "public") {
-      // D — live on YouTube.
-      nextStatus = "PUBLISHED";
-      publishedAt = publishedAt ?? new Date();
-    } else {
-      // E — on YouTube, not processing, private, no publish time.
-      // Truthfully complete. We do NOT claim Scheduled here even when the user
-      // asked for a schedule: absent publishAt, YouTube did not accept one.
-      nextStatus = "UPLOADED";
-
-      if (item.scheduledAt) {
-        errorMessage =
-          "The video uploaded successfully but YouTube did not record a publish time. If the API project is unverified, uploads can be forced private until Google completes its audit. Set the publish time in YouTube Studio, or re-check after verification.";
-      }
-    }
 
     const updated = await prisma.contentItem.update({
       where: { id: contentId },
       data: {
-        status: nextStatus,
-        processingStatus: status.processingStatus ?? status.uploadStatus,
-        publishedAt,
-        errorMessage,
+        status: mapped.status,
+        // Keep the raw signal for support: processingDetails when YouTube gave
+        // us one, otherwise the uploadStatus we actually decided on.
+        processingStatus: facts.processingStatus ?? facts.uploadStatus,
+        // Only ever set publishedAt going forward — never clear a real one.
+        publishedAt:
+          mapped.status === "PUBLISHED"
+            ? (item.publishedAt ?? new Date())
+            : item.publishedAt,
+        errorMessage: mapped.errorMessage,
       },
     });
 
