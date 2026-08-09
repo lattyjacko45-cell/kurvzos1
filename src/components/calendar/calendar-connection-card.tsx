@@ -111,8 +111,11 @@ export function CalendarConnectionCard({
     const needsReconnect = state === "reconnect_required";
 
     return (
-      <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5">
-        <div className="space-y-1">
+      /* items-start, not items-center: the left column carries two paragraphs
+         of read-only and disconnect explanation, and centring floated the
+         actions against the middle of that block. */
+      <section className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border p-5">
+        <div className="min-w-0 space-y-2">
           <SectionLabel as="h3">
             Google Calendar
           </SectionLabel>
@@ -165,8 +168,8 @@ export function CalendarConnectionCard({
   }
 
   return (
-    <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-5">
-      <div className="space-y-1">
+    <section className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border p-5">
+      <div className="min-w-0 space-y-2">
         <SectionLabel as="h3">
           Google Calendar
         </SectionLabel>

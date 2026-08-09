@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -86,37 +87,16 @@ export default async function SettingsPage({
 
   return (
     <div className="mx-auto w-full max-w-focused space-y-8">
-      <div>
-        <h1 className="font-serif text-display-lg">Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your account and preferences.
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Connected apps</CardTitle>
-          <CardDescription>
-            Services KurvzOS reads from. Each is authorised separately.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {calendarMessage ? (
-            <p role="status" className="rounded-2xl border p-3 text-sm">
-              {calendarMessage}
-            </p>
-          ) : null}
-
-          <CalendarConnectionCard
-            configured={calendarSetup.configured}
-            missingEnv={calendarSetup.missing}
-            state={calendarState}
-            calendarLabel={calendarConnection?.calendarLabel ?? null}
-            timeZone={calendarConnection?.calendarTimeZone ?? null}
-            oauthSetup={getCalendarOAuthSetupDetails()}
-          />
-        </CardContent>
-      </Card>
+      {/*
+        The hand-rolled heading is replaced by the shared PageHeader so this
+        page uses the same title treatment as every other route. Title and
+        description are the existing strings, unchanged. No eyebrow is passed:
+        this page never had one, and inventing a label would be new copy.
+      */}
+      <PageHeader
+        title="Settings"
+        description="Manage your account and preferences."
+      />
 
       <Card>
         <CardHeader>
@@ -138,18 +118,23 @@ export default async function SettingsPage({
             </div>
           </div>
           <Separator />
-          <dl className="grid gap-4 text-sm">
-            <div className="flex justify-between">
+          {/* Muted label left, value right and emphasised. items-baseline and
+              gap keep long values aligned instead of colliding when they wrap
+              on a narrow screen. */}
+          <dl className="grid gap-3 text-sm">
+            <div className="flex items-baseline justify-between gap-4">
               <dt className="text-muted-foreground">Full name</dt>
-              <dd className="font-medium">{profile.fullName ?? "—"}</dd>
+              <dd className="text-right font-medium">
+                {profile.fullName ?? "—"}
+              </dd>
             </div>
-            <div className="flex justify-between">
+            <div className="flex items-baseline justify-between gap-4">
               <dt className="text-muted-foreground">Email</dt>
-              <dd className="font-medium">{profile.email}</dd>
+              <dd className="text-right font-medium">{profile.email}</dd>
             </div>
-            <div className="flex justify-between">
+            <div className="flex items-baseline justify-between gap-4">
               <dt className="text-muted-foreground">Member since</dt>
-              <dd className="font-medium">
+              <dd className="text-right font-medium">
                 {profile.createdAt.toLocaleDateString("en-US", {
                   month: "long",
                   year: "numeric",
@@ -160,6 +145,36 @@ export default async function SettingsPage({
         </CardContent>
       </Card>
 
+      {/* Connected services, below account information. */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Connected apps</CardTitle>
+          <CardDescription>
+            Services KurvzOS reads from. Each is authorised separately.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {calendarMessage ? (
+            <p role="status" className="rounded-2xl border p-3 text-sm">
+              {calendarMessage}
+            </p>
+          ) : null}
+
+          {/* Google Calendar is the only service shown on Settings. The
+              YouTube card lives on the Content routes and is untouched. */}
+          <CalendarConnectionCard
+            configured={calendarSetup.configured}
+            missingEnv={calendarSetup.missing}
+            state={calendarState}
+            calendarLabel={calendarConnection?.calendarLabel ?? null}
+            timeZone={calendarConnection?.calendarTimeZone ?? null}
+            oauthSetup={getCalendarOAuthSetupDetails()}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Supporting information last: this card holds a future-availability
+          notice rather than any setting, so it sits below the real ones. */}
       <Card>
         <CardHeader>
           <CardTitle>Workspace</CardTitle>
