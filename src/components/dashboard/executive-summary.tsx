@@ -12,22 +12,37 @@ interface ExecutiveSummaryProps {
 }
 
 interface ExecutiveCellProps {
-  label: string;
+  /** Priority type, e.g. "Next Move". Rendered as the eyebrow. */
+  priority: string;
+  /** Executive name, e.g. "Harper". Rendered as the card title. */
+  name: string;
   value: string;
   href: string;
   action: string;
 }
 
-function ExecutiveCell({ label, value, href, action }: ExecutiveCellProps) {
+function ExecutiveCell({
+  priority,
+  name,
+  value,
+  href,
+  action,
+}: ExecutiveCellProps) {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="space-y-1">
-        <SectionLabel>
-          {label}
-        </SectionLabel>
+    /*
+      Echoes the approved /executive-team roster card: eyebrow, then the name in
+      the display serif, then the supporting sentence, with the action pinned to
+      the bottom edge. flex-1 on the advice is what absorbs the slack, so every
+      Open button lands on the same line regardless of sentence length.
+    */
+    <div className="flex h-full flex-col rounded-2xl border bg-card p-6">
+      <SectionLabel>
+        {priority}
+      </SectionLabel>
 
-        <p className="text-sm leading-6">{value}</p>
-      </div>
+      <p className="mt-1.5 font-serif text-heading text-foreground">{name}</p>
+
+      <p className="mt-3 flex-1 text-sm leading-6">{value}</p>
 
       {/* Base UI substitutes the `render` element for the button rather than
           nesting it, so the Link itself becomes the control. nativeButton is
@@ -35,7 +50,7 @@ function ExecutiveCell({ label, value, href, action }: ExecutiveCellProps) {
       <Button
         variant="outline"
         size="sm"
-        className="mt-auto w-fit"
+        className="mt-4 w-fit"
         nativeButton={false}
         render={<Link href={href} />}
       >
@@ -61,47 +76,51 @@ export function ExecutiveSummary({
   marcusFinancialPriority,
 }: ExecutiveSummaryProps) {
   return (
-    <section
-      aria-labelledby="executive-summary-heading"
-      className="rounded-2xl border bg-card p-6"
-    >
+    /* No outer card: the five executives are the cards here, and wrapping them
+       in a sixth would nest surfaces. */
+    <section aria-labelledby="executive-summary-heading">
       <SectionLabel as="h2" id={"executive-summary-heading"}>
         Executive Team
       </SectionLabel>
 
-      {/* One column on phones, two on tablets, three then five on wide
-          screens — the cells stay readable rather than collapsing to slivers. */}
-      <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+      {/* Two columns from sm up. Five cards means Marcus falls naturally into
+          the last left-hand position. */}
+      <div className="mt-4 grid gap-5 sm:grid-cols-2">
         <ExecutiveCell
-          label="Harper · next move"
+          priority="Next Move"
+          name="Harper"
           value={harperNextMove}
           href="/executive-team/harper"
           action="Open Harper"
         />
 
         <ExecutiveCell
-          label="Renee · strategic priority"
+          priority="Strategic Priority"
+          name="Renee"
           value={reneeStrategicPriority}
           href="/executive-team/renee"
           action="Open Renee"
         />
 
         <ExecutiveCell
-          label="Sophia · marketing priority"
+          priority="Marketing Priority"
+          name="Sophia"
           value={sophiaMarketingPriority}
           href="/executive-team/sophia"
           action="Open Sophia"
         />
 
         <ExecutiveCell
-          label="Olivia · operations priority"
+          priority="Operations Priority"
+          name="Olivia"
           value={oliviaOperationsPriority}
           href="/executive-team/olivia"
           action="Open Olivia"
         />
 
         <ExecutiveCell
-          label="Marcus · financial priority"
+          priority="Financial Priority"
+          name="Marcus"
           value={marcusFinancialPriority}
           href="/executive-team/marcus"
           action="Open Marcus"
