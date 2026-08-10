@@ -16,7 +16,14 @@ const startSessionSchema = z.object({
 
 const updateSessionSchema = z.object({
   sessionId: z.string().uuid(),
-  action: z.enum(["PAUSE", "RESUME", "RESET", "END", "CANCEL"]),
+  action: z.enum([
+    "PAUSE",
+    "RESUME",
+    "RESET",
+    "END",
+    "CANCEL",
+    "COMPLETE_MISSION",
+  ]),
 });
 
 const OPEN_STATUSES = ["ACTIVE", "PAUSED"] as const;
@@ -250,6 +257,30 @@ export async function PATCH(request: Request) {
             endedAt: now,
           },
         });
+
+        return NextResponse.json(toDto(updated));
+      }
+
+      case "COMPLETE_MISSION": {
+        // The focus session and its task are one workflow. Completing them in
+        // one transaction prevents a DONE task from hiding an open session
+        // that would block the next mission's timer.
+        const [updated] = await prisma.$transaction([
+          prisma.focusSession.update({
+            where: { id: session.id },
+            data: {
+              status: "COMPLETED",
+              elapsedSeconds: elapsed,
+              durationMinutes: toDurationMinutes(elapsed),
+              lastResumedAt: null,
+              endedAt: now,
+            },
+          }),
+          prisma.task.update({
+            where: { id: session.taskId },
+            data: { status: "DONE" },
+          }),
+        ]);
 
         return NextResponse.json(toDto(updated));
       }

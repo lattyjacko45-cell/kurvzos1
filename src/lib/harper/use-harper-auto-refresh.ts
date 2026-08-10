@@ -31,6 +31,32 @@ const AUTO_REFRESH_ENDPOINTS = [
   "/api/marcus/auto",
 ] as const;
 
+/**
+ * Runs one significance-gated refresh round for the full executive team.
+ * Each endpoint still makes its own decision about whether a model call is
+ * warranted; this helper only coordinates the requests and reports whether
+ * any executive produced new advice.
+ */
+export async function refreshExecutiveAdvice(): Promise<boolean> {
+  const results = await Promise.all(
+    AUTO_REFRESH_ENDPOINTS.map(async (endpoint) => {
+      try {
+        const response = await fetch(endpoint, { method: "POST" });
+        if (!response.ok) return false;
+
+        const result = (await response.json()) as {
+          refreshed?: boolean;
+        };
+        return Boolean(result.refreshed);
+      } catch {
+        return false;
+      }
+    })
+  );
+
+  return results.some(Boolean);
+}
+
 export function useHarperAutoRefresh(delayMs = 1200): () => void {
   const router = useRouter();
   const timerRef = useRef<number | null>(null);
@@ -52,23 +78,8 @@ export function useHarperAutoRefresh(delayMs = 1200): () => void {
       inFlightRef.current = true;
 
       try {
-        const results = await Promise.all(
-          AUTO_REFRESH_ENDPOINTS.map(async (endpoint) => {
-            try {
-              const response = await fetch(endpoint, { method: "POST" });
-              if (!response.ok) return false;
-
-              const result = (await response.json()) as {
-                refreshed?: boolean;
-              };
-              return Boolean(result.refreshed);
-            } catch {
-              return false;
-            }
-          })
-        );
-
-        if (results.some(Boolean)) router.refresh();
+        const refreshed = await refreshExecutiveAdvice();
+        if (refreshed) router.refresh();
       } finally {
         inFlightRef.current = false;
       }

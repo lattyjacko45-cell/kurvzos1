@@ -22,7 +22,8 @@ export type FocusSessionAction =
   | "RESUME"
   | "RESET"
   | "END"
-  | "CANCEL";
+  | "CANCEL"
+  | "COMPLETE_MISSION";
 
 /** Session shape sent to the client (dates serialised as ISO strings). */
 export interface FocusSessionDto {

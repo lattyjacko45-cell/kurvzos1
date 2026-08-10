@@ -175,9 +175,6 @@ export function FocusMode({
 
     const minutes = ended.durationMinutes ?? toDurationMinutes(elapsedSeconds);
 
-    // A completed focus session changes Olivia's read of execution rhythm.
-    scheduleHarperRefresh();
-
     setIsLeaving(true);
     router.push(`/dashboard?focusMinutes=${minutes}`);
     router.refresh();
@@ -222,13 +219,28 @@ export function FocusMode({
     setIsBusy(true);
 
     try {
-      await requestJson("/api/tasks", {
-        method: "PATCH",
-        body: JSON.stringify({ taskId: mission.id, status: "DONE" }),
-      });
+      let minutes: number | null = null;
+
+      if (session) {
+        const ended = await mutateSession("COMPLETE_MISSION");
+        if (!ended) return;
+
+        minutes =
+          ended.durationMinutes ?? toDurationMinutes(elapsedSeconds);
+      } else {
+        await requestJson("/api/tasks", {
+          method: "PATCH",
+          body: JSON.stringify({ taskId: mission.id, status: "DONE" }),
+        });
+      }
 
       setTaskStatus("DONE");
-      toast.success("Mission marked as done");
+      setIsLeaving(true);
+      router.push(
+        `/dashboard?missionCompleted=1${
+          minutes === null ? "" : `&focusMinutes=${minutes}`
+        }`
+      );
       router.refresh();
     } catch (error) {
       toast.error(errorMessage(error, "Failed to update the mission"));
