@@ -3,6 +3,8 @@
  * Mirrors the split used by `daily-briefing.server.ts`.
  */
 
+import { cache } from "react";
+
 import { prisma } from "@/lib/prisma";
 import {
   buildWeeklyPacket,
@@ -41,7 +43,7 @@ async function getWeeklyFocusTotals(
   };
 }
 
-export async function getWeeklyPacket(
+async function loadWeeklyPacket(
   workspaceId: string,
   now: Date = new Date()
 ): Promise<WeeklyPacket> {
@@ -89,3 +91,6 @@ export async function getWeeklyPacket(
 
   return buildWeeklyPacket(packetTasks, packetProjects, focusTotals, now);
 }
+
+/** Deduplicates identical reads inside one server render. */
+export const getWeeklyPacket = cache(loadWeeklyPacket);

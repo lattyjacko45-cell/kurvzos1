@@ -31,9 +31,10 @@ export interface MarcusView {
  */
 export async function getMarcusView(
   profileId: string,
-  workspaceId: string
+  workspaceId: string,
+  now: Date = new Date()
 ): Promise<MarcusView> {
-  const context = await buildMarcusContext(profileId, workspaceId);
+  const context = await buildMarcusContext(profileId, workspaceId, now);
   const latest = await getLatestMarcusAdvice(profileId);
 
   const savedContext = latest

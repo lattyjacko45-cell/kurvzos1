@@ -4,6 +4,8 @@
  * from client components without pulling prisma into the browser bundle.
  */
 
+import { cache } from "react";
+
 import { prisma } from "@/lib/prisma";
 import {
   buildDailyBriefing,
@@ -17,7 +19,7 @@ import {
  * then applies the briefing rules. Counts must be workspace-wide, so this
  * deliberately does not reuse the dashboard's `take: 5` recent-tasks query.
  */
-export async function getDailyBriefing(
+async function loadDailyBriefing(
   workspaceId: string,
   now: Date = new Date()
 ): Promise<DailyBriefing> {
@@ -76,3 +78,6 @@ export async function getDailyBriefing(
 
   return buildDailyBriefing(briefingTasks, now, projectsNeedingNextTask);
 }
+
+/** Deduplicates identical reads inside one server render. */
+export const getDailyBriefing = cache(loadDailyBriefing);

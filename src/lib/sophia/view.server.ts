@@ -26,9 +26,10 @@ export interface SophiaView {
  */
 export async function getSophiaView(
   profileId: string,
-  workspaceId: string
+  workspaceId: string,
+  now: Date = new Date()
 ): Promise<SophiaView> {
-  const context = await buildSophiaContext(profileId, workspaceId);
+  const context = await buildSophiaContext(profileId, workspaceId, now);
   const latest = await getLatestSophiaAdvice(profileId);
 
   const savedContext = latest

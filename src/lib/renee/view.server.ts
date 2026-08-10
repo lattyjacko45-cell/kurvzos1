@@ -28,9 +28,10 @@ export interface ReneeView {
  */
 export async function getReneeView(
   profileId: string,
-  workspaceId: string
+  workspaceId: string,
+  now: Date = new Date()
 ): Promise<ReneeView> {
-  const context = await buildReneeContext(profileId, workspaceId);
+  const context = await buildReneeContext(profileId, workspaceId, now);
   const latest = await getLatestReneeAdvice(profileId);
 
   const savedContext = latest

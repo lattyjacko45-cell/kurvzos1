@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { prisma } from "@/lib/prisma";
 import {
   AiRequestError,
@@ -119,12 +121,14 @@ export async function runSophia(
   return result;
 }
 
-export async function getLatestSophiaAdvice(profileId: string) {
+export const getLatestSophiaAdvice = cache(async function getLatestSophiaAdvice(
+  profileId: string
+) {
   return prisma.executiveConversation.findFirst({
     where: { profileId, executive: "SOPHIA" },
     orderBy: { createdAt: "desc" },
   });
-}
+});
 
 export async function getRecentSophiaConversations(
   profileId: string,

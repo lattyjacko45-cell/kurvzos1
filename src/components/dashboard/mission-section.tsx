@@ -34,7 +34,6 @@ import {
   type MissionStep,
 } from "@/lib/mission";
 import { ESTIMATED_FOCUS_MINUTES } from "@/lib/focus";
-import { useDeferredRefresh } from "@/lib/use-deferred-refresh";
 import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 import { SectionLabel } from "@/components/ui/section-label";
 
@@ -136,7 +135,6 @@ export function MissionSection({
   harper,
 }: MissionSectionProps) {
   const router = useRouter();
-  const scheduleRefresh = useDeferredRefresh();
   const scheduleHarperRefresh = useHarperAutoRefresh();
   const [steps, setSteps] = useState<MissionStep[]>(initialSteps);
   /** Only gates the add-step submit; never blocks the checklist itself. */
@@ -179,8 +177,6 @@ export function MissionSection({
         method: "PATCH",
         body: JSON.stringify({ stepId: step.id, completed: nextCompleted }),
       });
-      scheduleRefresh();
-
       // The server decides whether this is worth a model call — finishing the
       // last step is, ticking step 2 of 7 is not.
       scheduleHarperRefresh();
@@ -223,7 +219,6 @@ export function MissionSection({
       setSteps((current) =>
         current.map((item) => (item.id === optimisticId ? created : item))
       );
-      scheduleRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to add step"));
@@ -256,7 +251,6 @@ export function MissionSection({
         method: "PATCH",
         body: JSON.stringify({ stepId: step.id, title }),
       });
-      scheduleRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to rename step"));
@@ -279,7 +273,6 @@ export function MissionSection({
         method: "DELETE",
         body: JSON.stringify({ stepId: step.id }),
       });
-      scheduleRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to delete step"));
@@ -311,7 +304,6 @@ export function MissionSection({
           orderedIds: reordered.map((step) => step.id),
         }),
       });
-      scheduleRefresh();
     } catch (error) {
       setSteps(previous);
       toast.error(errorMessage(error, "Failed to reorder steps"));

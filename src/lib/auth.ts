@@ -1,8 +1,14 @@
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import type { AuthUser } from "@/types";
 
-export async function getCurrentUser(): Promise<AuthUser | null> {
+const getProfileByUserId = cache((userId: string) =>
+  prisma.profile.findUnique({ where: { userId } })
+);
+
+async function loadCurrentUser(): Promise<AuthUser | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -10,9 +16,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 
   if (!user) return null;
 
-  const profile = await prisma.profile.findUnique({
-    where: { userId: user.id },
-  });
+  const profile = await getProfileByUserId(user.id);
 
   return {
     id: user.id,
@@ -22,7 +26,26 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   };
 }
 
-export async function ensureProfile(userId: string, email: string, fullName?: string) {
+/** Layouts and pages often ask for the same user during one server render. */
+export const getCurrentUser = cache(loadCurrentUser);
+
+async function loadProfile(
+  userId: string,
+  email: string,
+  fullName?: string
+) {
+  const existing = await getProfileByUserId(userId);
+
+  // The normal path is read-only. Previously every page and API request wrote
+  // the same profile values back to the database even when nothing changed.
+  if (
+    existing &&
+    existing.email === email &&
+    existing.fullName === (fullName ?? null)
+  ) {
+    return existing;
+  }
+
   return prisma.profile.upsert({
     where: { userId },
     update: { email, fullName },
@@ -30,7 +53,9 @@ export async function ensureProfile(userId: string, email: string, fullName?: st
   });
 }
 
-export async function getUserWorkspace(profileId: string) {
+export const ensureProfile = cache(loadProfile);
+
+async function loadUserWorkspace(profileId: string) {
   const membership = await prisma.workspaceMember.findFirst({
     where: { profileId },
     include: { workspace: true },
@@ -53,6 +78,9 @@ export async function getUserWorkspace(profileId: string) {
     },
   });
 }
+
+/** The dashboard layout and page share this lookup in the same render. */
+export const getUserWorkspace = cache(loadUserWorkspace);
 
 export async function getDashboardStats(workspaceId: string) {
   const [projects, tasks] = await Promise.all([

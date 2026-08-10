@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { prisma } from "@/lib/prisma";
 import {
   AiRequestError,
@@ -133,12 +135,14 @@ export async function runHarper(
  * Latest saved advice, used by the dashboard so rendering never triggers a
  * model call.
  */
-export async function getLatestHarperAdvice(profileId: string) {
+export const getLatestHarperAdvice = cache(async function getLatestHarperAdvice(
+  profileId: string
+) {
   return prisma.executiveConversation.findFirst({
     where: { profileId, executive: "HARPER" },
     orderBy: { createdAt: "desc" },
   });
-}
+});
 
 export async function getRecentHarperConversations(
   profileId: string,

@@ -1,3 +1,5 @@
+import { cache as cacheRequest } from "react";
+
 import { prisma } from "@/lib/prisma";
 import {
   CalendarApiError,
@@ -65,10 +67,10 @@ export function invalidateSchedule(profileId: string): void {
   cache.delete(profileId);
 }
 
-export async function getScheduleForProfile(
+async function readScheduleForProfile(
   profileId: string,
-  now: Date = new Date(),
-  options: { force?: boolean } = {}
+  now: Date,
+  force: boolean
 ): Promise<ScheduleResult> {
   const connection = await prisma.calendarConnection.findUnique({
     where: { profileId },
@@ -86,7 +88,7 @@ export async function getScheduleForProfile(
     now.getTime() - cached.fetchedAt < CACHE_TTL_MS &&
     cached.dayKey === dayKeyFor(cached.schedule.timeZone, now);
 
-  if (fresh && !options.force) {
+  if (fresh && !force) {
     return { state: "connected", schedule: cached.schedule };
   }
 
@@ -140,4 +142,19 @@ export async function getScheduleForProfile(
       reason,
     };
   }
+}
+
+const getRequestCachedSchedule = cacheRequest(
+  (profileId: string, now: Date) =>
+    readScheduleForProfile(profileId, now, false)
+);
+
+export function getScheduleForProfile(
+  profileId: string,
+  now: Date = new Date(),
+  options: { force?: boolean } = {}
+): Promise<ScheduleResult> {
+  return options.force
+    ? readScheduleForProfile(profileId, now, true)
+    : getRequestCachedSchedule(profileId, now);
 }

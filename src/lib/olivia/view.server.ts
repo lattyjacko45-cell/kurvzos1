@@ -26,9 +26,10 @@ export interface OliviaView {
  */
 export async function getOliviaView(
   profileId: string,
-  workspaceId: string
+  workspaceId: string,
+  now: Date = new Date()
 ): Promise<OliviaView> {
-  const context = await buildOliviaContext(profileId, workspaceId);
+  const context = await buildOliviaContext(profileId, workspaceId, now);
   const latest = await getLatestOliviaAdvice(profileId);
 
   const savedContext = latest

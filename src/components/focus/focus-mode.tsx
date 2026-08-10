@@ -20,7 +20,6 @@ import {
   harperRecommendation,
   type MissionStep,
 } from "@/lib/mission";
-import { useDeferredRefresh } from "@/lib/use-deferred-refresh";
 import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 import {
   ESTIMATED_FOCUS_MINUTES,
@@ -80,8 +79,10 @@ export function FocusMode({
   initialSession,
 }: FocusModeProps) {
   const router = useRouter();
-  const scheduleRefresh = useDeferredRefresh();
-  const scheduleHarperRefresh = useHarperAutoRefresh();
+  // Give the user time to mark the finished task done. Navigation then
+  // cancels this timer and the task-completion event refreshes the full team,
+  // avoiding two overlapping Harper model calls for one workflow.
+  const scheduleHarperRefresh = useHarperAutoRefresh(5000);
   const [steps, setSteps] = useState<MissionStep[]>(initialSteps);
   const [session, setSession] = useState<FocusSessionDto | null>(
     initialSession
@@ -177,7 +178,6 @@ export function FocusMode({
 
     setIsLeaving(true);
     router.push(`/dashboard?focusMinutes=${minutes}`);
-    router.refresh();
   }
 
   /** Leaving without ending banks the time and keeps the session resumable. */
@@ -188,7 +188,6 @@ export function FocusMode({
 
     setIsLeaving(true);
     router.push("/dashboard");
-    router.refresh();
   }
 
   async function completeCurrentStep() {
@@ -207,7 +206,6 @@ export function FocusMode({
         method: "PATCH",
         body: JSON.stringify({ stepId: step.id, completed: true }),
       });
-      scheduleRefresh();
       scheduleHarperRefresh();
     } catch (error) {
       setSteps(previous);
@@ -241,7 +239,6 @@ export function FocusMode({
           minutes === null ? "" : `&focusMinutes=${minutes}`
         }`
       );
-      router.refresh();
     } catch (error) {
       toast.error(errorMessage(error, "Failed to update the mission"));
     } finally {

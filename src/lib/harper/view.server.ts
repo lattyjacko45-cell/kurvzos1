@@ -28,9 +28,10 @@ export interface HarperView {
  */
 export async function getHarperView(
   profileId: string,
-  workspaceId: string
+  workspaceId: string,
+  now: Date = new Date()
 ): Promise<HarperView> {
-  const context = await buildHarperContext(profileId, workspaceId);
+  const context = await buildHarperContext(profileId, workspaceId, now);
   const latest = await getLatestHarperAdvice(profileId);
 
   const savedContext = latest ? parseStoredContext(latest.contextSnapshot) : null;

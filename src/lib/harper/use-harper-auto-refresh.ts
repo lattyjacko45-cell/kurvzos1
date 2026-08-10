@@ -4,26 +4,26 @@ import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 /**
- * Asks the server to consider a background refresh for every active executive.
+ * Routes background advice refreshes to the executives affected by an event.
  *
- * Each executive owns its own gate and decides independently whether the
- * change was significant enough to spend a model call. Harper cares about
- * execution — the mission and its checklist. Renee cares about the portfolio —
- * projects, weekly priority, shipped content. Sophia cares about the pipeline —
- * content stages, the schedule, publishing cadence. Olivia cares about the
- * shape of the work — stages, staleness, handoffs, focus sessions. The same
- * user action can therefore be significant to one and not the others.
+ * Harper handles execution and checklist progress. A completed task still
+ * reaches the full team because it changes strategy, marketing, operations
+ * and financial context. An ended timer reaches Olivia because focus history
+ * is part of her operational diagnosis.
  *
  * Three layers stop duplicate spend:
  *  1. Here — a debounce plus an in-flight guard, so a burst of clicks produces
  *     at most one round of requests.
- *  2. The per-executive significance gates on the server.
+ *  2. Event routing here avoids asking unrelated executives to rebuild their
+ *     contexts.
  *  3. `router.refresh()` only fires when someone actually produced new advice.
  *
  * The filename keeps its original name so existing call sites are untouched.
  */
 
-const AUTO_REFRESH_ENDPOINTS = [
+const HARPER_REFRESH_ENDPOINTS = ["/api/harper/auto"] as const;
+
+const TEAM_REFRESH_ENDPOINTS = [
   "/api/harper/auto",
   "/api/renee/auto",
   "/api/sophia/auto",
@@ -31,22 +31,18 @@ const AUTO_REFRESH_ENDPOINTS = [
   "/api/marcus/auto",
 ] as const;
 
-/**
- * Runs one significance-gated refresh round for the full executive team.
- * Each endpoint still makes its own decision about whether a model call is
- * warranted; this helper only coordinates the requests and reports whether
- * any executive produced new advice.
- */
-export async function refreshExecutiveAdvice(): Promise<boolean> {
+const FOCUS_REFRESH_ENDPOINTS = ["/api/olivia/auto"] as const;
+
+async function refreshAdvice(
+  endpoints: readonly string[]
+): Promise<boolean> {
   const results = await Promise.all(
-    AUTO_REFRESH_ENDPOINTS.map(async (endpoint) => {
+    endpoints.map(async (endpoint) => {
       try {
         const response = await fetch(endpoint, { method: "POST" });
         if (!response.ok) return false;
 
-        const result = (await response.json()) as {
-          refreshed?: boolean;
-        };
+        const result = (await response.json()) as { refreshed?: boolean };
         return Boolean(result.refreshed);
       } catch {
         return false;
@@ -57,7 +53,30 @@ export async function refreshExecutiveAdvice(): Promise<boolean> {
   return results.some(Boolean);
 }
 
-export function useHarperAutoRefresh(delayMs = 1200): () => void {
+/** Checklist and task-detail changes concern Harper's execution brief. */
+export function refreshHarperAdvice(): Promise<boolean> {
+  return refreshAdvice(HARPER_REFRESH_ENDPOINTS);
+}
+
+/**
+ * Runs one significance-gated refresh round for the full executive team.
+ * Each endpoint still makes its own decision about whether a model call is
+ * warranted; this helper only coordinates the requests and reports whether
+ * any executive produced new advice.
+ */
+export async function refreshExecutiveAdvice(): Promise<boolean> {
+  return refreshAdvice(TEAM_REFRESH_ENDPOINTS);
+}
+
+/** An ended timer changes Olivia's operations context, not the other briefs. */
+export function refreshFocusAdvice(): Promise<boolean> {
+  return refreshAdvice(FOCUS_REFRESH_ENDPOINTS);
+}
+
+function useAdviceAutoRefresh(
+  refresh: () => Promise<boolean>,
+  delayMs: number
+): () => void {
   const router = useRouter();
   const timerRef = useRef<number | null>(null);
   const inFlightRef = useRef(false);
@@ -78,14 +97,19 @@ export function useHarperAutoRefresh(delayMs = 1200): () => void {
       inFlightRef.current = true;
 
       try {
-        const refreshed = await refreshExecutiveAdvice();
+        const refreshed = await refresh();
         if (refreshed) router.refresh();
       } finally {
         inFlightRef.current = false;
       }
     }, delayMs);
-  }, [delayMs, router]);
+  }, [delayMs, refresh, router]);
 }
 
-/** Preferred name now that more than one executive is live. */
-export const useExecutiveAutoRefresh = useHarperAutoRefresh;
+export function useHarperAutoRefresh(delayMs = 1200): () => void {
+  return useAdviceAutoRefresh(refreshHarperAdvice, delayMs);
+}
+
+export function useExecutiveAutoRefresh(delayMs = 1200): () => void {
+  return useAdviceAutoRefresh(refreshExecutiveAdvice, delayMs);
+}

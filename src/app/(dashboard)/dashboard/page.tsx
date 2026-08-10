@@ -23,10 +23,127 @@ import { getScheduleForProfile } from "@/lib/calendar/read.server";
 import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { ExecutiveSummary } from "@/components/dashboard/executive-summary";
 import { SectionLabel } from "@/components/ui/section-label";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Dashboard",
 };
+
+interface DashboardProject {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  _count: { tasks: number };
+}
+
+function SectionFallback({ rows = 2 }: { rows?: number }) {
+  return (
+    <div aria-hidden="true" className="rounded-2xl border bg-card p-6">
+      <Skeleton className="h-3 w-32" />
+      <div className="mt-5 space-y-3">
+        {Array.from({ length: rows }, (_, index) => (
+          <Skeleton
+            key={index}
+            className={index === rows - 1 ? "h-10 w-2/3" : "h-4 w-full"}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveSummaryFallback() {
+  return (
+    <section aria-busy="true">
+      <Skeleton className="h-3 w-28" />
+      <div className="mt-4 grid gap-5 sm:grid-cols-2">
+        {Array.from({ length: 5 }, (_, index) => (
+          <div key={index} className="rounded-2xl border bg-card p-6">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="mt-3 h-6 w-28" />
+            <Skeleton className="mt-4 h-14 w-full" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+async function DashboardSchedule({
+  profileId,
+  now,
+}: {
+  profileId: string;
+  now: Date;
+}) {
+  const calendar = await getScheduleForProfile(profileId, now);
+  return <TodaySchedule state={calendar.state} schedule={calendar.schedule} />;
+}
+
+async function DashboardExecutiveSummary({
+  profileId,
+  workspaceId,
+  now,
+}: {
+  profileId: string;
+  workspaceId: string;
+  now: Date;
+}) {
+  const [harperView, reneeView, sophiaView, oliviaView, marcusView] =
+    await Promise.all([
+      getHarperView(profileId, workspaceId, now),
+      getReneeView(profileId, workspaceId, now),
+      getSophiaView(profileId, workspaceId, now),
+      getOliviaView(profileId, workspaceId, now),
+      getMarcusView(profileId, workspaceId, now),
+    ]);
+
+  return (
+    <ExecutiveSummary
+      harperNextMove={harperView.advice.nextMove}
+      reneeStrategicPriority={reneeView.advice.strategicPriority}
+      sophiaMarketingPriority={sophiaView.advice.marketingPriority}
+      oliviaOperationsPriority={oliviaView.advice.operationsPriority}
+      marcusFinancialPriority={marcusView.advice.financialPriority}
+    />
+  );
+}
+
+async function DashboardSupportingData({
+  workspaceId,
+  projects,
+}: {
+  workspaceId: string;
+  projects: DashboardProject[];
+}) {
+  const [stats, tasks] = await Promise.all([
+    getDashboardStats(workspaceId),
+    prisma.task.findMany({
+      where: {
+        project: { workspaceId },
+        status: { not: "DONE" },
+      },
+      include: {
+        project: { select: { name: true } },
+        steps: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+    }),
+  ]);
+
+  return (
+    <>
+      <StatsCards stats={stats} />
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <ProjectList projects={projects} />
+        <TaskList tasks={tasks} />
+      </section>
+    </>
+  );
+}
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -38,61 +155,27 @@ export default async function DashboardPage() {
     user.fullName ?? undefined
   );
   const workspace = await getUserWorkspace(profile.id);
+  // One shared instant gives every executive the same view of "now" and lets
+  // request-scoped caches collapse their repeated briefing, packet and
+  // calendar reads into one operation apiece.
+  const now = new Date();
 
-  const [
-    stats,
-    briefing,
-    harperView,
-    reneeView,
-    sophiaView,
-    oliviaView,
-    marcusView,
-    calendar,
-    projects,
-    tasks,
-  ] = await Promise.all([
-      getDashboardStats(workspace.id),
-      getDailyBriefing(workspace.id),
-      // No view calls the model: each returns saved advice only while it still
-      // matches the live context, otherwise a deterministic read.
-      getHarperView(profile.id, workspace.id),
-      getReneeView(profile.id, workspace.id),
-      getSophiaView(profile.id, workspace.id),
-      getOliviaView(profile.id, workspace.id),
-      getMarcusView(profile.id, workspace.id),
-      // Cached read: no Google call within the TTL, and never a model call.
-      getScheduleForProfile(profile.id),
-      prisma.project.findMany({
-        where: { workspaceId: workspace.id },
-        include: { _count: { select: { tasks: true } } },
-        orderBy: { updatedAt: "desc" },
-        take: 5,
-      }),
-      // Recent Tasks shows active work only; completed tasks live on the
-      // Completed tab and keep their history there.
-      prisma.task.findMany({
-        where: {
-          project: { workspaceId: workspace.id },
-          status: { not: "DONE" },
-        },
-        include: {
-          project: { select: { name: true } },
-          steps: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] },
-        },
-        orderBy: { updatedAt: "desc" },
-        take: 5,
-      }),
-    ]);
+  // Only the data needed for the primary decision zone blocks its render.
+  // Calendar, executive contexts, metrics and recent lists stream below it.
+  const [briefing, projects] = await Promise.all([
+    getDailyBriefing(workspace.id, now),
+    prisma.project.findMany({
+      where: { workspaceId: workspace.id },
+      include: { _count: { select: { tasks: true } } },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+    }),
+  ]);
 
   // Single source of truth for "what am I working on": the Daily Briefing
   // selector. It already excludes DONE tasks and applies the ranking rules.
   const missionTask = briefing.mission;
   const firstName = user.fullName ? user.fullName.split(" ")[0] : null;
-
-  const harperAdvice = {
-    currentPriority: harperView.advice.currentPriority,
-    nextMove: harperView.advice.nextMove,
-  };
 
   return (
     <div className="mx-auto w-full max-w-page space-y-8">
@@ -148,6 +231,9 @@ export default async function DashboardPage() {
           />
         )}
 
+        {/* The card already has a truthful deterministic recommendation
+            derived from the live checklist. Saved executive advice streams
+            in the full team section without delaying this primary action. */}
         <MissionSection
           mission={
             missionTask
@@ -163,7 +249,7 @@ export default async function DashboardPage() {
           initialSteps={missionTask?.steps ?? []}
           firstName={firstName}
           greeting={briefing.greeting}
-          harper={harperAdvice}
+          harper={null}
         />
       </section>
 
@@ -179,22 +265,24 @@ export default async function DashboardPage() {
         <DailyBriefingSection briefing={briefing} firstName={firstName} />
       ) : null}
 
-      <TodaySchedule state={calendar.state} schedule={calendar.schedule} />
+      <Suspense fallback={<SectionFallback />}>
+        <DashboardSchedule profileId={profile.id} now={now} />
+      </Suspense>
 
-      <ExecutiveSummary
-        harperNextMove={harperView.advice.nextMove}
-        reneeStrategicPriority={reneeView.advice.strategicPriority}
-        sophiaMarketingPriority={sophiaView.advice.marketingPriority}
-        oliviaOperationsPriority={oliviaView.advice.operationsPriority}
-        marcusFinancialPriority={marcusView.advice.financialPriority}
-      />
+      <Suspense fallback={<ExecutiveSummaryFallback />}>
+        <DashboardExecutiveSummary
+          profileId={profile.id}
+          workspaceId={workspace.id}
+          now={now}
+        />
+      </Suspense>
 
-      <StatsCards stats={stats} />
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <ProjectList projects={projects} />
-        <TaskList tasks={tasks} />
-      </section>
+      <Suspense fallback={<SectionFallback rows={3} />}>
+        <DashboardSupportingData
+          workspaceId={workspace.id}
+          projects={projects}
+        />
+      </Suspense>
     </div>
   );
 }

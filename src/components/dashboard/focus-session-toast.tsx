@@ -4,7 +4,10 @@ import { useEffect, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
-import { refreshExecutiveAdvice } from "@/lib/harper/use-harper-auto-refresh";
+import {
+  refreshExecutiveAdvice,
+  refreshFocusAdvice,
+} from "@/lib/harper/use-harper-auto-refresh";
 
 /**
  * Focus Mode hands the saved duration back through `?focusMinutes=`.
@@ -41,12 +44,18 @@ export function FocusSessionToast() {
       );
     }
 
-    router.replace(pathname);
+    // Remove the one-time toast parameters without requesting the dashboard a
+    // second time. Native history stays in sync with Next's router.
+    window.history.replaceState(null, "", pathname);
 
-    // Navigation out of Focus Mode unmounts its debounced refresh hook. Run
-    // the same significance-gated team refresh from the stable destination so
-    // Harper, Renee, Sophia, Olivia and Marcus can all react to the outcome.
-    void refreshExecutiveAdvice().then((refreshed) => {
+    // Navigation out of Focus Mode unmounts its debounced refresh hook. A
+    // completed task reaches the whole team; a saved timer reaches Olivia,
+    // whose operations context includes focus-session history.
+    const refreshAdvice = missionCompleted
+      ? refreshExecutiveAdvice
+      : refreshFocusAdvice;
+
+    void refreshAdvice().then((refreshed) => {
       if (refreshed) router.refresh();
     });
   }, [focusMinutes, missionCompleted, pathname, router]);
