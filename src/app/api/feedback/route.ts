@@ -66,6 +66,22 @@ export async function POST(request: Request) {
   try {
     const data = createFeedbackSchema.parse(await request.json());
 
+    if (data.taskId) {
+      const task = await prisma.task.findFirst({
+        where: {
+          id: data.taskId,
+          project: {
+            workspace: { members: { some: { profileId } } },
+          },
+        },
+        select: { id: true },
+      });
+
+      if (!task) {
+        return NextResponse.json({ error: "Task not found" }, { status: 404 });
+      }
+    }
+
     const feedback = await prisma.feedback.create({
       data: {
         profileId,

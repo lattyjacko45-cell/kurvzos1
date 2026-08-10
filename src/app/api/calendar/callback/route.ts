@@ -45,6 +45,13 @@ function logFailure(
   });
 }
 
+function privateRedirect(url: string): NextResponse {
+  const response = NextResponse.redirect(url);
+  response.headers.set("Cache-Control", "no-store, private");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  return response;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
@@ -63,7 +70,7 @@ export async function GET(request: Request) {
 
   const settingsUrl = `${appUrl}/dashboard/settings`;
   const fail = (status: string, stage?: CallbackStage) =>
-    NextResponse.redirect(
+    privateRedirect(
       `${settingsUrl}?calendar=${status}${stage ? `&stage=${stage}` : ""}`
     );
 
@@ -91,7 +98,7 @@ export async function GET(request: Request) {
 
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.redirect(`${appUrl}/login`);
+    return privateRedirect(`${appUrl}/login`);
   }
 
   const profile = await ensureProfile(
@@ -181,5 +188,5 @@ export async function GET(request: Request) {
 
   invalidateSchedule(profile.id);
 
-  return NextResponse.redirect(`${settingsUrl}?calendar=connected`);
+  return privateRedirect(`${settingsUrl}?calendar=connected`);
 }

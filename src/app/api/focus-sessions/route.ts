@@ -8,7 +8,7 @@ import {
   toDurationMinutes,
   type FocusSessionDto,
 } from "@/lib/focus";
-import type { FocusSession } from "@/generated/prisma/client";
+import { Prisma, type FocusSession } from "@/generated/prisma/client";
 
 const startSessionSchema = z.object({
   taskId: z.string().uuid(),
@@ -27,6 +27,7 @@ const updateSessionSchema = z.object({
 });
 
 const OPEN_STATUSES = ["ACTIVE", "PAUSED"] as const;
+const SERIALIZABLE_RETRY_ATTEMPTS = 3;
 
 function toDto(session: FocusSession): FocusSessionDto {
   return {
@@ -80,6 +81,56 @@ function findOwnedTask(taskId: string, profileId: string) {
   });
 }
 
+async function startSessionAtomically(taskId: string, profileId: string) {
+  for (let attempt = 1; attempt <= SERIALIZABLE_RETRY_ATTEMPTS; attempt += 1) {
+    try {
+      return await prisma.$transaction(
+        async (tx) => {
+          const existing = await tx.focusSession.findFirst({
+            where: {
+              profileId,
+              status: { in: [...OPEN_STATUSES] },
+            },
+            orderBy: { createdAt: "desc" },
+          });
+
+          if (existing) {
+            return {
+              outcome: existing.taskId === taskId ? "existing" : "conflict",
+              session: existing,
+            } as const;
+          }
+
+          const now = new Date();
+          const session = await tx.focusSession.create({
+            data: {
+              taskId,
+              profileId,
+              status: "ACTIVE",
+              startedAt: now,
+              lastResumedAt: now,
+              elapsedSeconds: 0,
+            },
+          });
+
+          return { outcome: "created", session } as const;
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+      );
+    } catch (error) {
+      const shouldRetry =
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2034" &&
+        attempt < SERIALIZABLE_RETRY_ATTEMPTS;
+
+      if (!shouldRetry) throw error;
+    }
+  }
+
+  // The loop either returns or throws. Kept for exhaustive type inference.
+  throw new Error("Could not start focus session");
+}
+
 /** GET /api/focus-sessions?taskId=... — the open session, or null. */
 export async function GET(request: Request) {
   const profileId = await requireProfileId();
@@ -115,35 +166,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    const existing = await findOpenSession(profileId);
+    const result = await startSessionAtomically(data.taskId, profileId);
 
-    if (existing) {
-      if (existing.taskId === data.taskId) {
-        return NextResponse.json(toDto(existing));
-      }
-
+    if (result.outcome === "conflict") {
       return NextResponse.json(
         {
           error: "Another focus session is already running.",
-          session: toDto(existing),
+          session: toDto(result.session),
         },
         { status: 409 }
       );
     }
 
-    const now = new Date();
-    const session = await prisma.focusSession.create({
-      data: {
-        taskId: data.taskId,
-        profileId,
-        status: "ACTIVE",
-        startedAt: now,
-        lastResumedAt: now,
-        elapsedSeconds: 0,
-      },
+    return NextResponse.json(toDto(result.session), {
+      status: result.outcome === "created" ? 201 : 200,
     });
-
-    return NextResponse.json(toDto(session), { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(

@@ -55,6 +55,13 @@ function logCallbackFailure(
   });
 }
 
+function privateRedirect(url: string): NextResponse {
+  const response = NextResponse.redirect(url);
+  response.headers.set("Cache-Control", "no-store, private");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  return response;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
@@ -72,10 +79,10 @@ export async function GET(request: Request) {
   }
 
   const succeed = () =>
-    NextResponse.redirect(`${appUrl}/content?youtube=connected`);
+    privateRedirect(`${appUrl}/content?youtube=connected`);
 
   const fail = (status: string, stage?: CallbackStage, reason?: string) =>
-    NextResponse.redirect(
+    privateRedirect(
       `${appUrl}/content?youtube=${status}` +
         (stage ? `&stage=${stage}` : "") +
         // Only ever a value from a closed set defined in our own code.
@@ -109,7 +116,7 @@ export async function GET(request: Request) {
 
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.redirect(`${appUrl}/login`);
+    return privateRedirect(`${appUrl}/login`);
   }
 
   const profile = await ensureProfile(

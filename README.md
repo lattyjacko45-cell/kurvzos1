@@ -40,18 +40,39 @@ cp .env.example .env
 
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | Supabase Postgres connection string |
+| `DATABASE_URL` | Supabase pooled Postgres connection string used by the app |
+| `DIRECT_URL` | Supabase direct/session Postgres connection string used by Prisma migrations |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server only) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key used by Auth |
 | `NEXT_PUBLIC_APP_URL` | App URL (`http://localhost:3000` for dev) |
+| `GOOGLE_CLIENT_ID` | Google OAuth client id for Calendar and YouTube |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (server only) |
+| `YOUTUBE_TOKEN_ENCRYPTION_KEY` | 32-byte base64 key used to encrypt stored Google refresh tokens |
+| `AI_PROVIDER` | Executive AI provider (`openai` or `anthropic`) |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | Server-only key for the configured AI provider |
+
+KurvzOS does not use a Supabase service-role key. Do not add one to the
+application environment.
 
 ### 3. Set up the database
 
+For local development, apply existing migrations and generate the client:
+
 ```bash
-npx prisma migrate dev --name init
-npx prisma generate
+npm run db:migrate
+npm run db:generate
 ```
+
+For a shared, staging, or production database, deploy committed migrations:
+
+```bash
+npm run db:deploy
+```
+
+The committed migrations include the database access lockdown that enables
+Row Level Security on every KurvzOS table and removes direct table privileges
+from Supabase client roles. Do not use `prisma db push` for a release database;
+it does not deploy this security migration.
 
 ### 4. Run the development server
 
@@ -100,7 +121,8 @@ prisma/
 1. Push your repository to GitHub
 2. Import the project in [Vercel](https://vercel.com/new)
 3. Add environment variables from `.env.example`
-4. Deploy — Vercel runs `prisma generate` automatically via `vercel.json`
+4. Run `npm run db:deploy` against the release database before the first deploy
+5. Deploy — `postinstall` generates the Prisma client during installation
 
 ## Scripts
 
@@ -112,6 +134,7 @@ prisma/
 | `npm run lint` | Run ESLint |
 | `npm run db:generate` | Generate Prisma client |
 | `npm run db:migrate` | Run database migrations |
+| `npm run db:deploy` | Deploy committed migrations to a shared/release database |
 | `npm run db:push` | Push schema to database |
 | `npm run db:studio` | Open Prisma Studio |
 

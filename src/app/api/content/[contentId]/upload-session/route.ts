@@ -152,6 +152,7 @@ export async function POST(request: Request, context: RouteContext) {
     const claim = await prisma.contentItem.updateMany({
       where: {
         id: contentId,
+        profileId,
         youtubeVideoId: null,
         status: { notIn: ["UPLOADING", ...COMPLETED_UPLOAD_STATUSES] },
       },
@@ -218,7 +219,12 @@ export async function POST(request: Request, context: RouteContext) {
     if (claimedByThisRequest) {
       await prisma.contentItem
         .updateMany({
-          where: { id: contentId, youtubeVideoId: null, status: "UPLOADING" },
+          where: {
+            id: contentId,
+            profileId,
+            youtubeVideoId: null,
+            status: "UPLOADING",
+          },
           data: { status: "READY", uploadProgress: 0 },
         })
         .catch(() => undefined);

@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { getCurrentUser, ensureProfile } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { containsEveryIdExactlyOnce } from "@/lib/task-step-order";
 
 const reorderSchema = z.object({
   taskId: z.string().uuid(),
@@ -43,10 +44,12 @@ export async function POST(request: Request) {
       select: { id: true },
     });
 
-    const known = new Set(steps.map((step) => step.id));
-    const allBelong = data.orderedIds.every((id) => known.has(id));
-
-    if (!allBelong || data.orderedIds.length !== steps.length) {
+    if (
+      !containsEveryIdExactlyOnce(
+        data.orderedIds,
+        steps.map((step) => step.id)
+      )
+    ) {
       return NextResponse.json(
         { error: "orderedIds must contain every step of this task exactly once" },
         { status: 400 }

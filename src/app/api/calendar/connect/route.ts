@@ -37,7 +37,9 @@ export async function GET() {
       maxAge: 10 * 60,
     });
 
-    return NextResponse.redirect(authorizationUrl);
+    const response = NextResponse.redirect(authorizationUrl);
+    response.headers.set("Cache-Control", "no-store, private");
+    return response;
   } catch (err) {
     if (err instanceof CalendarNotConfiguredError) {
       return NextResponse.json(
