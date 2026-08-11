@@ -24,6 +24,7 @@ model Profile {
   financialSnapshots     FinancialSnapshot[]
   calendarConnection     CalendarConnection?
   gmailConnection        GmailConnection?
+  driveConnection        DriveConnection?
   assignedTasks     Task[]            @relation("TaskAssignee")
   workspaceMembers  WorkspaceMember[]
 
@@ -369,6 +370,33 @@ model GmailConnection {
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@map("gmail_connections")
+}
+
+/// Read-only Google Drive access. Same shape as the Gmail and Calendar
+/// connections deliberately: one Google Cloud client, one encryption helper,
+/// one refresh-token pattern.
+///
+/// No file content and no file metadata is ever stored here — only the
+/// credential and the identity of the account it belongs to. File listings are
+/// read live from Google and held in an in-process cache, never persisted.
+model DriveConnection {
+  id        String @id @default(uuid())
+  profileId String @unique @map("profile_id")
+
+  /// The connected Google account address, for display on the connection card.
+  accountEmail String @map("account_email")
+  /// AES-256-GCM ciphertext. Never returned to the browser.
+  encryptedRefreshToken String    @map("encrypted_refresh_token")
+  tokenExpiresAt        DateTime? @map("token_expires_at")
+  /// Space-separated scopes Google reported granting.
+  grantedScopes String @default("") @map("granted_scopes")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("drive_connections")
 }
 
 model YouTubeConnection {

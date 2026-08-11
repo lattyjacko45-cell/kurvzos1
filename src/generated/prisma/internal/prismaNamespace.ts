@@ -403,6 +403,7 @@ export const ModelName = {
   FinancialSnapshot: 'FinancialSnapshot',
   CalendarConnection: 'CalendarConnection',
   GmailConnection: 'GmailConnection',
+  DriveConnection: 'DriveConnection',
   YouTubeConnection: 'YouTubeConnection'
 } as const
 
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback" | "contentItem" | "executiveConversation" | "financialSnapshot" | "calendarConnection" | "gmailConnection" | "youTubeConnection"
+    modelProps: "profile" | "workspace" | "workspaceMember" | "project" | "task" | "taskStep" | "focusSession" | "feedback" | "contentItem" | "executiveConversation" | "financialSnapshot" | "calendarConnection" | "gmailConnection" | "driveConnection" | "youTubeConnection"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1385,6 +1386,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DriveConnection: {
+      payload: Prisma.$DriveConnectionPayload<ExtArgs>
+      fields: Prisma.DriveConnectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DriveConnectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DriveConnectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>
+        }
+        findFirst: {
+          args: Prisma.DriveConnectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DriveConnectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>
+        }
+        findMany: {
+          args: Prisma.DriveConnectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>[]
+        }
+        create: {
+          args: Prisma.DriveConnectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>
+        }
+        createMany: {
+          args: Prisma.DriveConnectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DriveConnectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>[]
+        }
+        delete: {
+          args: Prisma.DriveConnectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>
+        }
+        update: {
+          args: Prisma.DriveConnectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.DriveConnectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DriveConnectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DriveConnectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.DriveConnectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DriveConnectionPayload>
+        }
+        aggregate: {
+          args: Prisma.DriveConnectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDriveConnection>
+        }
+        groupBy: {
+          args: Prisma.DriveConnectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DriveConnectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DriveConnectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DriveConnectionCountAggregateOutputType> | number
+        }
+      }
+    }
     YouTubeConnection: {
       payload: Prisma.$YouTubeConnectionPayload<ExtArgs>
       fields: Prisma.YouTubeConnectionFieldRefs
@@ -1693,6 +1768,20 @@ export const GmailConnectionScalarFieldEnum = {
 } as const
 
 export type GmailConnectionScalarFieldEnum = (typeof GmailConnectionScalarFieldEnum)[keyof typeof GmailConnectionScalarFieldEnum]
+
+
+export const DriveConnectionScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  accountEmail: 'accountEmail',
+  encryptedRefreshToken: 'encryptedRefreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  grantedScopes: 'grantedScopes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DriveConnectionScalarFieldEnum = (typeof DriveConnectionScalarFieldEnum)[keyof typeof DriveConnectionScalarFieldEnum]
 
 
 export const YouTubeConnectionScalarFieldEnum = {
@@ -2071,6 +2160,7 @@ export type GlobalOmitConfig = {
   financialSnapshot?: Prisma.FinancialSnapshotOmit
   calendarConnection?: Prisma.CalendarConnectionOmit
   gmailConnection?: Prisma.GmailConnectionOmit
+  driveConnection?: Prisma.DriveConnectionOmit
   youTubeConnection?: Prisma.YouTubeConnectionOmit
 }
 

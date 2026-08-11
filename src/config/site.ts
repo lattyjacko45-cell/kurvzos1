@@ -50,7 +50,10 @@ export const navGroups: readonly NavGroup[] = [
    */
   {
     label: "Connected Workspace",
-    items: [{ title: "Inbox", href: "/inbox", icon: "Mail" }],
+    items: [
+      { title: "Inbox", href: "/inbox", icon: "Mail" },
+      { title: "Drive", href: "/drive", icon: "HardDrive" },
+    ],
   },
   {
     label: "Advisory",

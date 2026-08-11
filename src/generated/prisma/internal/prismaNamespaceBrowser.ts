@@ -62,6 +62,7 @@ export const ModelName = {
   FinancialSnapshot: 'FinancialSnapshot',
   CalendarConnection: 'CalendarConnection',
   GmailConnection: 'GmailConnection',
+  DriveConnection: 'DriveConnection',
   YouTubeConnection: 'YouTubeConnection'
 } as const
 
@@ -276,6 +277,20 @@ export const GmailConnectionScalarFieldEnum = {
 } as const
 
 export type GmailConnectionScalarFieldEnum = (typeof GmailConnectionScalarFieldEnum)[keyof typeof GmailConnectionScalarFieldEnum]
+
+
+export const DriveConnectionScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  accountEmail: 'accountEmail',
+  encryptedRefreshToken: 'encryptedRefreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  grantedScopes: 'grantedScopes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DriveConnectionScalarFieldEnum = (typeof DriveConnectionScalarFieldEnum)[keyof typeof DriveConnectionScalarFieldEnum]
 
 
 export const YouTubeConnectionScalarFieldEnum = {

@@ -206,6 +206,7 @@ export type ProfileWhereInput = {
   financialSnapshots?: Prisma.FinancialSnapshotListRelationFilter
   calendarConnection?: Prisma.XOR<Prisma.CalendarConnectionNullableScalarRelationFilter, Prisma.CalendarConnectionWhereInput> | null
   gmailConnection?: Prisma.XOR<Prisma.GmailConnectionNullableScalarRelationFilter, Prisma.GmailConnectionWhereInput> | null
+  driveConnection?: Prisma.XOR<Prisma.DriveConnectionNullableScalarRelationFilter, Prisma.DriveConnectionWhereInput> | null
   assignedTasks?: Prisma.TaskListRelationFilter
   workspaceMembers?: Prisma.WorkspaceMemberListRelationFilter
 }
@@ -226,6 +227,7 @@ export type ProfileOrderByWithRelationInput = {
   financialSnapshots?: Prisma.FinancialSnapshotOrderByRelationAggregateInput
   calendarConnection?: Prisma.CalendarConnectionOrderByWithRelationInput
   gmailConnection?: Prisma.GmailConnectionOrderByWithRelationInput
+  driveConnection?: Prisma.DriveConnectionOrderByWithRelationInput
   assignedTasks?: Prisma.TaskOrderByRelationAggregateInput
   workspaceMembers?: Prisma.WorkspaceMemberOrderByRelationAggregateInput
 }
@@ -249,6 +251,7 @@ export type ProfileWhereUniqueInput = Prisma.AtLeast<{
   financialSnapshots?: Prisma.FinancialSnapshotListRelationFilter
   calendarConnection?: Prisma.XOR<Prisma.CalendarConnectionNullableScalarRelationFilter, Prisma.CalendarConnectionWhereInput> | null
   gmailConnection?: Prisma.XOR<Prisma.GmailConnectionNullableScalarRelationFilter, Prisma.GmailConnectionWhereInput> | null
+  driveConnection?: Prisma.XOR<Prisma.DriveConnectionNullableScalarRelationFilter, Prisma.DriveConnectionWhereInput> | null
   assignedTasks?: Prisma.TaskListRelationFilter
   workspaceMembers?: Prisma.WorkspaceMemberListRelationFilter
 }, "id" | "userId">
@@ -295,6 +298,7 @@ export type ProfileCreateInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -315,6 +319,7 @@ export type ProfileUncheckedCreateInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -335,6 +340,7 @@ export type ProfileUpdateInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -355,6 +361,7 @@ export type ProfileUncheckedUpdateInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -569,6 +576,20 @@ export type ProfileUpdateOneRequiredWithoutGmailConnectionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutGmailConnectionInput, Prisma.ProfileUpdateWithoutGmailConnectionInput>, Prisma.ProfileUncheckedUpdateWithoutGmailConnectionInput>
 }
 
+export type ProfileCreateNestedOneWithoutDriveConnectionInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutDriveConnectionInput, Prisma.ProfileUncheckedCreateWithoutDriveConnectionInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutDriveConnectionInput
+  connect?: Prisma.ProfileWhereUniqueInput
+}
+
+export type ProfileUpdateOneRequiredWithoutDriveConnectionNestedInput = {
+  create?: Prisma.XOR<Prisma.ProfileCreateWithoutDriveConnectionInput, Prisma.ProfileUncheckedCreateWithoutDriveConnectionInput>
+  connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutDriveConnectionInput
+  upsert?: Prisma.ProfileUpsertWithoutDriveConnectionInput
+  connect?: Prisma.ProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProfileUpdateToOneWithWhereWithoutDriveConnectionInput, Prisma.ProfileUpdateWithoutDriveConnectionInput>, Prisma.ProfileUncheckedUpdateWithoutDriveConnectionInput>
+}
+
 export type ProfileCreateNestedOneWithoutYoutubeConnectionInput = {
   create?: Prisma.XOR<Prisma.ProfileCreateWithoutYoutubeConnectionInput, Prisma.ProfileUncheckedCreateWithoutYoutubeConnectionInput>
   connectOrCreate?: Prisma.ProfileCreateOrConnectWithoutYoutubeConnectionInput
@@ -599,6 +620,7 @@ export type ProfileCreateWithoutWorkspaceMembersInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
 }
 
@@ -618,6 +640,7 @@ export type ProfileUncheckedCreateWithoutWorkspaceMembersInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
 }
 
@@ -653,6 +676,7 @@ export type ProfileUpdateWithoutWorkspaceMembersInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
 }
 
@@ -672,6 +696,7 @@ export type ProfileUncheckedUpdateWithoutWorkspaceMembersInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
 }
 
@@ -691,6 +716,7 @@ export type ProfileCreateWithoutAssignedTasksInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
 
@@ -710,6 +736,7 @@ export type ProfileUncheckedCreateWithoutAssignedTasksInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
 
@@ -745,6 +772,7 @@ export type ProfileUpdateWithoutAssignedTasksInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
 
@@ -764,6 +792,7 @@ export type ProfileUncheckedUpdateWithoutAssignedTasksInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
 
@@ -782,6 +811,7 @@ export type ProfileCreateWithoutFocusSessionsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -801,6 +831,7 @@ export type ProfileUncheckedCreateWithoutFocusSessionsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -836,6 +867,7 @@ export type ProfileUpdateWithoutFocusSessionsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -855,6 +887,7 @@ export type ProfileUncheckedUpdateWithoutFocusSessionsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -874,6 +907,7 @@ export type ProfileCreateWithoutFeedbackInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -893,6 +927,7 @@ export type ProfileUncheckedCreateWithoutFeedbackInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -928,6 +963,7 @@ export type ProfileUpdateWithoutFeedbackInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -947,6 +983,7 @@ export type ProfileUncheckedUpdateWithoutFeedbackInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -966,6 +1003,7 @@ export type ProfileCreateWithoutContentItemsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -985,6 +1023,7 @@ export type ProfileUncheckedCreateWithoutContentItemsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -1020,6 +1059,7 @@ export type ProfileUpdateWithoutContentItemsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -1039,6 +1079,7 @@ export type ProfileUncheckedUpdateWithoutContentItemsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1058,6 +1099,7 @@ export type ProfileCreateWithoutExecutiveConversationsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -1077,6 +1119,7 @@ export type ProfileUncheckedCreateWithoutExecutiveConversationsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -1112,6 +1155,7 @@ export type ProfileUpdateWithoutExecutiveConversationsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -1131,6 +1175,7 @@ export type ProfileUncheckedUpdateWithoutExecutiveConversationsInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1150,6 +1195,7 @@ export type ProfileCreateWithoutFinancialSnapshotsInput = {
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -1169,6 +1215,7 @@ export type ProfileUncheckedCreateWithoutFinancialSnapshotsInput = {
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -1204,6 +1251,7 @@ export type ProfileUpdateWithoutFinancialSnapshotsInput = {
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -1223,6 +1271,7 @@ export type ProfileUncheckedUpdateWithoutFinancialSnapshotsInput = {
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1242,6 +1291,7 @@ export type ProfileCreateWithoutCalendarConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -1261,6 +1311,7 @@ export type ProfileUncheckedCreateWithoutCalendarConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -1296,6 +1347,7 @@ export type ProfileUpdateWithoutCalendarConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -1315,6 +1367,7 @@ export type ProfileUncheckedUpdateWithoutCalendarConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1334,6 +1387,7 @@ export type ProfileCreateWithoutGmailConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -1353,6 +1407,7 @@ export type ProfileUncheckedCreateWithoutGmailConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -1388,6 +1443,7 @@ export type ProfileUpdateWithoutGmailConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -1407,6 +1463,103 @@ export type ProfileUncheckedUpdateWithoutGmailConnectionInput = {
   executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileCreateWithoutDriveConnectionInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
+  calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
+  gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileUncheckedCreateWithoutDriveConnectionInput = {
+  id?: string
+  userId: string
+  email: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedCreateNestedManyWithoutProfileInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProfileInput
+  contentItems?: Prisma.ContentItemUncheckedCreateNestedManyWithoutProfileInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedCreateNestedOneWithoutProfileInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedCreateNestedManyWithoutProfileInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
+  calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
+}
+
+export type ProfileCreateOrConnectWithoutDriveConnectionInput = {
+  where: Prisma.ProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutDriveConnectionInput, Prisma.ProfileUncheckedCreateWithoutDriveConnectionInput>
+}
+
+export type ProfileUpsertWithoutDriveConnectionInput = {
+  update: Prisma.XOR<Prisma.ProfileUpdateWithoutDriveConnectionInput, Prisma.ProfileUncheckedUpdateWithoutDriveConnectionInput>
+  create: Prisma.XOR<Prisma.ProfileCreateWithoutDriveConnectionInput, Prisma.ProfileUncheckedCreateWithoutDriveConnectionInput>
+  where?: Prisma.ProfileWhereInput
+}
+
+export type ProfileUpdateToOneWithWhereWithoutDriveConnectionInput = {
+  where?: Prisma.ProfileWhereInput
+  data: Prisma.XOR<Prisma.ProfileUpdateWithoutDriveConnectionInput, Prisma.ProfileUncheckedUpdateWithoutDriveConnectionInput>
+}
+
+export type ProfileUpdateWithoutDriveConnectionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
+  calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
+  gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
+}
+
+export type ProfileUncheckedUpdateWithoutDriveConnectionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  focusSessions?: Prisma.FocusSessionUncheckedUpdateManyWithoutProfileNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProfileNestedInput
+  contentItems?: Prisma.ContentItemUncheckedUpdateManyWithoutProfileNestedInput
+  youtubeConnection?: Prisma.YouTubeConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  executiveConversations?: Prisma.ExecutiveConversationUncheckedUpdateManyWithoutProfileNestedInput
+  financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
+  calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1426,6 +1579,7 @@ export type ProfileCreateWithoutYoutubeConnectionInput = {
   financialSnapshots?: Prisma.FinancialSnapshotCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberCreateNestedManyWithoutProfileInput
 }
@@ -1445,6 +1599,7 @@ export type ProfileUncheckedCreateWithoutYoutubeConnectionInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedCreateNestedManyWithoutProfileInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedCreateNestedOneWithoutProfileInput
   gmailConnection?: Prisma.GmailConnectionUncheckedCreateNestedOneWithoutProfileInput
+  driveConnection?: Prisma.DriveConnectionUncheckedCreateNestedOneWithoutProfileInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutProfileInput
 }
@@ -1480,6 +1635,7 @@ export type ProfileUpdateWithoutYoutubeConnectionInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUpdateManyWithoutProfileNestedInput
 }
@@ -1499,6 +1655,7 @@ export type ProfileUncheckedUpdateWithoutYoutubeConnectionInput = {
   financialSnapshots?: Prisma.FinancialSnapshotUncheckedUpdateManyWithoutProfileNestedInput
   calendarConnection?: Prisma.CalendarConnectionUncheckedUpdateOneWithoutProfileNestedInput
   gmailConnection?: Prisma.GmailConnectionUncheckedUpdateOneWithoutProfileNestedInput
+  driveConnection?: Prisma.DriveConnectionUncheckedUpdateOneWithoutProfileNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   workspaceMembers?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutProfileNestedInput
 }
@@ -1604,6 +1761,7 @@ export type ProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   financialSnapshots?: boolean | Prisma.Profile$financialSnapshotsArgs<ExtArgs>
   calendarConnection?: boolean | Prisma.Profile$calendarConnectionArgs<ExtArgs>
   gmailConnection?: boolean | Prisma.Profile$gmailConnectionArgs<ExtArgs>
+  driveConnection?: boolean | Prisma.Profile$driveConnectionArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Profile$assignedTasksArgs<ExtArgs>
   workspaceMembers?: boolean | Prisma.Profile$workspaceMembersArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -1649,6 +1807,7 @@ export type ProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   financialSnapshots?: boolean | Prisma.Profile$financialSnapshotsArgs<ExtArgs>
   calendarConnection?: boolean | Prisma.Profile$calendarConnectionArgs<ExtArgs>
   gmailConnection?: boolean | Prisma.Profile$gmailConnectionArgs<ExtArgs>
+  driveConnection?: boolean | Prisma.Profile$driveConnectionArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.Profile$assignedTasksArgs<ExtArgs>
   workspaceMembers?: boolean | Prisma.Profile$workspaceMembersArgs<ExtArgs>
   _count?: boolean | Prisma.ProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -1667,6 +1826,7 @@ export type $ProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     financialSnapshots: Prisma.$FinancialSnapshotPayload<ExtArgs>[]
     calendarConnection: Prisma.$CalendarConnectionPayload<ExtArgs> | null
     gmailConnection: Prisma.$GmailConnectionPayload<ExtArgs> | null
+    driveConnection: Prisma.$DriveConnectionPayload<ExtArgs> | null
     assignedTasks: Prisma.$TaskPayload<ExtArgs>[]
     workspaceMembers: Prisma.$WorkspaceMemberPayload<ExtArgs>[]
   }
@@ -2080,6 +2240,7 @@ export interface Prisma__ProfileClient<T, Null = never, ExtArgs extends runtime.
   financialSnapshots<T extends Prisma.Profile$financialSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$financialSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FinancialSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   calendarConnection<T extends Prisma.Profile$calendarConnectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$calendarConnectionArgs<ExtArgs>>): Prisma.Prisma__CalendarConnectionClient<runtime.Types.Result.GetResult<Prisma.$CalendarConnectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   gmailConnection<T extends Prisma.Profile$gmailConnectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$gmailConnectionArgs<ExtArgs>>): Prisma.Prisma__GmailConnectionClient<runtime.Types.Result.GetResult<Prisma.$GmailConnectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  driveConnection<T extends Prisma.Profile$driveConnectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$driveConnectionArgs<ExtArgs>>): Prisma.Prisma__DriveConnectionClient<runtime.Types.Result.GetResult<Prisma.$DriveConnectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignedTasks<T extends Prisma.Profile$assignedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$assignedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workspaceMembers<T extends Prisma.Profile$workspaceMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Profile$workspaceMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2680,6 +2841,25 @@ export type Profile$gmailConnectionArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.GmailConnectionInclude<ExtArgs> | null
   where?: Prisma.GmailConnectionWhereInput
+}
+
+/**
+ * Profile.driveConnection
+ */
+export type Profile$driveConnectionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DriveConnection
+   */
+  select?: Prisma.DriveConnectionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DriveConnection
+   */
+  omit?: Prisma.DriveConnectionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DriveConnectionInclude<ExtArgs> | null
+  where?: Prisma.DriveConnectionWhereInput
 }
 
 /**
