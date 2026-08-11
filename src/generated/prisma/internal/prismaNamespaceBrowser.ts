@@ -61,6 +61,7 @@ export const ModelName = {
   ExecutiveConversation: 'ExecutiveConversation',
   FinancialSnapshot: 'FinancialSnapshot',
   CalendarConnection: 'CalendarConnection',
+  GmailConnection: 'GmailConnection',
   YouTubeConnection: 'YouTubeConnection'
 } as const
 
@@ -261,6 +262,20 @@ export const CalendarConnectionScalarFieldEnum = {
 } as const
 
 export type CalendarConnectionScalarFieldEnum = (typeof CalendarConnectionScalarFieldEnum)[keyof typeof CalendarConnectionScalarFieldEnum]
+
+
+export const GmailConnectionScalarFieldEnum = {
+  id: 'id',
+  profileId: 'profileId',
+  emailAddress: 'emailAddress',
+  encryptedRefreshToken: 'encryptedRefreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  grantedScopes: 'grantedScopes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GmailConnectionScalarFieldEnum = (typeof GmailConnectionScalarFieldEnum)[keyof typeof GmailConnectionScalarFieldEnum]
 
 
 export const YouTubeConnectionScalarFieldEnum = {

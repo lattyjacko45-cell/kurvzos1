@@ -92,6 +92,14 @@ export type FinancialSnapshot = Prisma.FinancialSnapshotModel
  */
 export type CalendarConnection = Prisma.CalendarConnectionModel
 /**
+ * Model GmailConnection
+ * Read-only Gmail access. Same shape as CalendarConnection deliberately:
+ * one Google Cloud client, one encryption helper, one refresh-token pattern.
+ * No message content is ever stored — only the credential and the identity of
+ * the mailbox it belongs to.
+ */
+export type GmailConnection = Prisma.GmailConnectionModel
+/**
  * Model YouTubeConnection
  * 
  */

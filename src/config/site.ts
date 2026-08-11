@@ -41,6 +41,17 @@ export const navGroups: readonly NavGroup[] = [
       { title: "Content", href: "/content", icon: "Clapperboard" },
     ],
   },
+  /**
+   * Surfaces backed by an external account rather than KurvzOS's own data.
+   *
+   * Kept separate from Work so it stays obvious which screens depend on a
+   * third-party connection — and so Calendar and any future integration have
+   * an established home rather than being appended to a generic group.
+   */
+  {
+    label: "Connected Workspace",
+    items: [{ title: "Inbox", href: "/inbox", icon: "Mail" }],
+  },
   {
     label: "Advisory",
     items: [

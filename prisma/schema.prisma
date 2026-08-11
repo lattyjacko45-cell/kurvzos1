@@ -23,6 +23,7 @@ model Profile {
   executiveConversations ExecutiveConversation[]
   financialSnapshots     FinancialSnapshot[]
   calendarConnection     CalendarConnection?
+  gmailConnection        GmailConnection?
   assignedTasks     Task[]            @relation("TaskAssignee")
   workspaceMembers  WorkspaceMember[]
 
@@ -344,6 +345,30 @@ model CalendarConnection {
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@map("calendar_connections")
+}
+
+/// Read-only Gmail access. Same shape as CalendarConnection deliberately:
+/// one Google Cloud client, one encryption helper, one refresh-token pattern.
+/// No message content is ever stored — only the credential and the identity of
+/// the mailbox it belongs to.
+model GmailConnection {
+  id        String @id @default(uuid())
+  profileId String @unique @map("profile_id")
+
+  /// The connected mailbox address, for display on the connection card.
+  emailAddress String @map("email_address")
+  /// AES-256-GCM ciphertext. Never returned to the browser.
+  encryptedRefreshToken String    @map("encrypted_refresh_token")
+  tokenExpiresAt        DateTime? @map("token_expires_at")
+  /// Space-separated scopes Google reported granting.
+  grantedScopes String @default("") @map("granted_scopes")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("gmail_connections")
 }
 
 model YouTubeConnection {

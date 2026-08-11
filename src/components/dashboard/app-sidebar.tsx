@@ -10,6 +10,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   LogOut,
+  Mail,
   Settings,
   Users,
 } from "lucide-react";
@@ -50,6 +51,7 @@ const iconMap = {
   CheckSquare,
   Clapperboard,
   FileText,
+  Mail,
   Users,
   Settings,
 } as const;
