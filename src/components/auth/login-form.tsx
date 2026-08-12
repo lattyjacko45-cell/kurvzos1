@@ -18,8 +18,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
+import { describeAuthError } from "@/lib/auth-messages";
+import { AuthNoticeBanner } from "@/components/auth/auth-notice-banner";
+import { PasswordInput } from "@/components/auth/password-input";
+import { safeInternalRedirect } from "@/lib/security";
 
-export function LoginForm() {
+interface LoginFormProps {
+  /**
+   * Where to go after signing in. Comes from the `redirect` parameter that
+   * middleware attaches when it bounces an unauthenticated user off a
+   * protected page — read on the server and re-validated below.
+   */
+  redirectTo?: string;
+  /** Copy for a `?error=`/`?notice=` state, already resolved server-side. */
+  notice?: string;
+}
+
+export function LoginForm({ redirectTo, notice }: LoginFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -36,13 +51,24 @@ export function LoginForm() {
     });
 
     if (error) {
-      toast.error(error.message);
+      // Never the provider's own string.
+      toast.error(describeAuthError(error));
       setIsLoading(false);
       return;
     }
 
+    /**
+     * Re-validated against this origin even though the server already checked
+     * it. The parameter reaches the browser, so treating it as trusted here
+     * would make the second half of the round trip the weak link.
+     */
+    const destination = safeInternalRedirect(
+      redirectTo ?? null,
+      window.location.origin
+    );
+
     toast.success("Welcome back!");
-    router.push("/dashboard");
+    router.push(destination);
     router.refresh();
   }
 
@@ -56,6 +82,11 @@ export function LoginForm() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          {/* Expired links, failed callbacks and post-reset confirmations all
+              arrive here — as a query parameter, or as a URL fragment that
+              only the browser can read. The banner resolves both. */}
+          <AuthNoticeBanner serverNotice={notice} />
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -69,10 +100,22 @@ export function LoginForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
+            <div className="flex items-baseline justify-between gap-3">
+              <Label htmlFor="password">Password</Label>
+
+              <Link
+                href="/forgot-password"
+                className="text-sm text-muted-foreground hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <PasswordInput
               id="password"
-              type="password"
+              name="password"
+              /* Tells a password manager this is an existing credential to
+                 fill, not a new one to generate. */
+              autoComplete="current-password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
