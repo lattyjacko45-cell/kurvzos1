@@ -20,6 +20,19 @@ interface DailyBriefingSectionProps {
    * exists elsewhere in the app.
    */
   action?: React.ReactNode;
+  /**
+   * Slot for the compact Connected Workspace strip, rendered below the
+   * recommendation.
+   *
+   * A ReactNode rather than data on purpose: the caller wraps it in Suspense so
+   * the Gmail and Drive reads stream in *after* the mission card has painted.
+   * Passing a resolved summary here would have put two Google round trips in
+   * front of the page's primary decision.
+   *
+   * Optional, so the briefing renders exactly as before when nothing is
+   * supplied — the task and project intelligence above is untouched by this.
+   */
+  workspaceSlot?: React.ReactNode;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -39,6 +52,7 @@ export function DailyBriefingSection({
   firstName,
   emphasis = "default",
   action,
+  workspaceSlot,
 }: DailyBriefingSectionProps) {
   const isPrimary = emphasis === "primary";
 
@@ -152,6 +166,14 @@ export function DailyBriefingSection({
           {isPrimary && action ? <div className="pt-2">{action}</div> : null}
         </div>
       )}
+
+      {/*
+        Connected Workspace awareness, below the recommendation rather than
+        beside it — the task decision stays the point of this card, and this is
+        context around it. Streamed in by the caller, and renders nothing at
+        all when every source is disconnected or silent.
+      */}
+      {workspaceSlot}
     </section>
   );
 }

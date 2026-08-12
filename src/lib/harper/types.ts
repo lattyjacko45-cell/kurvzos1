@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { ConnectedWorkspaceContext } from "@/lib/workspace-context/types";
+
 /**
  * Harper's contract. Both the AI path and the deterministic fallback produce
  * exactly this shape, so the UI never has to know which one ran.
@@ -107,4 +109,15 @@ export interface HarperContext {
     eventsRemainingToday: number;
     largestFreeGapMinutes: number | null;
   } | null;
+  /**
+   * The unified Connected Workspace snapshot — Gmail, Drive and content
+   * status alongside the calendar, each with its own availability state.
+   *
+   * Awareness only. Harper may mention that mail is unread or that a video is
+   * still processing; it has no capability to act on any of it, and no route
+   * exists that would let it. Every value is already capped and truncated by
+   * the aggregator, so this cannot grow the prompt without a visible change to
+   * WORKSPACE_CONTEXT_CAPS.
+   */
+  connectedWorkspace: ConnectedWorkspaceContext;
 }

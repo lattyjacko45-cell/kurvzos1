@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getDailyBriefing } from "@/lib/daily-briefing.server";
 import { getWeeklyPacket } from "@/lib/weekly-packet.server";
-import { getScheduleForProfile } from "@/lib/calendar/read.server";
+import { getConnectedWorkspaceContext } from "@/lib/workspace-context/context.server";
+import { isSourceUsable } from "@/lib/workspace-context/types";
 import type { HarperContext } from "@/lib/harper/types";
 
 /**
@@ -23,7 +24,14 @@ export async function buildHarperContext(
 ): Promise<HarperContext> {
   const since = new Date(now.getTime() - SEVEN_DAYS_MS);
 
-  const [briefing, packet, focusSessions, completedTasks, feedback, calendar] =
+  /**
+   * The calendar is no longer fetched here.
+   *
+   * It arrives inside the Connected Workspace snapshot, which the aggregator
+   * builds once per request and shares with the dashboard. Reading it directly
+   * as well would have been a second call for data already in hand.
+   */
+  const [briefing, packet, focusSessions, completedTasks, feedback, workspace] =
     await Promise.all([
       getDailyBriefing(workspaceId, now),
       getWeeklyPacket(workspaceId, now),
@@ -51,7 +59,7 @@ export async function buildHarperContext(
         orderBy: { createdAt: "desc" },
         take: 3,
       }),
-      getScheduleForProfile(profileId, now),
+      getConnectedWorkspaceContext(profileId, workspaceId),
     ]);
 
   const activeProjects = packet.projects.filter(
@@ -104,25 +112,41 @@ export async function buildHarperContext(
       type: entry.type,
       description: entry.description.slice(0, 200),
     })),
-    // Titles and counts only. Nothing identifying anyone else travels here.
+    /**
+     * Unchanged shape and unchanged meaning — it is simply sourced from the
+     * shared snapshot now instead of a second calendar read. Still null when
+     * no calendar is connected, so the prompt rule about it still holds.
+     */
     schedule:
-      calendar.state === "not_connected"
+      workspace.calendar.state === "disconnected"
         ? null
         : {
-            currentEvent: calendar.schedule.currentEvent?.title ?? null,
-            nextEvent: calendar.schedule.nextEvent?.title ?? null,
-            minutesUntilNextEvent: calendar.schedule.nextEvent?.startsAt
-              ? Math.max(
-                  0,
-                  Math.round(
-                    (new Date(calendar.schedule.nextEvent.startsAt).getTime() -
-                      now.getTime()) /
-                      60000
-                  )
-                )
-              : null,
-            eventsRemainingToday: calendar.schedule.eventsRemainingToday,
-            largestFreeGapMinutes: calendar.schedule.largestGapMinutes,
+            currentEvent: workspace.calendar.currentEvent,
+            nextEvent: workspace.calendar.nextEvent,
+            minutesUntilNextEvent: workspace.calendar.minutesUntilNextEvent,
+            eventsRemainingToday: workspace.calendar.eventsRemainingToday,
+            largestFreeGapMinutes: workspace.calendar.largestFreeGapMinutes,
           },
+    connectedWorkspace: workspace,
   };
+}
+
+/**
+ * Whether any connected source has something to say.
+ *
+ * Exported for the prompt layer and tests: when every integration is
+ * disconnected or silent there is nothing for Harper to be aware of, and the
+ * snapshot should not encourage it to comment.
+ */
+export function hasConnectedWorkspaceSignal(
+  context: HarperContext
+): boolean {
+  const workspace = context.connectedWorkspace;
+
+  return (
+    isSourceUsable(workspace.calendar.state) ||
+    isSourceUsable(workspace.gmail.state) ||
+    isSourceUsable(workspace.drive.state) ||
+    isSourceUsable(workspace.content.state)
+  );
 }

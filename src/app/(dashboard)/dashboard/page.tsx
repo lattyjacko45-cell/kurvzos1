@@ -20,6 +20,7 @@ import { getSophiaView } from "@/lib/sophia/view.server";
 import { getOliviaView } from "@/lib/olivia/view.server";
 import { getMarcusView } from "@/lib/marcus/view.server";
 import { getScheduleForProfile } from "@/lib/calendar/read.server";
+import { ConnectedWorkspaceStrip } from "@/components/dashboard/connected-workspace-strip";
 import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { ExecutiveSummary } from "@/components/dashboard/executive-summary";
 import { SectionLabel } from "@/components/ui/section-label";
@@ -228,6 +229,16 @@ export default async function DashboardPage() {
                 triggerLabel="Create Task"
               />
             }
+            workspaceSlot={
+              /* Streamed: the card paints from task data, the connected
+                 sources fill in behind it. */
+              <Suspense fallback={null}>
+                <ConnectedWorkspaceStrip
+                  profileId={profile.id}
+                  workspaceId={workspace.id}
+                />
+              </Suspense>
+            }
           />
         )}
 
@@ -262,7 +273,18 @@ export default async function DashboardPage() {
         same card twice.
       */}
       {missionTask ? (
-        <DailyBriefingSection briefing={briefing} firstName={firstName} />
+        <DailyBriefingSection
+          briefing={briefing}
+          firstName={firstName}
+          workspaceSlot={
+            <Suspense fallback={null}>
+              <ConnectedWorkspaceStrip
+                profileId={profile.id}
+                workspaceId={workspace.id}
+              />
+            </Suspense>
+          }
+        />
       ) : null}
 
       <Suspense fallback={<SectionFallback />}>
