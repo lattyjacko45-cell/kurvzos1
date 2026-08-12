@@ -23,7 +23,7 @@ async function loadDailyBriefing(
   workspaceId: string,
   now: Date = new Date()
 ): Promise<DailyBriefing> {
-  const [tasks, activeProjects] = await Promise.all([
+  const [tasks, activeProjects, totalProjects] = await Promise.all([
     prisma.task.findMany({
       where: {
         project: { workspaceId },
@@ -48,6 +48,13 @@ async function loadDailyBriefing(
       select: { id: true, name: true },
       orderBy: { updatedAt: "desc" },
     }),
+    /**
+     * Counts every project regardless of status, which is what separates a
+     * brand-new workspace from one whose work is genuinely finished. The
+     * active-only query above cannot tell those apart, and a new user was
+     * being told they were "clear for today" on an empty account.
+     */
+    prisma.project.count({ where: { workspaceId } }),
   ]);
 
   const briefingTasks: BriefingTask[] = tasks.map((task) => ({
@@ -76,7 +83,12 @@ async function loadDailyBriefing(
     .filter((project) => !projectIdsWithWork.has(project.id))
     .map((project) => project.name);
 
-  return buildDailyBriefing(briefingTasks, now, projectsNeedingNextTask);
+  return buildDailyBriefing(
+    briefingTasks,
+    now,
+    projectsNeedingNextTask,
+    totalProjects === 0
+  );
 }
 
 /** Deduplicates identical reads inside one server render. */

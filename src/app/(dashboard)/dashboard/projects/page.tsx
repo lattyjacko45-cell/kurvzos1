@@ -7,6 +7,7 @@ import {
 } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CreateProjectDialog } from "@/components/dashboard/create-dialogs";
+import { isFromOnboarding } from "@/lib/provisioning";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -20,7 +21,13 @@ export const metadata: Metadata = {
   title: "Projects",
 };
 
-export default async function ProjectsPage() {
+interface ProjectsPageProps {
+  searchParams: Promise<{ from?: string }>;
+}
+
+export default async function ProjectsPage({
+  searchParams,
+}: ProjectsPageProps) {
   const user = await getCurrentUser();
   if (!user) return null;
 
@@ -30,6 +37,11 @@ export default async function ProjectsPage() {
     user.fullName ?? undefined
   );
   const workspace = await getUserWorkspace(profile.id);
+
+  // Read on the server so the dialog needs no useSearchParams, and therefore
+  // no Suspense boundary of its own.
+  const { from } = await searchParams;
+  const fromOnboarding = isFromOnboarding(from);
 
   const projects = await prisma.project.findMany({
     where: { workspaceId: workspace.id },
@@ -46,7 +58,10 @@ export default async function ProjectsPage() {
             Manage and organize your team&apos;s projects.
           </p>
         </div>
-        <CreateProjectDialog workspaceId={workspace.id} />
+        <CreateProjectDialog
+          workspaceId={workspace.id}
+          returnToDashboard={fromOnboarding}
+        />
       </div>
 
       {projects.length === 0 ? (

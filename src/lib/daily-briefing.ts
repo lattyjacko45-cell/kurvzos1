@@ -16,6 +16,11 @@ import {
   type MissionStep,
 } from "@/lib/mission";
 import { ESTIMATED_FOCUS_MINUTES } from "@/lib/focus";
+import {
+  CLEAR_FOR_TODAY,
+  FIRST_PROJECT_PROMPT,
+  noMissionRecommendation,
+} from "@/lib/briefing-rules";
 
 /** Minimal task shape the briefing needs. */
 export interface BriefingTask {
@@ -40,6 +45,14 @@ export interface DailyBriefing {
    * Harper — which do see projects — asked for the next task.
    */
   projectsNeedingNextTask: string[];
+  /**
+   * True when the workspace contains no projects at all.
+   *
+   * Distinct from "clear for today", which means the work exists and is done.
+   * A brand-new account has neither, and telling someone with an empty
+   * workspace that they are clear is both false and useless.
+   */
+  isEmptyWorkspace: boolean;
   progress: MissionProgress;
   overdueCount: number;
   dueTodayCount: number;
@@ -49,7 +62,12 @@ export interface DailyBriefing {
   missionIsOverdue: boolean;
 }
 
-export const CLEAR_FOR_TODAY = "You’re clear for today.";
+/**
+ * Re-exported so existing importers keep working. The values and the
+ * no-mission decision now live in `briefing-rules.ts`, which is
+ * dependency-free and therefore testable.
+ */
+export { CLEAR_FOR_TODAY, FIRST_PROJECT_PROMPT };
 
 const PRIORITY_RANK: Record<Priority, number> = {
   URGENT: 4,
@@ -145,16 +163,11 @@ export function buildRecommendation(
   mission: BriefingTask | null,
   progress: MissionProgress,
   now: Date = new Date(),
-  projectsNeedingNextTask: string[] = []
+  projectsNeedingNextTask: string[] = [],
+  isEmptyWorkspace = false
 ): string {
   if (!mission) {
-    // An active project with nothing actionable is not a clear day — it is a
-    // planning gap. Phrasing matches the CEO Packet's next move exactly so the
-    // two surfaces read as one voice.
-    const [project] = projectsNeedingNextTask;
-    if (project) return `Create the next task for “${project}”.`;
-
-    return CLEAR_FOR_TODAY;
+    return noMissionRecommendation(isEmptyWorkspace, projectsNeedingNextTask);
   }
 
   const overdue = isOverdue(mission, now);
@@ -178,7 +191,8 @@ export function buildRecommendation(
 export function buildDailyBriefing(
   tasks: BriefingTask[],
   now: Date = new Date(),
-  projectsNeedingNextTask: string[] = []
+  projectsNeedingNextTask: string[] = [],
+  isEmptyWorkspace = false
 ): DailyBriefing {
   const mission = selectPrimaryMission(tasks, now);
   const progress = deriveMissionProgress(mission?.steps ?? []);
@@ -187,6 +201,7 @@ export function buildDailyBriefing(
     greeting: greetingForHour(now.getHours()),
     mission,
     projectsNeedingNextTask,
+    isEmptyWorkspace,
     progress,
     overdueCount: countOverdue(tasks, now),
     dueTodayCount: countDueToday(tasks, now),
@@ -195,7 +210,8 @@ export function buildDailyBriefing(
       mission,
       progress,
       now,
-      projectsNeedingNextTask
+      projectsNeedingNextTask,
+      isEmptyWorkspace
     ),
     missionIsOverdue: mission ? isOverdue(mission, now) : false,
   };

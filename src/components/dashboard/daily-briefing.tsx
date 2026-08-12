@@ -128,9 +128,10 @@ export function DailyBriefingSection({
             <p className="text-sm leading-6">{recommendation}</p>
           </div>
         </>
-      ) : needsNextTask ? (
-        /* No mission, but an active project is out of tasks. Reuses the label
-           block above so the ask reads as an action, not a passive note. */
+      ) : needsNextTask || briefing.isEmptyWorkspace ? (
+        /* Two different asks, one treatment: an active project out of tasks,
+           and a workspace with nothing in it yet. Both are real next actions,
+           so both get the action label rather than the quiet clear-day note. */
         <div className={isPrimary ? "mt-6 space-y-3" : "mt-5 space-y-1"}>
           <SectionLabel>
             Recommended next action

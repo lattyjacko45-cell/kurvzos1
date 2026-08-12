@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getCurrentUser, ensureProfile } from "@/lib/auth";
+import { getCurrentUser, ensureProfile, getUserWorkspace } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   getCalendarOAuthSetupDetails,
@@ -62,6 +62,10 @@ export default async function SettingsPage({
     user.email,
     user.fullName ?? undefined
   );
+
+  // Provisions on first visit if this is a brand-new account, and is
+  // request-cached alongside the dashboard's own lookup.
+  const workspace = await getUserWorkspace(profile.id);
 
   const { calendar } = await searchParams;
   const calendarMessage = calendar ? CALENDAR_MESSAGES[calendar] : undefined;
@@ -180,10 +184,23 @@ export default async function SettingsPage({
           <CardTitle>Workspace</CardTitle>
           <CardDescription>Your workspace configuration</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* A beta user needs to be able to see which workspace they are in
+              before any of the rest of this page makes sense. */}
+          <dl className="grid gap-3 text-sm">
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted-foreground">Workspace</dt>
+              <dd className="text-right font-medium">{workspace.name}</dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4">
+              <dt className="text-muted-foreground">Your role</dt>
+              <dd className="text-right font-medium">Owner</dd>
+            </div>
+          </dl>
+
           <p className="text-muted-foreground text-sm">
-            Workspace settings and team management will be available in a future
-            update.
+            Renaming workspaces and inviting team members will be available in a
+            future update.
           </p>
         </CardContent>
       </Card>

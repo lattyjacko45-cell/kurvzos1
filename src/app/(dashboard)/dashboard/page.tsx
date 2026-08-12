@@ -10,7 +10,11 @@ import {
 import { prisma } from "@/lib/prisma";
 import { StatsCards, ProjectList, TaskList } from "@/components/dashboard/stats-cards";
 import { MissionSection } from "@/components/dashboard/mission-section";
-import { CreateTaskDialog } from "@/components/dashboard/create-dialogs";
+import {
+  CreateProjectDialog,
+  CreateTaskDialog,
+} from "@/components/dashboard/create-dialogs";
+import { OnboardingGuide } from "@/components/dashboard/onboarding-guide";
 import { FocusSessionToast } from "@/components/dashboard/focus-session-toast";
 import { DailyBriefingSection } from "@/components/dashboard/daily-briefing";
 import { getDailyBriefing } from "@/lib/daily-briefing.server";
@@ -202,7 +206,7 @@ export default async function DashboardPage() {
         </h1>
 
         <p className="mt-1 max-w-2xl text-caption text-muted-foreground">
-          Focus on the work that moves KurvzOS forward today.
+          Focus on the work that moves your business forward today.
         </p>
       </section>
 
@@ -214,6 +218,15 @@ export default async function DashboardPage() {
         cases. `items-start` is what keeps Harper content-height instead of
         stretching to match a tall mission card.
       */}
+      {/*
+        First-run guide. Streams in below the header and removes itself once
+        the required steps are done, so an established workspace never pays for
+        it and never sees it.
+      */}
+      <Suspense fallback={null}>
+        <OnboardingGuide profileId={profile.id} workspaceId={workspace.id} />
+      </Suspense>
+
       <section className="grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:items-start">
         {missionTask ? null : (
           <DailyBriefingSection
@@ -221,13 +234,19 @@ export default async function DashboardPage() {
             firstName={firstName}
             emphasis="primary"
             action={
-              <CreateTaskDialog
-                projects={projects.map((project) => ({
-                  id: project.id,
-                  name: project.name,
-                }))}
-                triggerLabel="Create Task"
-              />
+              /* An empty workspace has no project to hang a task on, so
+                 offering "Create Task" there would be a dead end. */
+              briefing.isEmptyWorkspace ? (
+                <CreateProjectDialog workspaceId={workspace.id} />
+              ) : (
+                <CreateTaskDialog
+                  projects={projects.map((project) => ({
+                    id: project.id,
+                    name: project.name,
+                  }))}
+                  triggerLabel="Create Task"
+                />
+              )
             }
             workspaceSlot={
               /* Streamed: the card paints from task data, the connected

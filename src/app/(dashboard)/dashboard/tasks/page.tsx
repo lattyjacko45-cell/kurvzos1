@@ -8,6 +8,7 @@ import {
 } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CreateTaskDialog } from "@/components/dashboard/create-dialogs";
+import { isFromOnboarding } from "@/lib/provisioning";
 import {
   CompletedTaskRow,
   type CompletedTaskRowData,
@@ -43,7 +44,7 @@ const priorityVariants: Record<
 };
 
 interface TasksPageProps {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; from?: string }>;
 }
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
@@ -57,8 +58,9 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   );
   const workspace = await getUserWorkspace(profile.id);
 
-  const { tab } = await searchParams;
+  const { tab, from } = await searchParams;
   const activeTab = tab === "completed" ? "completed" : "active";
+  const fromOnboarding = isFromOnboarding(from);
 
   const [activeTasks, completedTasks, projects] = await Promise.all([
     prisma.task.findMany({
@@ -114,7 +116,10 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
             Track and manage work across all projects.
           </p>
         </div>
-        <CreateTaskDialog projects={projects} />
+        <CreateTaskDialog
+          projects={projects}
+          returnToDashboard={fromOnboarding}
+        />
       </div>
 
       {/* Link-driven tabs so the Completed stat on the dashboard can deep-link. */}

@@ -23,9 +23,17 @@ import { useHarperAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
 
 interface CreateProjectDialogProps {
   workspaceId: string;
+  /**
+   * Set only when the page was opened from the first-run guide. Established
+   * users creating an ordinary project stay where they are, as before.
+   */
+  returnToDashboard?: boolean;
 }
 
-export function CreateProjectDialog({ workspaceId }: CreateProjectDialogProps) {
+export function CreateProjectDialog({
+  workspaceId,
+  returnToDashboard = false,
+}: CreateProjectDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,10 +56,19 @@ export function CreateProjectDialog({ workspaceId }: CreateProjectDialogProps) {
         throw new Error(data.error ?? "Failed to create project");
       }
 
-      toast.success("Project created!");
       setOpen(false);
       setName("");
       setDescription("");
+
+      if (returnToDashboard) {
+        // A first-run user has no reason to know the guide is back on the
+        // dashboard, so take them there and name the next step.
+        toast.success("Project created. Next, add your first task.");
+        router.push("/dashboard");
+        return;
+      }
+
+      toast.success("Project created!");
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -113,6 +130,8 @@ interface CreateTaskDialogProps {
   projects: Array<{ id: string; name: string }>;
   /** Defaults to "New Task"; the mission card's empty state overrides it. */
   triggerLabel?: string;
+  /** Set only when the page was opened from the first-run guide. */
+  returnToDashboard?: boolean;
 }
 
 type CreateMode = "BLANK" | "TEMPLATE";
@@ -120,6 +139,7 @@ type CreateMode = "BLANK" | "TEMPLATE";
 export function CreateTaskDialog({
   projects,
   triggerLabel = "New Task",
+  returnToDashboard = false,
 }: CreateTaskDialogProps) {
   const router = useRouter();
   const scheduleHarperRefresh = useHarperAutoRefresh();
@@ -184,16 +204,24 @@ export function CreateTaskDialog({
         steps
       );
 
+      setOpen(false);
+      resetForm();
+      // A new task can outrank the current mission.
+      scheduleHarperRefresh();
+
+      if (returnToDashboard) {
+        // Back to the guide, where Today's Mission now has something to show.
+        toast.success("Task created. Here's today's mission.");
+        router.push("/dashboard");
+        return;
+      }
+
       toast.success(
         result.stepsCreated > 0
           ? `Task created with ${result.stepsCreated} steps!`
           : "Task created!"
       );
 
-      setOpen(false);
-      resetForm();
-      // A new task can outrank the current mission.
-      scheduleHarperRefresh();
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
