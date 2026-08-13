@@ -21,6 +21,8 @@ import { createClient } from "@/lib/supabase/client";
 import { describeAuthError } from "@/lib/auth-messages";
 import { AuthNoticeBanner } from "@/components/auth/auth-notice-banner";
 import { PasswordInput } from "@/components/auth/password-input";
+import { SupportLink } from "@/components/support-link";
+import { SUPPORT_SUBJECTS } from "@/lib/beta";
 import { safeInternalRedirect } from "@/lib/security";
 
 interface LoginFormProps {
@@ -135,6 +137,14 @@ export function LoginForm({ redirectTo, notice }: LoginFormProps) {
               Sign up
             </Link>
           </p>
+
+          {/* The one support route reachable without a session. A tester who
+              cannot sign in has no other way to reach us. */}
+          <SupportLink
+            label="Trouble signing in?"
+            subject={SUPPORT_SUBJECTS.signIn}
+            className="text-center text-sm text-muted-foreground"
+          />
         </CardFooter>
       </form>
     </Card>

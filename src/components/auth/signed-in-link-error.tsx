@@ -9,6 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AuthNoticeBanner } from "@/components/auth/auth-notice-banner";
+import { SupportLink } from "@/components/support-link";
+import { SUPPORT_SUBJECTS } from "@/lib/beta";
 
 interface SignedInLinkErrorProps {
   notice: string;
@@ -47,6 +49,11 @@ export function SignedInLinkError({ notice }: SignedInLinkErrorProps) {
             Request a new password reset link
           </Link>
         </p>
+
+        <SupportLink
+          subject={SUPPORT_SUBJECTS.signIn}
+          className="text-center text-sm text-muted-foreground"
+        />
       </CardFooter>
     </Card>
   );

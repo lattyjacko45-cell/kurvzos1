@@ -20,12 +20,15 @@ import { createClient } from "@/lib/supabase/client";
 import { buildAuthRedirectUrl, describeAuthError } from "@/lib/auth-messages";
 
 /**
- * Long enough to discourage hammering the button, short enough not to trap
- * someone who genuinely mistyped their address. Supabase's own default mailer
- * allows only 2 emails per hour, so the real limit is upstream — this exists
- * to stop the UI encouraging requests that will simply be rejected.
+ * Matches Supabase's own per-user window for /auth/v1/recover, which its rate
+ * limit documentation gives as 60 seconds before the same user may request
+ * again. The previous 30s invited a second request that Supabase would simply
+ * reject — the UI now cannot encourage a call that is guaranteed to fail.
+ *
+ * Note the separate, harder ceiling: the built-in mailer allows only 2 emails
+ * per hour project-wide. That one is fixed upstream and needs custom SMTP.
  */
-const RESEND_COOLDOWN_SECONDS = 30;
+const RESEND_COOLDOWN_SECONDS = 60;
 
 export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);

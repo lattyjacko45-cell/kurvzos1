@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { getCurrentUser, ensureProfile, getUserWorkspace } from "@/lib/auth";
+import { PRIVATE_BETA_LABEL, isPrivateBetaEnabled } from "@/lib/beta";
+import { SupportLink } from "@/components/support-link";
 import { prisma } from "@/lib/prisma";
 import {
   getCalendarOAuthSetupDetails,
@@ -196,7 +198,22 @@ export default async function SettingsPage({
               <dt className="text-muted-foreground">Your role</dt>
               <dd className="text-right font-medium">Owner</dd>
             </div>
+
+            {/* Only while the flag is on. Placed here rather than in the
+                sidebar so it reads as account information, not as a banner
+                implying the product is unfinished. */}
+            {isPrivateBetaEnabled(process.env.NEXT_PUBLIC_PRIVATE_BETA) ? (
+              <div className="flex items-baseline justify-between gap-4">
+                <dt className="text-muted-foreground">Access</dt>
+                <dd className="text-right font-medium">
+                  {PRIVATE_BETA_LABEL}
+                </dd>
+              </div>
+            ) : null}
           </dl>
+
+          {/* Renders nothing when NEXT_PUBLIC_SUPPORT_EMAIL is unset. */}
+          <SupportLink />
 
           <p className="text-muted-foreground text-sm">
             Renaming workspaces and inviting team members will be available in a

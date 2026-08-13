@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { useExecutiveAutoRefresh } from "@/lib/harper/use-harper-auto-refresh";
+import { SupportLink } from "@/components/support-link";
 
 export const FEEDBACK_TYPE_LABELS = {
   BUG: "Bug",
@@ -163,6 +164,13 @@ export function FeedbackDialog() {
                 </p>
               ) : null}
             </div>
+
+            {/* For anything that needs a reply — feedback is one-way. Renders
+                nothing when no support address is configured. */}
+            <SupportLink
+              label="Need a direct reply?"
+              className="text-xs text-muted-foreground"
+            />
           </div>
 
           <DialogFooter className="items-center justify-between gap-2 sm:justify-between">
