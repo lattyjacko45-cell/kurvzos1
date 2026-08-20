@@ -36,6 +36,21 @@ export const ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages";
 /** Floor that leaves room for reasoning tokens plus a full JSON answer. */
 const MIN_OPENAI_OUTPUT_TOKENS = 2048;
 
+/**
+ * Bounds every provider request so a hung or slow call cannot block a caller
+ * indefinitely. A caller may tighten this via `timeoutMs`; leaving it unset
+ * still gets this ceiling rather than an unbounded `fetch`.
+ */
+const DEFAULT_TIMEOUT_MS = 30_000;
+
+/** True for the abort errors `fetch` throws when an `AbortSignal.timeout()` fires. */
+function isTimeoutError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.name === "TimeoutError" || error.name === "AbortError")
+  );
+}
+
 function readProviderName(): AiProviderName | null {
   const raw = process.env.AI_PROVIDER?.trim().toLowerCase();
 
@@ -94,6 +109,7 @@ export class AiUnavailableError extends Error {
 /** Where in the pipeline a request died. Safe to log. */
 export type AiFailureStage =
   | "http"
+  | "timeout"
   | "empty-output"
   | "incomplete-output"
   | "no-json"
@@ -197,10 +213,21 @@ export interface StructuredRequest<T = unknown> {
   jsonSchema?: JsonSchemaSpec;
   /** Final gate: output that fails this is rejected, never patched up. */
   validator?: StructuredValidator<T>;
+  /** Overrides {@link DEFAULT_TIMEOUT_MS} for this request. */
+  timeoutMs?: number;
+  /**
+   * OpenAI reasoning effort, for reasoning-capable models (the gpt-5
+   * family). A classification or advice task rarely needs deep reasoning,
+   * and every reasoning token comes out of the same `max_output_tokens`
+   * budget as the answer itself — an unset effort leaves the provider
+   * default in place, so existing callers are unaffected. Ignored by
+   * Anthropic and by OpenAI models that do not support reasoning effort.
+   */
+  reasoningEffort?: "minimal" | "low" | "medium" | "high";
 }
 
 /** Pulls the first JSON object out of a model reply. */
-function extractJson(text: string, config: AiProviderConfig): unknown {
+export function extractJson(text: string, config: AiProviderConfig): unknown {
   const trimmed = text.trim();
 
   const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -238,21 +265,39 @@ async function callAnthropic(
   config: AiProviderConfig,
   request: StructuredRequest
 ): Promise<string> {
-  const response = await fetch(ANTHROPIC_MESSAGES_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": config.apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: config.model,
-      max_tokens: request.maxTokens ?? 1024,
-      system: request.systemPrompt,
-      messages: [{ role: "user", content: request.userPrompt }],
-    }),
-    cache: "no-store",
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(ANTHROPIC_MESSAGES_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": config.apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: config.model,
+        max_tokens: request.maxTokens ?? 1024,
+        system: request.systemPrompt,
+        messages: [{ role: "user", content: request.userPrompt }],
+      }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(request.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+    });
+  } catch (error) {
+    if (isTimeoutError(error)) {
+      const diagnostics: AiFailureDiagnostics = {
+        provider: "anthropic",
+        model: config.model,
+        stage: "timeout",
+      };
+
+      logAiFailure(diagnostics);
+      throw new AiRequestError("The model request timed out.", diagnostics);
+    }
+
+    throw error;
+  }
 
   if (!response.ok) {
     // Identifiers only: a provider error body can echo the request.
@@ -334,47 +379,86 @@ export function extractOpenAiText(payload: OpenAiResponsePayload): string {
   return text;
 }
 
+/**
+ * True when the Responses API cut generation short before finishing —
+ * almost always because the reasoning-plus-output budget (`max_output_tokens`)
+ * ran out before the model closed its answer. Checked independently of
+ * whether any text came back: a truncated response can still end mid-object,
+ * which reads as non-empty but is not valid JSON, so this must gate on the
+ * provider's own signal rather than on `text` being empty.
+ */
+export function isOpenAiResponseIncomplete(
+  payload: OpenAiResponsePayload
+): boolean {
+  return payload.status === "incomplete";
+}
+
 async function callOpenAi(
   config: AiProviderConfig,
   request: StructuredRequest
 ): Promise<string> {
-  const response = await fetch(OPENAI_RESPONSES_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: config.model,
-      // System prompt belongs in `instructions` on the Responses API.
-      instructions: request.systemPrompt,
-      input: [
-        {
-          role: "user",
-          content: [{ type: "input_text", text: request.userPrompt }],
-        },
-      ],
-      // Reasoning models (the gpt-5 family) spend part of this budget on
-      // internal reasoning before emitting a message. A caller's 900-token
-      // ask can be consumed entirely, leaving an empty message and a silent
-      // fallback — hence the floor.
-      max_output_tokens: Math.max(request.maxTokens ?? 0, MIN_OPENAI_OUTPUT_TOKENS),
-      // Strict json_schema is enforced during decoding, so the model cannot
-      // return prose or a fenced block. json_object is the weaker fallback for
-      // callers that supply no schema.
-      text: request.jsonSchema
-        ? {
-            format: {
-              type: "json_schema",
-              name: request.jsonSchema.name,
-              strict: true,
-              schema: request.jsonSchema.schema,
-            },
-          }
-        : { format: { type: "json_object" } },
-    }),
-    cache: "no-store",
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(OPENAI_RESPONSES_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        // System prompt belongs in `instructions` on the Responses API.
+        instructions: request.systemPrompt,
+        input: [
+          {
+            role: "user",
+            content: [{ type: "input_text", text: request.userPrompt }],
+          },
+        ],
+        // Reasoning models (the gpt-5 family) spend part of this budget on
+        // internal reasoning before emitting a message. A caller's 900-token
+        // ask can be consumed entirely, leaving an empty message and a silent
+        // fallback — hence the floor.
+        max_output_tokens: Math.max(request.maxTokens ?? 0, MIN_OPENAI_OUTPUT_TOKENS),
+        // Unset by default, so existing callers keep the provider's own
+        // default reasoning depth. A caller with a low-reasoning task (e.g.
+        // classification) can ask for less of the shared token budget to go
+        // to hidden reasoning, leaving more of it for the actual answer.
+        ...(request.reasoningEffort
+          ? { reasoning: { effort: request.reasoningEffort } }
+          : {}),
+        // Strict json_schema is enforced during decoding, so the model cannot
+        // return prose or a fenced block. json_object is the weaker fallback for
+        // callers that supply no schema.
+        text: request.jsonSchema
+          ? {
+              format: {
+                type: "json_schema",
+                name: request.jsonSchema.name,
+                strict: true,
+                schema: request.jsonSchema.schema,
+              },
+            }
+          : { format: { type: "json_object" } },
+      }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(request.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+    });
+  } catch (error) {
+    if (isTimeoutError(error)) {
+      const diagnostics: AiFailureDiagnostics = {
+        provider: "openai",
+        model: config.model,
+        stage: "timeout",
+      };
+
+      logAiFailure(diagnostics);
+      throw new AiRequestError("The model request timed out.", diagnostics);
+    }
+
+    throw error;
+  }
 
   if (!response.ok) {
     const errorPayload: unknown = await response.json().catch(() => null);
@@ -395,11 +479,13 @@ async function callOpenAi(
 
   const payload = (await response.json()) as OpenAiResponsePayload;
   const text = extractOpenAiText(payload);
+  const incomplete = isOpenAiResponseIncomplete(payload);
 
-  if (!text) {
-    // A truncated reasoning response is the usual cause of an empty message.
-    const stage: AiFailureStage =
-      payload.status === "incomplete" ? "incomplete-output" : "empty-output";
+  // Checked before trusting `text`: an incomplete response can still carry a
+  // non-empty, partial JSON fragment, which would otherwise reach the parser
+  // and fail there with a much less useful "malformed JSON" diagnostic.
+  if (!text || incomplete) {
+    const stage: AiFailureStage = incomplete ? "incomplete-output" : "empty-output";
 
     const diagnostics: AiFailureDiagnostics = {
       provider: "openai",
@@ -411,7 +497,9 @@ async function callOpenAi(
 
     logAiFailure(diagnostics);
     throw new AiRequestError(
-      "The model returned an empty response.",
+      incomplete
+        ? "The model response was truncated before it finished."
+        : "The model returned an empty response.",
       diagnostics
     );
   }

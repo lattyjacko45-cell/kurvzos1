@@ -13,6 +13,7 @@ import {
   LogOut,
   Mail,
   Settings,
+  Sunrise,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -54,6 +55,7 @@ const iconMap = {
   FileText,
   HardDrive,
   Mail,
+  Sunrise,
   Users,
   Settings,
 } as const;

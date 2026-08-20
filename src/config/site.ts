@@ -59,6 +59,13 @@ export const navGroups: readonly NavGroup[] = [
     label: "Advisory",
     items: [
       { title: "Executive Team", href: "/executive-team", icon: "Users" },
+      /**
+       * Harper's Morning Brief. Kept beside Executive Team rather than under
+       * Command or Connected Workspace — it is Harper's read of Gmail,
+       * Calendar and KurvzOS priorities together, not a KurvzOS-only view or
+       * a raw integration screen.
+       */
+      { title: "Morning Brief", href: "/morning-brief", icon: "Sunrise" },
     ],
   },
   {

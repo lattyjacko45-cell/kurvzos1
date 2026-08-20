@@ -81,6 +81,17 @@ export default async function HarperPage() {
     <div className="mx-auto w-full max-w-focused space-y-8">
       <ExecutiveHeader id="HARPER" />
 
+      {/* Harper's structured start-of-day read — a separate page from this
+          conversational one, so the two don't compete for the same space. */}
+      <p className="text-sm">
+        <Link
+          href="/morning-brief"
+          className="underline underline-offset-4"
+        >
+          Open this morning&apos;s brief →
+        </Link>
+      </p>
+
       <HarperWorkspace
         initialAdvice={shownAdvice}
         initialSource={shownSource}
