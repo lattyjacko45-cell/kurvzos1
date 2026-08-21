@@ -6,6 +6,8 @@ import {
   getDriveAccessToken,
   listRecentFiles,
 } from "@/lib/drive/client";
+import { DriveNotConfiguredError } from "@/lib/drive/config";
+import { classifyDriveReadFailure } from "@/lib/drive/read-failure";
 import type { DriveFile, DriveReadState } from "@/lib/drive/normalize";
 
 export type { DriveReadState };
@@ -116,35 +118,55 @@ async function readDriveFilesForProfile(
     };
   } catch (error) {
     const status = error instanceof DriveApiError ? error.status : undefined;
-    const reason =
-      error instanceof DriveApiError
-        ? (error.errorCode ?? "request_failed")
-        : "unexpected";
-
-    console.error("[drive] files read failed", {
-      stage: "list_files",
-      status: status ?? null,
-      reason,
-      fileCount: 0,
-    });
 
     /**
-     * 403 counts as "reconnect", not a transient error.
+     * Classification lives in `read-failure.ts` so the expected-vs-unexpected
+     * split — and specifically the "do not log this" decision — is covered
+     * by its own dependency-free tests rather than living only inline here.
      *
-     * A profile that connected before Drive existed in KurvzOS holds a valid
-     * Google grant without the Drive scope, and Google answers that with 403
-     * insufficient permissions — the "authorized, but not for Drive" case.
-     * Sending them to reconnect is the correct outcome.
+     * An unconfigured integration (missing client id/secret, encryption key,
+     * or app URL) and an expired-or-scope-insufficient authorization (401 /
+     * 403, "reconnect required") are both expected states an inbox read can
+     * land in — a workspace with no Drive connection is not a bug. Only a
+     * failure outside those cases is genuinely unexpected and worth a real
+     * `console.error` an operator should see.
      */
-    const needsReconnect = status === 401 || status === 403;
+    const classification = classifyDriveReadFailure({
+      notConfigured: error instanceof DriveNotConfiguredError,
+      isApiError: error instanceof DriveApiError,
+      status,
+      errorCode: error instanceof DriveApiError ? error.errorCode : undefined,
+    });
+
+    if (classification.shouldLog) {
+      console.error("[drive] files read failed", {
+        stage: "list_files",
+        status: status ?? null,
+        reason: classification.reason,
+        fileCount: 0,
+      });
+    }
+
+    if (classification.state === "not_connected") {
+      // Drive is not configured for this deployment — degrade exactly like a
+      // profile with no Drive connection at all, rather than serving a stale
+      // cache that can no longer be refreshed.
+      return {
+        state: "not_connected",
+        files: [],
+        accountEmail: connection.accountEmail,
+        incompleteSearch: false,
+        reason: classification.reason,
+      };
+    }
 
     return {
-      state: needsReconnect ? "reconnect_required" : "error",
+      state: classification.state,
       // Serve a stale page rather than blanking the list on a transient fault.
       files: cached?.files ?? [],
       accountEmail: connection.accountEmail,
       incompleteSearch: cached?.incompleteSearch ?? false,
-      reason,
+      reason: classification.reason,
     };
   }
 }
