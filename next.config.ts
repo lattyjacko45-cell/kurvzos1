@@ -2,6 +2,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Prisma's generated client (and its native query-engine binary,
+  // libquery_engine-rhel-openssl-3.0.x.so.node) lives under a custom output
+  // path (see prisma/schema.prisma's generator block), outside node_modules.
+  // Next's file tracer does not follow the engine binary from that custom
+  // path on its own — it isn't require()'d, Prisma finds it via its own
+  // filesystem lookup at runtime — so without this it gets left out of the
+  // Vercel serverless bundle, producing
+  // "Prisma Client could not locate the Query Engine for runtime
+  // rhel-openssl-3.0.x" at runtime even though the build itself succeeds.
+  outputFileTracingIncludes: {
+    "/*": ["./src/generated/prisma/**/*"],
+  },
   async headers() {
     const securityHeaders = [
       {
