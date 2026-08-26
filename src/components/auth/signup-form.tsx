@@ -211,6 +211,18 @@ export function SignupForm() {
               Sign in
             </Link>
           </p>
+
+          <p className="text-muted-foreground text-center text-xs">
+            By creating an account, you agree to our{" "}
+            <Link href="/terms" className="hover:underline">
+              Terms of Use
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="hover:underline">
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </CardFooter>
       </form>
     </Card>

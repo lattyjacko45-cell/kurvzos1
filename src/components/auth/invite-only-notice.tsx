@@ -49,6 +49,16 @@ export function InviteOnlyNotice() {
           subject={SUPPORT_SUBJECTS.general}
           className="text-center text-sm text-muted-foreground"
         />
+
+        <p className="text-center text-xs text-muted-foreground">
+          <Link href="/privacy" className="hover:underline">
+            Privacy Policy
+          </Link>{" "}
+          ·{" "}
+          <Link href="/terms" className="hover:underline">
+            Terms of Use
+          </Link>
+        </p>
       </CardFooter>
     </Card>
   );

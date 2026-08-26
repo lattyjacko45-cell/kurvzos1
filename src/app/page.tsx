@@ -144,7 +144,7 @@ export default function HomePage() {
         <footer className="flex flex-col gap-4 border-t border-gray-200 py-8 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 KurvzOS. Built for focused execution.</p>
 
-          <div className="flex gap-5">
+          <div className="flex flex-wrap gap-5">
             <a href="#features" className="hover:text-black">
               Features
             </a>
@@ -153,6 +153,12 @@ export default function HomePage() {
             </Link>
             <Link href="/signup" className="hover:text-black">
               Get Started
+            </Link>
+            <Link href="/privacy" className="hover:text-black">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-black">
+              Terms of Use
             </Link>
           </div>
         </footer>
