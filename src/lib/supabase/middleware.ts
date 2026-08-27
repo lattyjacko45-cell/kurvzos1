@@ -2,6 +2,28 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { isLinkFailureNotice } from "@/lib/auth-messages";
+import {
+  AUTH_CHECK_TIMEOUT_MS,
+  classifyRoute,
+  decideMiddlewareAction,
+  getUserWithTimeout,
+  hasSupabaseAuthCookie,
+} from "@/lib/supabase/auth-check";
+
+/**
+ * The auth check did not produce a confirmed authenticated/unauthenticated
+ * answer in time. Identifiers only — never a token, cookie value, or session
+ * payload.
+ */
+function logAuthCheckFallback(
+  status: "timeout" | "error",
+  pathname: string
+): void {
+  console.warn("[middleware] auth check did not complete", {
+    status,
+    pathname,
+  });
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -27,50 +49,28 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
+  const { isAuthRoute, isProtectedRoute } = classifyRoute(pathname);
 
-  /**
-   * Signed-in users are bounced off these.
-   *
-   * `/reset-password` is deliberately absent: a live recovery session IS an
-   * authenticated session, so treating it as an auth route would redirect the
-   * user to the dashboard before they could set a password. It is absent from
-   * the protected list too, so an expired link reaches the page and gets a
-   * real explanation instead of a silent bounce to /login.
-   */
-  const isAuthRoute =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/signup") ||
-    pathname.startsWith("/forgot-password");
+  // No session cookie at all: there is nothing to validate, so a protected
+  // route redirects immediately without ever calling `getUser`.
+  const hasCookie = hasSupabaseAuthCookie(
+    request.cookies.getAll().map((cookie) => cookie.name)
+  );
 
-  /**
-   * Every signed-in surface. `/inbox` and `/drive` were missing — they arrived
-   * with the Gmail and Drive milestones and were never added here, so the
-   * middleware guard did not cover them. Their pages redirect on their own, so
-   * nothing leaked, but the edge guard is the layer that is supposed to catch
-   * this first.
-   */
-  const isProtectedRoute =
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/focus") ||
-    pathname.startsWith("/ceo-packet") ||
-    pathname.startsWith("/feedback") ||
-    pathname.startsWith("/content") ||
-    pathname.startsWith("/executive-team") ||
-    pathname.startsWith("/inbox") ||
-    pathname.startsWith("/drive");
+  // A cookie is present but unconfirmed (timeout or thrown error) is
+  // deliberately NOT treated as authenticated or unauthenticated here — see
+  // `decideMiddlewareAction`. The dashboard layout's own `getCurrentUser()`
+  // call remains the real, revalidated authorization gate.
+  const outcome = hasCookie
+    ? await getUserWithTimeout(
+        () => supabase.auth.getUser(),
+        AUTH_CHECK_TIMEOUT_MS
+      )
+    : null;
 
-  if (!user && isProtectedRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    // Path only — never the query string, which could carry anything.
-    // The login page re-validates this against the app origin regardless.
-    url.searchParams.set("redirect", request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+  if (outcome && outcome.status !== "ok") {
+    logAuthCheckFallback(outcome.status, pathname);
   }
 
   /**
@@ -91,7 +91,24 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.searchParams.get("notice") ??
     undefined;
 
-  if (user && isAuthRoute && !isLinkFailureNotice(noticeParam)) {
+  const action = decideMiddlewareAction({
+    hasCookie,
+    outcome,
+    isAuthRoute,
+    isProtectedRoute,
+    isLinkFailure: isLinkFailureNotice(noticeParam),
+  });
+
+  if (action.type === "redirect-login") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    // Path only — never the query string, which could carry anything.
+    // The login page re-validates this against the app origin regardless.
+    url.searchParams.set("redirect", request.nextUrl.pathname);
+    return NextResponse.redirect(url);
+  }
+
+  if (action.type === "redirect-dashboard") {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     // Drop the auth-page query so it cannot ride along onto the dashboard.
